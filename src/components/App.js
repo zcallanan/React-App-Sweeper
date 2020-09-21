@@ -10,7 +10,8 @@ class App extends React.Component {
     bombPercentage: {
       0: "35%",
       1: "50%",
-      2: "65%"
+      2: "65%",
+      3: "80%"
     },
     squares: {}
   }
@@ -33,9 +34,11 @@ class App extends React.Component {
     // 2. Build squares object
     for (let i = 0; i < size; i++) {
       for (let k = 0; k < size; k++ ) {
-        squares[`r${i}s${k}`] = {
+        squares[`r${i}-s${k}`] = {
           bomb: false,
-          marked: false
+          marked: false,
+          clicked: false,
+          neighbors: 0
         }
       }
     }
@@ -45,9 +48,70 @@ class App extends React.Component {
     setTimeout(() => this.setBombs(), 400);
   }
 
-  onSquareClick = key => {
-
+  onSquareClick = squareKey => {
+    // 1. Copy state
+    const squares = { ...this.state.squares }
+    for (const [key, value] of Object.entries(squares)) {
+      if (squareKey === key && value.bomb) {
+        // 2. Mark square as clicked
+        squares[key]['clicked'] = true;
+        // 3. Save state
+        this.setState({ squares });
+      }
+    }
   }
+
+  countAdjacentBombs = square => {
+    const size = this.state.options.size;
+    const squareRow = square.split("-")[0].match(/\d{1,3}/);
+    const row = parseInt(squareRow[0]);
+    const squarePos = square.split("-")[1].match(/(\d{1,3})/);
+    const s = parseInt(squarePos[0]);
+    const neighbors = [];
+    if (row - 1 >= 0) {
+      // If it's not the first row
+      neighbors.push(`r${row - 1}-s${s}`);
+      if (s - 1 >= 0) {
+      // If it's not the first column
+        neighbors.push(`r${row - 1}-s${s - 1}`);
+      }
+      if (s + 1 !== size) {
+        // If it's not the last column
+        neighbors.push(`r${row - 1}-s${s + 1}`);
+      }
+    }
+    if (s - 1 >= 0) {
+      neighbors.push(`r${row}-s${s - 1}`);
+    }
+    if (s + 1 !== size) {
+      neighbors.push(`r${row}-s${s + 1}`);
+    }
+    if (row + 1 !== size) {
+      // If it's not the last row
+      neighbors.push(`r${row + 1}-s${s}`);
+      if (s - 1 >= 0) {
+        // If it's not the first column
+        neighbors.push(`r${row + 1}-s${s - 1}`);
+      }
+      if (s + 1 !== size) {
+        // If it's not the last column
+        neighbors.push(`r${row + 1}-s${s + 1}`);
+      }
+    }
+    // 1. Copy squares
+    const squares = { ...this.state.squares }
+    // 2. Iterate over neighbord and check for bombs
+    let n = 0;
+    neighbors.forEach(neighbor => {
+      if (squares[neighbor].bomb) {
+        n++;
+      }
+    })
+    // 3. Set state neighbor count
+    squares[square].neighbors = n;
+    this.setState({ squares });
+  }
+
 
   // Recursive function that returns an object with bombCount positions
   generatePositions = (positionArray, squares, bombCount, optionSize, count) => {
@@ -55,12 +119,9 @@ class App extends React.Component {
       // stop recursive call
       return squares;
     }
-    let tempPosition = `r${randomIntFromInterval(0, optionSize - 1)}s${randomIntFromInterval(0, optionSize - 1)}`;
+    let tempPosition = `r${randomIntFromInterval(0, optionSize - 1)}-s${randomIntFromInterval(0, optionSize - 1)}`;
     if (!positionArray.includes(tempPosition)) {
-      squares[tempPosition] = {
-        bomb: true,
-        marked: false
-      }
+      squares[tempPosition]['bomb'] = true;
       positionArray.push(tempPosition);
       count++;
     }
@@ -87,6 +148,8 @@ class App extends React.Component {
     this.generatePositions(positionArray, squares, bombCount, options.size, 0);
     // Save bomb positions
     this.setState({squares});
+    // Determine adjacent bomb count
+    setTimeout(() => Object.keys(squares).map(key => this.countAdjacentBombs(key)), 400);
   }
 
   render() {
@@ -95,6 +158,7 @@ class App extends React.Component {
       rows.push(<Row
         key={`r${i}`}
         row={`r${i}`}
+        squares = {this.state.squares}
         total={this.state.options.size}
         onSquareClick={this.onSquareClick}
       />)
