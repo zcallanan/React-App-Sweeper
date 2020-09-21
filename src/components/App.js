@@ -12,10 +12,10 @@ class App extends React.Component {
       1: "50%",
       2: "65%"
     },
-    bombPositions: {}
+    squares: {}
   }
 
-  // Save Player's game board size entry
+  // Save Player's game board options
   saveOptions = (count, difficulty) => {
     // 1. Copy state
     const options = this.state.options;
@@ -26,25 +26,46 @@ class App extends React.Component {
     this.setState({ options });
   }
 
+  // Generate initial squares state
+  initSquares = size => {
+    // 1. Copy state
+    const squares = {...this.state.squares};
+    // 2. Build squares object
+    for (let i = 0; i < size; i++) {
+      for (let k = 0; k < size; k++ ) {
+        squares[`r${i}s${k}`] = {
+          bomb: false,
+          marked: false
+        }
+      }
+    }
+    // 3. SetState
+    this.setState({ squares })
+    // 4. Determine what squares have bombs
+    setTimeout(() => this.setBombs(), 400);
+  }
+
   onSquareClick = key => {
 
   }
 
   // Recursive function that returns an object with bombCount positions
-  generatePositions = (positionArray, bombPositions, bombCount, optionSize, count) => {
+  generatePositions = (positionArray, squares, bombCount, optionSize, count) => {
     if (count > bombCount - 1) {
       // stop recursive call
-      return bombPositions;
+      return squares;
     }
-    console.log(bombPositions[count])
     let tempPosition = `r${randomIntFromInterval(0, optionSize - 1)}s${randomIntFromInterval(0, optionSize - 1)}`;
     if (!positionArray.includes(tempPosition)) {
-
-      bombPositions[count] = { square: tempPosition, marked: false }
+      squares[tempPosition] = {
+        bomb: true,
+        marked: false
+      }
       positionArray.push(tempPosition);
       count++;
     }
-    this.generatePositions(positionArray, bombPositions, bombCount, optionSize, count)
+    // If position was a dupe, count remains the same, otherwise a new bomb's position is generated
+    this.generatePositions(positionArray, squares, bombCount, optionSize, count)
   }
 
   // Use user input to call bomb position fn and save positions to state
@@ -53,6 +74,7 @@ class App extends React.Component {
     let positionArray = []
     // Copy game board dimension
     const options = {...this.state.options};
+    const squares = {...this.state.squares};
     // Get percentage of bombs
     for (const [key, value] of Object.entries(this.state.bombPercentage)) {
       if (parseInt(key) === options.difficulty) {
@@ -61,11 +83,10 @@ class App extends React.Component {
     }
     // Calculate number of bombs
     const bombCount = (options.size ** 2) * percentage;
-    let bombPositions = {};
     // Generate bomb positions
-    this.generatePositions(positionArray, bombPositions, bombCount, options.size, 0)
+    this.generatePositions(positionArray, squares, bombCount, options.size, 0);
     // Save bomb positions
-    this.setState({bombPositions});
+    this.setState({squares});
   }
 
   render() {
@@ -81,7 +102,12 @@ class App extends React.Component {
 
     return (
       <div className="game-board">
-        <Form saveOptions={this.saveOptions} setBombs={this.setBombs} />
+        <Form
+          saveOptions={this.saveOptions}
+          initSquares={this.initSquares}
+          setBombs={this.setBombs}
+          percentages={this.state.bombPercentage}
+        />
         {rows}
       </div>
     )
