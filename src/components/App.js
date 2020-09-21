@@ -8,10 +8,10 @@ class App extends React.Component {
   state = {
     options: {},
     bombPercentage: {
-      0: "35%",
-      1: "50%",
-      2: "65%",
-      3: "80%"
+      0: "25%",
+      1: "40%",
+      2: "55%",
+      3: "70%"
     },
     squares: {}
   }
@@ -51,14 +51,10 @@ class App extends React.Component {
   onSquareClick = squareKey => {
     // 1. Copy state
     const squares = { ...this.state.squares }
-    for (const [key, value] of Object.entries(squares)) {
-      if (squareKey === key && value.bomb) {
-        // 2. Mark square as clicked
-        squares[key]['clicked'] = true;
-        // 3. Save state
-        this.setState({ squares });
-      }
-    }
+    // 2. Update square
+    squares[squareKey]['clicked'] = true;
+    // 3. Save state
+    this.setState({ squares });
   }
 
   countAdjacentBombs = square => {
