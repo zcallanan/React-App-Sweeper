@@ -15,16 +15,12 @@ class Form extends React.Component {
     const difficulty = this.difficultyRef.current.value
     // 3. Save value
     this.props.saveOptions(count, difficulty);
-    this.props.setBombs();
+    // 4. Determine positioning of bombs
+    this.props.initSquares(count);
   }
 
   render() {
-    const difficulty = {
-      0: "35%",
-      1: "50%",
-      2: "65%"
-    }
-
+    const percentages = this.props.percentages;
     return (
       <div className="form">
         <form onSubmit={this.handleClick}>
@@ -47,7 +43,7 @@ class Form extends React.Component {
                 ref={this.difficultyRef}
                 defaultValue="1"
               >
-                {Object.keys(difficulty).map(key => <option key={key} value={key}>{difficulty[key]}</option>)}
+                {Object.keys(percentages).map(key => <option key={key} value={key}>{percentages[key]}</option>)}
               </select>
             </div>
             <button type="submit">Create Board</button>
