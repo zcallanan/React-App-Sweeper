@@ -15,6 +15,7 @@ class Form extends React.Component {
     const difficulty = this.difficultyRef.current.value
     // 3. Save value
     this.props.saveOptions(count, difficulty);
+    this.props.setBombs();
   }
 
   render() {
