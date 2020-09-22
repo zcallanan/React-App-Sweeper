@@ -23,6 +23,24 @@ class App extends React.Component {
     flag: false
   }
 
+  componentDidMount() {
+    let options = { ...this.state.options };
+    // Read options from local storage
+    const localStorageRef = localStorage.getItem("options");
+    if (localStorageRef) {
+      console.log('hi')
+      options = JSON.parse(localStorageRef);
+    } else {
+      console.log('no')
+      // No local storage
+      options["size"] = 10;
+      options["difficulty"] = 2;
+    }
+    console.log(options)
+    this.setState({ options });
+    this.initSquares(options.size);
+  }
+
   // Save Player's game board options
   saveOptions = (count, difficulty) => {
     // 1. Copy state
@@ -32,6 +50,8 @@ class App extends React.Component {
     options["difficulty"] = parseInt(difficulty);
     // 3. SetState
     this.setState({ options });
+    // 4. Save options to local storage
+    localStorage.setItem("options", JSON.stringify(options));
   }
 
   onFlagClick = e => {
@@ -213,6 +233,7 @@ class App extends React.Component {
     return (
       <div className="game-board">
         <Form
+          options={this.state.options}
           saveOptions={this.saveOptions}
           initSquares={this.initSquares}
           setBombs={this.setBombs}

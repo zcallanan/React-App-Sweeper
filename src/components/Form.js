@@ -21,9 +21,10 @@ class Form extends React.Component {
 
   render() {
     const percentages = this.props.percentages;
+    console.log(this.props.options.size)
     return (
       <div className="form">
-        <form onSubmit={this.handleClick}>
+        <form key={this.props.options.size} onSubmit={this.handleClick}>
           <div className="form-fields">
             <div>
               <label htmlFor="size">Enter the number of squares to add to the game board:</label>
@@ -32,7 +33,7 @@ class Form extends React.Component {
                 id="size"
                 ref={this.sizeRef}
                 required
-                defaultValue="10"
+                defaultValue={this.props.options.size}
               />
             </div>
             <div>
@@ -41,7 +42,7 @@ class Form extends React.Component {
                 name="difficulty"
                 id="difficulty"
                 ref={this.difficultyRef}
-                defaultValue="2"
+                defaultValue={this.props.options.difficulty}
               >
                 {Object.keys(percentages).map(key => <option key={key} value={key}>{percentages[key]}</option>)}
               </select>
