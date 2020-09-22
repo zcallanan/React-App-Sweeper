@@ -221,6 +221,7 @@ class App extends React.Component {
       rows.push(<Row
         key={`r${i}`}
         row={`r${i}`}
+        flag={this.state.flag}
         squares = {this.state.squares}
         total={this.state.options.size}
         onSquareClick={this.onSquareClick}

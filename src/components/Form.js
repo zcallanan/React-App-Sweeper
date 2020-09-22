@@ -21,7 +21,6 @@ class Form extends React.Component {
 
   render() {
     const percentages = this.props.percentages;
-    console.log(this.props.options.size)
     return (
       <div className="form">
         <form key={this.props.options.size} onSubmit={this.handleClick}>

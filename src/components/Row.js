@@ -8,6 +8,7 @@ class Row extends React.Component {
       row.push(<Square
         key={`${this.props.row}-s${i}`}
         square={`${this.props.row}-s${i}`}
+        flag={this.props.flag}
         squareState={this.props.squares[`${this.props.row}-s${i}`]}
         onSquareClick={this.props.onSquareClick}
       />)
