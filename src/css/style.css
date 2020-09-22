@@ -1,6 +1,7 @@
 .square {
   background: #fff;
-  border: 1px solid #999;
+  border: 2px solid rgb(221,216,212);
+  box-sizing: border-box;
   float: left;
   font-size: 24px;
   font-weight: bold;
@@ -11,7 +12,17 @@
   padding: 2px;
   text-align: center;
   width: 40px;
-  display: table-cell;
+  transition: all 0.3s ease-in-out;
+}
+
+.square:not([disabled]):hover{
+  transition: all 0.3s ease-in-out;
+  background-color: rgb(220,220,220);
+  transform: translate(10%, 10%);
+}
+
+.square:focus{
+  outline: none;
 }
 
 .game-board {
@@ -28,9 +39,63 @@
   flex-direction: column;
 }
 
-.bomb-image {
+.image {
   width: 100%;
   height: 100%;
   object-fit: cover;
   overflow: hidden;
+}
+
+.neighbors-1 {
+  color: rgb(34,66,252);
+  margin-block-start: 0px;
+  margin-block-end: 0px;
+}
+
+.neighbors-1 {
+  color: rgb(34,66,252);
+  margin-block-start: 0px;
+  margin-block-end: 0px;
+}
+
+.neighbors-2 {
+  color: rgb(65,120,29);
+  margin-block-start: 0px;
+  margin-block-end: 0px;
+}
+
+.neighbors-3 {
+  color: rgb(216,68,33);
+  margin-block-start: 0px;
+  margin-block-end: 0px;
+}
+
+.neighbors-4 {
+  color: rgb(10,26,133);
+  margin-block-start: 0px;
+  margin-block-end: 0px;
+}
+
+.neighbors-5 {
+  color: rgb(101,17,9);
+  margin-block-start: 0px;
+  margin-block-end: 0px;
+}
+
+.neighbors-6 {
+  color: rgb(65,120,29);
+  margin-block-start: 0px;
+  margin-block-end: 0px;
+}
+
+.neighbors-7 {
+  color: rgb(65,120,29);
+  margin-block-start: 0px;
+  margin-block-end: 0px;
+}
+
+.neighbors-8 {
+  color: rgb(162,162,162);
+  margin-block-start: 0px;
+  margin-block-end: 0px;
 }

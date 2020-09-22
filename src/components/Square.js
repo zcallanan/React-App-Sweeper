@@ -3,27 +3,56 @@ import React from 'react';
 class Square extends React.Component {
 
   renderSquare = () => {
-    const neighbors = this.props.squareState.neighbors;
-    const bomb = this.props.squareState.bomb;
-    const clicked = this.props.squareState.clicked
+    const squareState = this.props.squareState;
+    const adjacentBombCount = squareState.adjacentBombCount;
+    const bomb = squareState.bomb;
+    const clicked = squareState.clicked;
+    const hint = squareState.hint;
+    const marked = squareState.marked;
     if (bomb && clicked) {
+      // If it's a bomb and clicked, show the bomb
       return (
         <div >
-          <img className="bomb-image" src="/images/bomb.png" alt="bomb"/>
+          <img className="image" src="/images/bomb.png" alt="B"/>
         </div>)
-    } else if (!bomb && neighbors > 0 && clicked){
+    } else if (marked && !clicked) {
       return (
-        <span className={`${neighbors}-neighbors`}>{neighbors}</span>
+        <img className="image" src="/images/flag.png" alt="F"/>
       )
+    } else if (hint && !clicked) {
+      // If it has an adjacent bomb, has not been clicked, hint is true, show the hint
+      return (
+        <p className={`neighbors-${adjacentBombCount}`}>{adjacentBombCount}</p>
+      )
+    } else if (!bomb && clicked) {
+      // Not a bomb, has been clicked
+      return;
     }
-    return "?"
+    return "?";
+  }
+
+  generateButton = () => {
+    // Disable the button if it's been clicked
+    if (this.props.squareState.clicked) {
+      return (
+        <button className="square" disabled>
+          {this.renderSquare()}
+        </button>
+      );
+    }
+    // Return initial functional button
+    return (
+      <button className="square" onClick={(e) => { this.props.onSquareClick(this.props.square, e)}}>
+        {this.renderSquare()}
+      </button>
+    );
   }
 
   render() {
     return (
-      <button className="square" onClick={() => this.props.onSquareClick(this.props.square)}>
-        {this.renderSquare()}
-      </button>
+      <div>
+        {this.generateButton()}
+      </div>
     );
   }
 
