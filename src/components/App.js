@@ -1,12 +1,16 @@
 import React from 'react';
 import Form from './Form';
 import Row from './Row';
-import { randomIntFromInterval } from '../helpers'
+import Flag from './Flag';
+import { randomIntFromInterval } from '../helpers';
 
 class App extends React.Component {
   // Initialize state
   state = {
-    options: {},
+    options: {
+      size: 0,
+      difficulty: 0
+    },
     bombPercentage: {
       0: "10%",
       1: "20%",
@@ -15,7 +19,8 @@ class App extends React.Component {
       4: "60%",
       5: "75%"
     },
-    squares: {}
+    squares: {},
+    flag: false
   }
 
   // Save Player's game board options
@@ -27,6 +32,16 @@ class App extends React.Component {
     options["difficulty"] = parseInt(difficulty);
     // 3. SetState
     this.setState({ options });
+  }
+
+  onFlagClick = e => {
+    e.preventDefault();
+    // 1. Get state of flag
+    let flag = this.state.flag;
+    // 2. Change flag setting
+    flag = !flag;
+    // 3. Save change
+    this.setState({ flag })
   }
 
   // Generate initial squares state
@@ -52,15 +67,41 @@ class App extends React.Component {
     setTimeout(() => this.setBombs(), 400);
   }
 
-  onSquareClick = squareKey => {
+  checkNeighbors = (squareKey, squares) => {
+    squares[squareKey]['neighbors'].forEach(neighbor => {
+      if (squares[neighbor]['adjacentBombCount'] > 0 && !squares[neighbor]['clicked'] && !squares[neighbor]['hint']) {
+        // If a neighbor has an adjacent bomb, hasn't been clicked or had its hint revealed, then reveal its hint
+        squares[neighbor]['hint'] = true;
+      } else if (squares[neighbor]['adjacentBombCount'] === 0 && !squares[neighbor]['bomb'] && !squares[neighbor]['clicked'] && !squares[neighbor]['hint']) {
+        // If a neighbor has no adjacent bombs, isn't a bomb, has no revealed hint or been clicked, then mark as clicked and check its neighbors
+        squares[neighbor]['clicked'] = true;
+        this.checkNeighbors(neighbor, squares);
+      }
+    })
+    return;
+  }
+
+  onSquareClick = (squareKey, e) => {
     // 1. Copy state
     const squares = { ...this.state.squares };
+    const flag = this.state.flag;
     // 2. Update square
-    squares[squareKey]['clicked'] = true;
-    // If squares[squareKey]['adjacentBombCount'] === 0 && !squares[squareKey]['bomb']
-      // Then iterate through all of its neighbors to check if
-        // a. Those have no adjacentBombCount, if so, check all its neighbors and so on (recursively)
-        // b. If neighbor has an adjacentBombCount, then set hint to true
+    if (flag) {
+      // If marking a flag is active, then mark only that square and then save to state
+      squares[squareKey]['marked'] = !squares[squareKey]['marked'];
+    } else {
+      // If not marking a flag, then mark as clicked and evaluate
+      squares[squareKey]['clicked'] = true;
+      // e.currentTarget.setAttribute("disabled", "")
+      if (squares[squareKey]['adjacentBombCount'] > 0 && !squares[squareKey]['bomb']) {
+        // Click on a square with an adjacent bomb, reveal its hint
+        squares[squareKey]['hint'] = true;
+      }
+      if (!squares[squareKey]['bomb']) {
+        // Check neighbors to determine whether to click them or show their hint. Those with hints CAN be bombs
+        this.checkNeighbors(squareKey, squares);
+      }
+    }
     // 3. Save state
     this.setState({ squares });
   }
@@ -178,6 +219,7 @@ class App extends React.Component {
           percentages={this.state.bombPercentage}
         />
         {rows}
+        <Flag onFlagClick={this.onFlagClick}/>
       </div>
     )
   }
