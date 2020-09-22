@@ -1,6 +1,6 @@
 .square {
-  background: #fff;
-  border: 2px solid rgb(221,216,212);
+  background-color: rgb(235,235,235);
+  border: 2px solid rgb(180,180,180);
   box-sizing: border-box;
   float: left;
   font-size: 24px;
@@ -15,14 +15,46 @@
   transition: all 0.3s ease-in-out;
 }
 
-.square:not([disabled]):hover{
+p {
+  margin-block-start: 0px;
+  margin-block-end: 0px;
+}
+
+.square:not([disabled]):hover {
   transition: all 0.3s ease-in-out;
-  background-color: rgb(220,220,220);
+  background-color: rgb(200,200,200);
   transform: translate(10%, 10%);
+}
+
+.square:not([disabled]).flag:hover {
+  transition: all 0.3s ease-in-out;
+  background-color: rgb(220,190,220);
+  transform: translate(10%, 10%);
+}
+
+.square:not([disabled]).flag span:hover p {
+  display: none;
+}
+
+.square:not([disabled]).flag span:hover .flag-icon {
+  display: inline;
+}
+
+.flag-icon {
+  display: none;
+}
+
+.square:disabled {
+  background-color: rgb(245,245,245)
 }
 
 .square:focus{
   outline: none;
+}
+
+.fa-flag {
+  font-size: 26px;
+  color: rgba(20,30,40, .5);
 }
 
 .game-board {
@@ -48,54 +80,36 @@
 
 .neighbors-1 {
   color: rgb(34,66,252);
-  margin-block-start: 0px;
-  margin-block-end: 0px;
 }
 
 .neighbors-1 {
   color: rgb(34,66,252);
-  margin-block-start: 0px;
-  margin-block-end: 0px;
 }
 
 .neighbors-2 {
   color: rgb(65,120,29);
-  margin-block-start: 0px;
-  margin-block-end: 0px;
 }
 
 .neighbors-3 {
   color: rgb(216,68,33);
-  margin-block-start: 0px;
-  margin-block-end: 0px;
 }
 
 .neighbors-4 {
   color: rgb(10,26,133);
-  margin-block-start: 0px;
-  margin-block-end: 0px;
 }
 
 .neighbors-5 {
   color: rgb(101,17,9);
-  margin-block-start: 0px;
-  margin-block-end: 0px;
 }
 
 .neighbors-6 {
   color: rgb(65,120,29);
-  margin-block-start: 0px;
-  margin-block-end: 0px;
 }
 
 .neighbors-7 {
   color: rgb(65,120,29);
-  margin-block-start: 0px;
-  margin-block-end: 0px;
 }
 
 .neighbors-8 {
   color: rgb(162,162,162);
-  margin-block-start: 0px;
-  margin-block-end: 0px;
 }

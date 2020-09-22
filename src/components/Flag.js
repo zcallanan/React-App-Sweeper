@@ -8,10 +8,8 @@ class Flag extends React.Component {
           <button>Flag Square</button>
         </form>
       </div>
-
     )
   }
-
 }
 
 export default Flag;
