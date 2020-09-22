@@ -28,15 +28,12 @@ class App extends React.Component {
     // Read options from local storage
     const localStorageRef = localStorage.getItem("options");
     if (localStorageRef) {
-      console.log('hi')
       options = JSON.parse(localStorageRef);
     } else {
-      console.log('no')
       // No local storage
       options["size"] = 10;
       options["difficulty"] = 2;
     }
-    console.log(options)
     this.setState({ options });
     this.initSquares(options.size);
   }
