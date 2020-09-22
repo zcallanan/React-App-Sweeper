@@ -41,7 +41,7 @@ class Form extends React.Component {
                 name="difficulty"
                 id="difficulty"
                 ref={this.difficultyRef}
-                defaultValue="1"
+                defaultValue="2"
               >
                 {Object.keys(percentages).map(key => <option key={key} value={key}>{percentages[key]}</option>)}
               </select>

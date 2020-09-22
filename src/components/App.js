@@ -8,10 +8,12 @@ class App extends React.Component {
   state = {
     options: {},
     bombPercentage: {
-      0: "25%",
-      1: "40%",
-      2: "55%",
-      3: "70%"
+      0: "10%",
+      1: "20%",
+      2: "30%",
+      3: "45%",
+      4: "60%",
+      5: "75%"
     },
     squares: {}
   }
@@ -38,21 +40,27 @@ class App extends React.Component {
           bomb: false,
           marked: false,
           clicked: false,
-          neighbors: 0
+          hint: false,
+          neighbors: [],
+          adjacentBombCount: 0
         }
       }
     }
     // 3. SetState
-    this.setState({ squares })
+    this.setState({ squares });
     // 4. Determine what squares have bombs
     setTimeout(() => this.setBombs(), 400);
   }
 
   onSquareClick = squareKey => {
     // 1. Copy state
-    const squares = { ...this.state.squares }
+    const squares = { ...this.state.squares };
     // 2. Update square
     squares[squareKey]['clicked'] = true;
+    // If squares[squareKey]['adjacentBombCount'] === 0 && !squares[squareKey]['bomb']
+      // Then iterate through all of its neighbors to check if
+        // a. Those have no adjacentBombCount, if so, check all its neighbors and so on (recursively)
+        // b. If neighbor has an adjacentBombCount, then set hint to true
     // 3. Save state
     this.setState({ squares });
   }
@@ -96,15 +104,16 @@ class App extends React.Component {
     }
     // 1. Copy squares
     const squares = { ...this.state.squares }
-    // 2. Iterate over neighbord and check for bombs
-    let n = 0;
+    // 2. Iterate over neighbor and check for bombs
+    let adjacentBombCount = 0;
     neighbors.forEach(neighbor => {
       if (squares[neighbor].bomb) {
-        n++;
+        adjacentBombCount++;
       }
     })
     // 3. Set state neighbor count
-    squares[square].neighbors = n;
+    squares[square].neighbors = neighbors;
+    squares[square].adjacentBombCount = adjacentBombCount;
     this.setState({ squares });
   }
 

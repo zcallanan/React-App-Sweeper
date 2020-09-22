@@ -3,18 +3,22 @@ import React from 'react';
 class Square extends React.Component {
 
   renderSquare = () => {
-    const neighbors = this.props.squareState.neighbors;
-    const bomb = this.props.squareState.bomb;
-    const clicked = this.props.squareState.clicked
+    const squareState = this.props.squareState;
+    const adjacentBombCount = squareState.adjacentBombCount;
+    const bomb = squareState.bomb;
+    const clicked = squareState.clicked;
+    const hint = squareState.hint;
     if (bomb && clicked) {
       return (
         <div >
           <img className="bomb-image" src="/images/bomb.png" alt="bomb"/>
         </div>)
-    } else if (!bomb && neighbors > 0 && clicked){
+    } else if (!bomb && adjacentBombCount > 0 && (hint || clicked)) {
       return (
-        <span className={`${neighbors}-neighbors`}>{neighbors}</span>
+        <span className={`${adjacentBombCount}-neighbors`}>{adjacentBombCount}</span>
       )
+    } else if (!bomb && adjacentBombCount === 0 && clicked) {
+      return;
     }
     return "?"
   }
