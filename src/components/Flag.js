@@ -1,15 +1,16 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
-class Flag extends React.Component {
-  render() {
-    return (
-      <div>
-        <form onSubmit={this.props.onFlagClick}>
-          <button>Flag Square</button>
-        </form>
-      </div>
-    )
-  }
+const Flag = props => (
+  <div>
+    <form onSubmit={props.onFlagClick}>
+      <button>Flag Square</button>
+    </form>
+  </div>
+)
+
+Flag.propTypes = {
+  onFlagClick: PropTypes.func.isRequired
 }
 
 export default Flag;

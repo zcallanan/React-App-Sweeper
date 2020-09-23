@@ -98,7 +98,7 @@ class App extends React.Component {
     return;
   }
 
-  onSquareClick = (squareKey, e) => {
+  onSquareClick = squareKey => {
     // 1. Copy state
     const squares = { ...this.state.squares };
     const flag = this.state.flag;
@@ -109,7 +109,6 @@ class App extends React.Component {
     } else {
       // If not marking a flag, then mark as clicked and evaluate
       squares[squareKey]['clicked'] = true;
-      // e.currentTarget.setAttribute("disabled", "")
       if (squares[squareKey]['adjacentBombCount'] > 0 && !squares[squareKey]['bomb']) {
         // Click on a square with an adjacent bomb, reveal its hint
         squares[squareKey]['hint'] = true;
@@ -223,7 +222,7 @@ class App extends React.Component {
         row={`r${i}`}
         flag={this.state.flag}
         squares = {this.state.squares}
-        total={this.state.options.size}
+        size={this.state.options.size}
         onSquareClick={this.onSquareClick}
       />)
     }

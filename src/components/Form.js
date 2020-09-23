@@ -2,6 +2,15 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 class Form extends React.Component {
+  static propTypes = {
+    saveOptions: PropTypes.func.isRequired,
+    initSquares: PropTypes.func.isRequired,
+    percentages: PropTypes.object.isRequired,
+    options: PropTypes.shape({
+      size: PropTypes.number.isRequired,
+      difficulty: PropTypes.number.isRequired
+    })
+  }
   sizeRef = React.createRef();
   difficultyRef = React.createRef();
 
