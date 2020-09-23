@@ -65,12 +65,18 @@ class App extends React.Component {
   initSquares = size => {
     // 1. Copy state
     let squares = {...this.state.squares};
-    // if (Object.keys(squares).length !== 0) {
-    //   Object.keys(squares).forEach(square => delete squares[square])
-    //   this.setState({ squares });
-    // }
-    // squares = {...this.state.squares};
-    // console.log("squares", squares)
+    // If size decreases, then size keys should be deleted before the board is regenerated
+    let row;
+    let column;
+    Object.keys(squares).map(square => {
+      row = parseInt(square.split("-")[0].match(/\d{1,3}/)[0]);
+      column = parseInt(square.split("-")[1].match(/(\d{1,3})/)[0]);
+      if (row > this.state.options.size - 1 || column > this.state.options.size - 1) {
+        // Check to see if squares has any rows or columns greater than the board size - 1
+        delete squares[square];
+      }
+      return squares;
+    })
     // 2. Build squares object
     for (let i = 0; i < size; i++) {
       for (let k = 0; k < size; k++ ) {
@@ -167,7 +173,6 @@ class App extends React.Component {
     }
     // 1. Copy squares
     const squares = { ...this.state.squares }
-    console.log(this.state.options.size, squares)
     // 2. Iterate over neighbor and check for bombs
     let adjacentBombCount = 0;
     neighbors.forEach(neighbor => {
@@ -217,6 +222,7 @@ class App extends React.Component {
     this.generatePositions(positionArray, squares, bombCount, options.size, 0);
     // Save bomb positions
     this.setState({squares});
+    console.log("setBombs", squares)
     // Determine adjacent bomb count
     Object.keys(squares).map(key => this.countAdjacentBombs(key))
     //setTimeout(() => Object.keys(squares).map(key => this.countAdjacentBombs(key)), 400);
