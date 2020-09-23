@@ -65,7 +65,7 @@ class App extends React.Component {
   initSquares = size => {
     // 1. Copy state
     let squares = {...this.state.squares};
-    // If size decreases, then size keys should be deleted before the board is regenerated
+    // If size decreases, then square keys should be deleted before the board is regenerated
     let row;
     let column;
     Object.keys(squares).map(square => {
