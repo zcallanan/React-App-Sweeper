@@ -64,7 +64,13 @@ class App extends React.Component {
   // Generate initial squares state
   initSquares = size => {
     // 1. Copy state
-    const squares = {...this.state.squares};
+    let squares = {...this.state.squares};
+    // if (Object.keys(squares).length !== 0) {
+    //   Object.keys(squares).forEach(square => delete squares[square])
+    //   this.setState({ squares });
+    // }
+    // squares = {...this.state.squares};
+    // console.log("squares", squares)
     // 2. Build squares object
     for (let i = 0; i < size; i++) {
       for (let k = 0; k < size; k++ ) {
@@ -81,7 +87,7 @@ class App extends React.Component {
     // 3. SetState
     this.setState({ squares });
     // 4. Determine what squares have bombs
-    setTimeout(() => this.setBombs(), 400);
+    setTimeout(() => this.setBombs(), 200);
   }
 
   checkNeighbors = (squareKey, squares) => {
@@ -98,7 +104,7 @@ class App extends React.Component {
     return;
   }
 
-  onSquareClick = (squareKey, e) => {
+  onSquareClick = squareKey => {
     // 1. Copy state
     const squares = { ...this.state.squares };
     const flag = this.state.flag;
@@ -109,7 +115,6 @@ class App extends React.Component {
     } else {
       // If not marking a flag, then mark as clicked and evaluate
       squares[squareKey]['clicked'] = true;
-      // e.currentTarget.setAttribute("disabled", "")
       if (squares[squareKey]['adjacentBombCount'] > 0 && !squares[squareKey]['bomb']) {
         // Click on a square with an adjacent bomb, reveal its hint
         squares[squareKey]['hint'] = true;
@@ -162,6 +167,7 @@ class App extends React.Component {
     }
     // 1. Copy squares
     const squares = { ...this.state.squares }
+    console.log(this.state.options.size, squares)
     // 2. Iterate over neighbor and check for bombs
     let adjacentBombCount = 0;
     neighbors.forEach(neighbor => {
@@ -212,7 +218,8 @@ class App extends React.Component {
     // Save bomb positions
     this.setState({squares});
     // Determine adjacent bomb count
-    setTimeout(() => Object.keys(squares).map(key => this.countAdjacentBombs(key)), 400);
+    Object.keys(squares).map(key => this.countAdjacentBombs(key))
+    //setTimeout(() => Object.keys(squares).map(key => this.countAdjacentBombs(key)), 400);
   }
 
   render() {
@@ -223,7 +230,7 @@ class App extends React.Component {
         row={`r${i}`}
         flag={this.state.flag}
         squares = {this.state.squares}
-        total={this.state.options.size}
+        size={this.state.options.size}
         onSquareClick={this.onSquareClick}
       />)
     }
@@ -238,7 +245,7 @@ class App extends React.Component {
           percentages={this.state.bombPercentage}
         />
         {rows}
-        <Flag onFlagClick={this.onFlagClick}/>
+        <Flag onFlagClick={this.onFlagClick} flag={this.state.flag}/>
       </div>
     )
   }

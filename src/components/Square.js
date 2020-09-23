@@ -1,17 +1,30 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faFlag } from '@fortawesome/free-solid-svg-icons'
 import { faFlag as farFlag } from '@fortawesome/free-regular-svg-icons'
 
 class Square extends React.Component {
+  static propTypes = {
+    squares: PropTypes.shape({
+      adjacentBombCount: PropTypes.number.isRequired,
+      bomb: PropTypes.bool.isRequired,
+      clicked: PropTypes.bool.isRequired,
+      hint: PropTypes.bool.isRequired,
+      marked: PropTypes.bool.isRequired
+    }),
+    onSquareClick: PropTypes.func.isRequired,
+    flag: PropTypes.bool.isRequired,
+    square: PropTypes.string.isRequired
+  }
 
   renderSquare = () => {
-    const squareState = this.props.squareState;
-    const adjacentBombCount = squareState.adjacentBombCount;
-    const bomb = squareState.bomb;
-    const clicked = squareState.clicked;
-    const hint = squareState.hint;
-    const marked = squareState.marked;
+    const squares = this.props.squares;
+    const adjacentBombCount = squares.adjacentBombCount;
+    const bomb = squares.bomb;
+    const clicked = squares.clicked;
+    const hint = squares.hint;
+    const marked = squares.marked;
     if (bomb && clicked) {
       // If it's a bomb and clicked, show the bomb
       return (
@@ -42,13 +55,15 @@ class Square extends React.Component {
         <p>?</p>
         <FontAwesomeIcon className="flag-icon" icon={ farFlag } />
       </span>
-
     );
   }
 
   generateButton = () => {
+    const squares = this.props.squares;
+    const square = this.props.square;
+
     // Disable the button if it's been clicked
-    if (this.props.squareState.clicked) {
+    if (squares.clicked) {
       return (
         <button className="square" disabled>
           {this.renderSquare()}
@@ -56,14 +71,14 @@ class Square extends React.Component {
       );
     } else if (this.props.flag) {
       return (
-        <button className="square flag" onClick={(e) => { this.props.onSquareClick(this.props.square, e)}}>
+        <button className="square flag" onClick={() => { this.props.onSquareClick(square)}}>
           {this.renderSquare()}
         </button>
       );
     }
     // Return initial functional button
     return (
-      <button className="square" onClick={(e) => { this.props.onSquareClick(this.props.square, e)}}>
+      <button className="square" onClick={() => { this.props.onSquareClick(square)}}>
         {this.renderSquare()}
       </button>
     );

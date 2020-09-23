@@ -44,6 +44,14 @@ p {
   display: none;
 }
 
+.flag-button, .flag-button-active {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 8%;
+  font-size: 16px;
+}
+
 .square:disabled {
   background-color: rgb(245,245,245)
 }
