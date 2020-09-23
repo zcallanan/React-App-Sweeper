@@ -222,7 +222,6 @@ class App extends React.Component {
     this.generatePositions(positionArray, squares, bombCount, options.size, 0);
     // Save bomb positions
     this.setState({squares});
-    console.log("setBombs", squares)
     // Determine adjacent bomb count
     Object.keys(squares).map(key => this.countAdjacentBombs(key))
     //setTimeout(() => Object.keys(squares).map(key => this.countAdjacentBombs(key)), 400);
