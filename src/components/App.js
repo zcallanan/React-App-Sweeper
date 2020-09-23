@@ -136,39 +136,37 @@ class App extends React.Component {
 
   countAdjacentBombs = square => {
     const size = this.state.options.size;
-    const squareRow = square.split("-")[0].match(/\d{1,3}/);
-    const row = parseInt(squareRow[0]);
-    const squarePos = square.split("-")[1].match(/(\d{1,3})/);
-    const s = parseInt(squarePos[0]);
+    const row = parseInt(square.split("-")[0].match(/\d{1,3}/)[0]);
+    const column = parseInt(square.split("-")[1].match(/(\d{1,3})/)[0]);
     const neighbors = [];
     if (row - 1 >= 0) {
       // If it's not the first row
-      neighbors.push(`r${row - 1}-s${s}`);
-      if (s - 1 >= 0) {
+      neighbors.push(`r${row - 1}-s${column}`);
+      if (column - 1 >= 0) {
       // If it's not the first column
-        neighbors.push(`r${row - 1}-s${s - 1}`);
+        neighbors.push(`r${row - 1}-s${column - 1}`);
       }
-      if (s + 1 !== size) {
+      if (column + 1 !== size) {
         // If it's not the last column
-        neighbors.push(`r${row - 1}-s${s + 1}`);
+        neighbors.push(`r${row - 1}-s${column + 1}`);
       }
     }
-    if (s - 1 >= 0) {
-      neighbors.push(`r${row}-s${s - 1}`);
+    if (column - 1 >= 0) {
+      neighbors.push(`r${row}-s${column - 1}`);
     }
-    if (s + 1 !== size) {
-      neighbors.push(`r${row}-s${s + 1}`);
+    if (column + 1 !== size) {
+      neighbors.push(`r${row}-s${column + 1}`);
     }
     if (row + 1 !== size) {
       // If it's not the last row
-      neighbors.push(`r${row + 1}-s${s}`);
-      if (s - 1 >= 0) {
+      neighbors.push(`r${row + 1}-s${column}`);
+      if (column - 1 >= 0) {
         // If it's not the first column
-        neighbors.push(`r${row + 1}-s${s - 1}`);
+        neighbors.push(`r${row + 1}-s${column - 1}`);
       }
-      if (s + 1 !== size) {
+      if (column + 1 !== size) {
         // If it's not the last column
-        neighbors.push(`r${row + 1}-s${s + 1}`);
+        neighbors.push(`r${row + 1}-s${column + 1}`);
       }
     }
     // 1. Copy squares
