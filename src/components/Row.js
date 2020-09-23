@@ -6,7 +6,7 @@ class Row extends React.Component {
   static propTypes = {
     size: PropTypes.number.isRequired,
     row: PropTypes.string.isRequired,
-    flag: PropTypes.bool.isRequired,
+    flagMode: PropTypes.bool.isRequired,
     squares: PropTypes.object.isRequired,
     onSquareClick: PropTypes.func.isRequired
   }
@@ -17,7 +17,7 @@ class Row extends React.Component {
       row.push(<Square
         key={`${this.props.row}-s${i}`}
         square={`${this.props.row}-s${i}`}
-        flag={this.props.flag}
+        flagMode={this.props.flagMode}
         squares={this.props.squares[`${this.props.row}-s${i}`]}
         onSquareClick={this.props.onSquareClick}
       />)

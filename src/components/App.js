@@ -2,6 +2,7 @@ import React from 'react';
 import Form from './Form';
 import Row from './Row';
 import Flag from './Flag';
+import Header from './Header';
 import { randomIntFromInterval } from '../helpers';
 
 class App extends React.Component {
@@ -20,7 +21,8 @@ class App extends React.Component {
       5: "75%"
     },
     squares: {},
-    flag: false
+    flagMode: false,
+    flagCount: 0
   }
 
   componentDidMount() {
@@ -54,7 +56,7 @@ class App extends React.Component {
   onFlagClick = e => {
     e.preventDefault();
     // 1. Get state of flag
-    let flag = this.state.flag;
+    let flag = this.state.flagMode;
     // 2. Change flag setting
     flag = !flag;
     // 3. Save change
@@ -113,7 +115,7 @@ class App extends React.Component {
   onSquareClick = squareKey => {
     // 1. Copy state
     const squares = { ...this.state.squares };
-    const flag = this.state.flag;
+    const flag = this.state.flagMode;
     // 2. Update square
     if (flag) {
       // If marking a flag is active, then mark only that square and then save to state
@@ -231,7 +233,7 @@ class App extends React.Component {
       rows.push(<Row
         key={`r${i}`}
         row={`r${i}`}
-        flag={this.state.flag}
+        flagMode={this.state.flagMode}
         squares = {this.state.squares}
         size={this.state.options.size}
         onSquareClick={this.onSquareClick}
@@ -240,6 +242,7 @@ class App extends React.Component {
 
     return (
       <div className="game-board">
+        <Header />
         <Form
           options={this.state.options}
           saveOptions={this.saveOptions}
@@ -248,7 +251,7 @@ class App extends React.Component {
           percentages={this.state.bombPercentage}
         />
         {rows}
-        <Flag onFlagClick={this.onFlagClick} flag={this.state.flag}/>
+        <Flag onFlagClick={this.onFlagClick} flagMode={this.state.flagMode}/>
       </div>
     )
   }
