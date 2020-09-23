@@ -6,11 +6,12 @@ import { faFlag as farFlag } from '@fortawesome/free-regular-svg-icons'
 
 class Flag extends React.Component {
   static propTypes = {
-    onFlagClick: PropTypes.func.isRequired
+    onFlagClick: PropTypes.func.isRequired,
+    flagMode: PropTypes.bool.isRequired
   }
 
   renderFlagIcons = () => {
-    if (this.props.flag) {
+    if (this.props.flagMode) {
       return (
         <button className="flag-button-active">
           <p>Set Flag</p>

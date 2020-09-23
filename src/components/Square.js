@@ -14,7 +14,7 @@ class Square extends React.Component {
       marked: PropTypes.bool.isRequired
     }),
     onSquareClick: PropTypes.func.isRequired,
-    flag: PropTypes.bool.isRequired,
+    flagMode: PropTypes.bool.isRequired,
     square: PropTypes.string.isRequired
   }
 
@@ -69,7 +69,7 @@ class Square extends React.Component {
           {this.renderSquare()}
         </button>
       );
-    } else if (this.props.flag) {
+    } else if (this.props.flagMode) {
       return (
         <button className="square flag" onClick={() => { this.props.onSquareClick(square)}}>
           {this.renderSquare()}
