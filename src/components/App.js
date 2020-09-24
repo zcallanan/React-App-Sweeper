@@ -12,7 +12,8 @@ class App extends React.Component {
   state = {
     options: {
       size: 0,
-      difficulty: 0
+      difficulty: 0,
+      lives: 0
     },
     bombPercentage: {
       0: "10%",
@@ -22,11 +23,26 @@ class App extends React.Component {
       4: "60%",
       5: "75%"
     },
-    squares: {},
+    squares: {
+      "r0-s0": {
+        bomb: false,
+        flagged: false,
+        questionMarked: false,
+        clicked: false,
+        hint: false,
+        neighbors: [],
+        adjacentBombCount: 0
+      }
+    },
     marks: {
       flagMode: false,
-      flagCount: 0,
       questionMode: false
+    },
+    totalCounts: {
+      bombs: 0,
+      revealed: 0,
+      flags: 0,
+      questions: 0
     }
 
   }
@@ -117,17 +133,20 @@ class App extends React.Component {
     // 1. Copy state
     let squares = {...this.state.squares};
     // If size decreases, then square keys should be deleted before the board is regenerated
-    let row;
-    let column;
-    Object.keys(squares).map(square => {
-      row = parseInt(square.split("-")[0].match(/\d{1,3}/)[0]);
-      column = parseInt(square.split("-")[1].match(/(\d{1,3})/)[0]);
-      if (row > this.state.options.size - 1 || column > this.state.options.size - 1) {
-        // Check to see if squares has any rows or columns greater than the board size - 1
-        delete squares[square];
-      }
-      return squares;
-    })
+    if (Object.keys(squares).length > 1) {
+      let row;
+      let column;
+      Object.keys(squares).map(square => {
+        row = parseInt(square.split("-")[0].match(/\d{1,3}/)[0]);
+        column = parseInt(square.split("-")[1].match(/(\d{1,3})/)[0]);
+        if (row > this.state.options.size - 1 || column > this.state.options.size - 1) {
+          // Check to see if squares has any rows or columns greater than the board size - 1
+          delete squares[square];
+        }
+        return squares;
+      })
+    }
+
     // 2. Build squares object
     for (let i = 0; i < size; i++) {
       for (let k = 0; k < size; k++ ) {
@@ -164,6 +183,7 @@ class App extends React.Component {
 
   countAdjacentBombs = square => {
     const size = this.state.options.size;
+    console.log(square)
     const row = parseInt(square.split("-")[0].match(/\d{1,3}/)[0]);
     const column = parseInt(square.split("-")[1].match(/(\d{1,3})/)[0]);
     const neighbors = [];
