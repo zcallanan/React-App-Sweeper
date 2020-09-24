@@ -21,7 +21,7 @@ class Flag extends React.Component {
     }
     return (
       <button className="flag-button">
-        <p>Set Flag</p>
+        <p>Flag Possible Bomb</p>
         <FontAwesomeIcon icon={ farFlag } />
       </button>
     )
