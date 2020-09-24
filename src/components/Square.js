@@ -1,8 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faFlag } from '@fortawesome/free-solid-svg-icons'
-import { faFlag as farFlag } from '@fortawesome/free-regular-svg-icons'
+import { faFlag, faQuestionCircle } from '@fortawesome/free-solid-svg-icons'
+import { faFlag as farFlag, faQuestionCircle as farQuestionCircle } from '@fortawesome/free-regular-svg-icons'
 
 class Square extends React.Component {
   static propTypes = {
@@ -11,20 +11,20 @@ class Square extends React.Component {
       bomb: PropTypes.bool.isRequired,
       clicked: PropTypes.bool.isRequired,
       hint: PropTypes.bool.isRequired,
-      marked: PropTypes.bool.isRequired
+      flagged: PropTypes.bool.isRequired,
+      questionMarked: PropTypes.bool.isRequired
     }),
     onSquareClick: PropTypes.func.isRequired,
-    flagMode: PropTypes.bool.isRequired,
+    marks: PropTypes.object.isRequired,
     square: PropTypes.string.isRequired
   }
 
   renderSquare = () => {
     const squares = this.props.squares;
-    const adjacentBombCount = squares.adjacentBombCount;
     const bomb = squares.bomb;
     const clicked = squares.clicked;
-    const hint = squares.hint;
-    const marked = squares.marked;
+    const flaggedBool = squares.flagged;
+    const questionmarkBool = squares.questionMarked
     if (bomb && clicked) {
       // If it's a bomb and clicked, show the bomb
       return (
@@ -32,53 +32,128 @@ class Square extends React.Component {
           <img className="image" src="/images/bomb.png" alt="B"/>
         </span>
       )
-    } else if (marked && !clicked) {
+    } else if (flaggedBool && !clicked) {
       return (
         <span>
           <FontAwesomeIcon icon={ faFlag } />
         </span>
       )
-    }  else if (hint && !clicked) {
-      // If it has an adjacent bomb, has not been clicked, hint is true, show the hint
+    } else if (questionmarkBool && !clicked) {
       return (
         <span>
-          <p className={`neighbors-${adjacentBombCount}`}>{adjacentBombCount}</p>
-          <FontAwesomeIcon className="flag-icon" icon={ farFlag } />
+          <FontAwesomeIcon icon={ faQuestionCircle } />
         </span>
       )
-    } else if (!bomb && clicked) {
-      // Not a bomb, has been clicked
-      return;
     }
     return (
       <span>
-        <p>?</p>
         <FontAwesomeIcon className="flag-icon" icon={ farFlag } />
+        <FontAwesomeIcon className="questionmark-icon" icon={ farQuestionCircle } />
       </span>
     );
   }
 
+  // Handles button modes
   generateButton = () => {
     const squares = this.props.squares;
     const square = this.props.square;
+    const marks = this.props.marks;
+    const adjacentBombCount = squares.adjacentBombCount;
+    const clicked = squares.clicked;
+    const hint = squares.hint;
+    const flaggedBool = squares.flagged;
+    const questionmarkBool = squares.questionMarked;
+    let className;
 
-    // Disable the button if it's been clicked
-    if (squares.clicked) {
+    if (clicked) {
+      // Disable the button if it's been clicked
+      className = "square";
       return (
-        <button className="square" disabled>
+        <button className={className} disabled>
           {this.renderSquare()}
         </button>
       );
-    } else if (this.props.flagMode) {
+    } else if (marks.flagMode) {
+      // Toggle placement of flags
+      if (questionmarkBool) {
+        className = "square flag-mode questionmarked";
+      } else if (flaggedBool) {
+        // In flagMode, if the square is flagged, show a solid flag
+        className = "square flag-mode flagged";
+      } else if (hint) {
+        if (questionmarkBool) {
+          // In flagMode, if the square has a solid question mark over a hint, display it (hint should be hidden)
+          className = "square flag-mode questionmarked hint"
+        } else {
+          className = "square flag-mode hint";
+        }
+        return (
+          <button className={className} onClick={() => { this.props.onSquareClick(square)}}>
+            <span>
+              <p className={`bomb-count neighbors-${adjacentBombCount}`}>{adjacentBombCount}</p>
+              {this.renderSquare()}
+            </span>
+          </button>
+        );
+      } else {
+        className = "square flag-mode";
+      }
+    } else if (marks.questionMode) {
+      // Toggle question marks
+      if (flaggedBool) {
+        // In questionMode, if the square is flagged
+        className = "square questionmark-mode flagged";
+      } else if (questionmarkBool) {
+        className = "square questionmark-mode questionmarked";
+      } else if (hint) {
+        if (flaggedBool) {
+          // In questionMode, if the square has a solid flag over a hint, display it
+          className = "square questionmark-mode flagged hint"
+        } else {
+          className = "square questionmark-mode hint";
+        }
+        return (
+          <button className={className} onClick={() => { this.props.onSquareClick(square)}}>
+            <span>
+              <p className={`bomb-count neighbors-${adjacentBombCount}`}>{adjacentBombCount}</p>
+              {this.renderSquare()}
+            </span>
+          </button>
+        );
+      } else {
+        className = "square questionmark-mode";
+      }
+    } else if (hint) {
+      if (flaggedBool) {
+        className = "square flagged hint";
+      } else if (questionmarkBool) {
+        className = "square questionmarked hint";
+      } else {
+        // Toggle display of hints
+        className="square hint";
+      }
+
       return (
-        <button className="square flag" onClick={() => { this.props.onSquareClick(square)}}>
-          {this.renderSquare()}
+        <button className={className} onClick={() => { this.props.onSquareClick(square)}}>
+          <span>
+            <p className={`bomb-count neighbors-${adjacentBombCount}`}>{adjacentBombCount}</p>
+            {this.renderSquare()}
+          </span>
         </button>
       );
+    } else {
+      if (flaggedBool) {
+        className = "square flagged"
+      } else if (questionmarkBool) {
+        className = "square questionmarked"
+      } else {
+        // Default functional button
+        className = "square default";
+      }
+
     }
-    // Return initial functional button
     return (
-      <button className="square" onClick={() => { this.props.onSquareClick(square)}}>
+      <button className={className} onClick={() => { this.props.onSquareClick(square)}}>
         {this.renderSquare()}
       </button>
     );
