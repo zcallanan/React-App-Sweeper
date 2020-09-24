@@ -34,11 +34,11 @@ class App extends React.Component {
         adjacentBombCount: 0
       }
     },
-    marks: {
+    modes: {
       flagMode: false,
       questionMode: false
     },
-    totalCounts: {
+    stats: {
       bombs: 0,
       revealed: 0,
       flags: 0,
@@ -79,24 +79,24 @@ class App extends React.Component {
   onMarkClick = e => {
     e.preventDefault();
     // 1. Get state of flag
-    let marks = this.state.marks;
+    let modes = this.state.modes;
     // 2. Change flag setting
-    marks[e.target.name] = !marks[e.target.name];
+    modes[e.target.name] = !modes[e.target.name];
     // 3. If mode X toggles to true, then make sure mode Y is false
-    if ("flagMode" === e.target.name && marks[e.target.name]) {
-      marks["questionMode"] = false;
-    } else if ("questionMode" === e.target.name && marks[e.target.name]){
-      marks["flagMode"] = false;
+    if ("flagMode" === e.target.name && modes[e.target.name]) {
+      modes["questionMode"] = false;
+    } else if ("questionMode" === e.target.name && modes[e.target.name]){
+      modes["flagMode"] = false;
     }
     // 4. Save change
-    this.setState({ marks })
+    this.setState({ modes })
   }
 
   onSquareClick = squareKey => {
     // 1. Copy state
     const squares = { ...this.state.squares };
-    const flagMode = this.state.marks.flagMode;
-    const questionMode = this.state.marks.questionMode;
+    const flagMode = this.state.modes.flagMode;
+    const questionMode = this.state.modes.questionMode;
     // 2. Update square
     if (flagMode) {
       // If marking a flag is active, then mark only that square and then save to state
@@ -183,7 +183,6 @@ class App extends React.Component {
 
   countAdjacentBombs = square => {
     const size = this.state.options.size;
-    console.log(square)
     const row = parseInt(square.split("-")[0].match(/\d{1,3}/)[0]);
     const column = parseInt(square.split("-")[1].match(/(\d{1,3})/)[0]);
     const neighbors = [];
@@ -279,7 +278,7 @@ class App extends React.Component {
       rows.push(<Row
         key={`r${i}`}
         row={`r${i}`}
-        marks={this.state.marks}
+        modes={this.state.modes}
         squares={this.state.squares}
         size={this.state.options.size}
         onSquareClick={this.onSquareClick}
@@ -303,8 +302,8 @@ class App extends React.Component {
           <Stats />
         </div>
         <div className="modes">
-          <Flag onMarkClick={this.onMarkClick} flagMode={this.state.marks.flagMode}/>
-          <QuestionMark onMarkClick={this.onMarkClick} questionMode={this.state.marks.questionMode}/>
+          <Flag onMarkClick={this.onMarkClick} flagMode={this.state.modes.flagMode}/>
+          <QuestionMark onMarkClick={this.onMarkClick} questionMode={this.state.modes.questionMode}/>
         </div>
       </div>
     )
