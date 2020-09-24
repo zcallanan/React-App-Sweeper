@@ -124,7 +124,7 @@ class Form extends React.Component {
               />
             </div>
             <div>
-              <label htmlFor="difficulty">Select the percentage of mines hidden on the board:</label>
+              <label htmlFor="difficulty">Customize the percentage of bombs hidden on your game board:</label>
               <select
                 value={this.state.fields.difficulty}
                 onChange={this.handleChange}
