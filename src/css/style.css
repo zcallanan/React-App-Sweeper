@@ -20,14 +20,20 @@ p {
   transition: all 0.3s ease-in-out;
 }
 
-.square.default, .square.flag {
+.square.default, .square.flag-mode, .square.questionmark-mode {
   background: radial-gradient(rgba(77,162,207, .8), rgb(42,109,199));
   box-shadow: inset 0 -4px 6px rgba(0, 0, 0, 0.2);
 }
 
-.square.hint, .square.flag.flagged {
-  background: radial-gradient(rgba(205,205,215, .1), rgba(180,180,190, .8));
-  box-shadow: inset 0 -2px 3px rgba(0, 0, 0, 0.1);
+.square.hint,
+  .square.flagged,
+  .square.questionmarked,
+  .square.flag-mode.flagged,
+  .square.flag-mode.questionmarked,
+  .square.questionmark-mode.questionmarked,
+  .square.questionmark-mode.flagged {
+    background: radial-gradient(rgba(205,205,215, .1), rgba(180,180,190, .8));
+    box-shadow: inset 0 -2px 3px rgba(0, 0, 0, 0.1);
 }
 
 .square:disabled {
@@ -45,18 +51,24 @@ p {
   transform: translate(10%, 10%);
 }
 
-.square:not([disabled]).flag:hover {
-  transition: all 0.3s ease-in-out;
-  transform: translate(10%, 10%);
-  font-size: 24px;
+.square:not([disabled]).flag-mode:hover,
+  .square:not([disabled]).questionmark-mode:hover {
+    transition: all 0.3s ease-in-out;
+    transform: translate(10%, 10%);
+    font-size: 24px;
 }
 
-.square:not([disabled]).flag:hover span .flag-icon {
-  display: inline;
+.square:not([disabled]).flag-mode:hover span .flag-icon,
+  .square:not([disabled]).questionmark-mode:hover span .questionmark-icon {
+    display: inline;
 }
 
-.square.flag.hint span:hover .bomb-count, .flag-icon, .questionmark-icon {
-  display: none;
+.square.flag-mode.hint span:hover .bomb-count,
+  .square.questionmark-mode.hint span:hover .bomb-count,
+  .square.flagged.hint span .bomb-count,
+  .square.questionmarked.hint span .bomb-count,
+  .flag-icon, .questionmark-icon {
+    display: none;
 }
 
 .flag-button, .flag-button-active {

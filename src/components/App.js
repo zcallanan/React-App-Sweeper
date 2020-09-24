@@ -75,6 +75,42 @@ class App extends React.Component {
     this.setState({ marks })
   }
 
+  onSquareClick = squareKey => {
+    // 1. Copy state
+    const squares = { ...this.state.squares };
+    const flagMode = this.state.marks.flagMode;
+    const questionMode = this.state.marks.questionMode;
+    // 2. Update square
+    if (flagMode) {
+      // If marking a flag is active, then mark only that square and then save to state
+      squares[squareKey]['flagged'] = !squares[squareKey]['flagged'];
+      if (squares[squareKey]['questionMarked']) {
+        // If the square is question marked when placing a flag, remove questionMarked
+        squares[squareKey]['questionMarked'] = !squares[squareKey]['questionMarked']
+      }
+    } else if (questionMode) {
+      // If placing a question mark is active, then mark only that square and then save to state
+      squares[squareKey]['questionMarked'] = !squares[squareKey]['questionMarked'];
+      if (squares[squareKey]['flagged']) {
+        // If the square is flagged when placing a question mark, unflag it
+        squares[squareKey]['flagged'] = !squares[squareKey]['flagged']
+      }
+    } else {
+      // If not marking a flag, then mark as clicked and evaluate
+      squares[squareKey]['clicked'] = true;
+      if (squares[squareKey]['adjacentBombCount'] > 0 && !squares[squareKey]['bomb']) {
+        // Click on a square with an adjacent bomb, reveal its hint
+        squares[squareKey]['hint'] = true;
+      }
+      if (!squares[squareKey]['bomb']) {
+        // Check neighbors to determine whether to click them or show their hint. Those with hints CAN be bombs
+        this.checkNeighbors(squareKey, squares);
+      }
+    }
+    // 3. Save state
+    this.setState({ squares });
+  }
+
   // Generate initial squares state
   initSquares = size => {
     // 1. Copy state
@@ -123,34 +159,6 @@ class App extends React.Component {
       }
     })
     return;
-  }
-
-  onSquareClick = squareKey => {
-    // 1. Copy state
-    const squares = { ...this.state.squares };
-    const flagMode = this.state.marks.flagMode;
-    const questionMode = this.state.marks.questionMode;
-    // 2. Update square
-    if (flagMode) {
-      // If marking a flag is active, then mark only that square and then save to state
-      squares[squareKey]['flagged'] = !squares[squareKey]['flagged'];
-    } else if (questionMode) {
-      // If placing a question mark is active, then mark only that square and then save to state
-      squares[squareKey]['questionMarked'] = !squares[squareKey]['questionMarked'];
-    } else {
-      // If not marking a flag, then mark as clicked and evaluate
-      squares[squareKey]['clicked'] = true;
-      if (squares[squareKey]['adjacentBombCount'] > 0 && !squares[squareKey]['bomb']) {
-        // Click on a square with an adjacent bomb, reveal its hint
-        squares[squareKey]['hint'] = true;
-      }
-      if (!squares[squareKey]['bomb']) {
-        // Check neighbors to determine whether to click them or show their hint. Those with hints CAN be bombs
-        this.checkNeighbors(squareKey, squares);
-      }
-    }
-    // 3. Save state
-    this.setState({ squares });
   }
 
   countAdjacentBombs = square => {
