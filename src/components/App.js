@@ -4,6 +4,7 @@ import Row from './Row';
 import Flag from './Flag';
 import Header from './Header';
 import QuestionMark from './QuestionMark';
+import Stats from './Stats';
 import { randomIntFromInterval } from '../helpers';
 
 class App extends React.Component {
@@ -275,9 +276,16 @@ class App extends React.Component {
           setBombs={this.setBombs}
           percentages={this.state.bombPercentage}
         />
-        {rows}
-        <Flag onMarkClick={this.onMarkClick} flagMode={this.state.marks.flagMode}/>
-        <QuestionMark onMarkClick={this.onMarkClick} questionMode={this.state.marks.questionMode}/>
+        <div className="game-body">
+          <div className="squares">
+            {rows}
+          </div>
+          <Stats />
+        </div>
+        <div className="modes">
+          <Flag onMarkClick={this.onMarkClick} flagMode={this.state.marks.flagMode}/>
+          <QuestionMark onMarkClick={this.onMarkClick} questionMode={this.state.marks.questionMode}/>
+        </div>
       </div>
     )
   }
