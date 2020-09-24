@@ -1,11 +1,16 @@
+p {
+  margin-block-start: 0px;
+  margin-block-end: 0px;
+}
+
 .square {
-  background-color: rgb(235,235,235);
   border: 2px solid rgb(180,180,180);
+  border-radius: 4px;
   box-sizing: border-box;
   float: left;
   font-size: 24px;
   font-weight: bold;
-  line-height: 40px;
+  line-height: 32px;
   height: 40px;
   margin-right: -1px;
   margin-top: -1px;
@@ -15,9 +20,23 @@
   transition: all 0.3s ease-in-out;
 }
 
-p {
-  margin-block-start: 0px;
-  margin-block-end: 0px;
+.square.default, .square.flag {
+  background: radial-gradient(rgba(77,162,207, .8), rgb(42,109,199));
+  box-shadow: inset 0 -4px 6px rgba(0, 0, 0, 0.2);
+}
+
+.square.hint, .square.flag.flagged {
+  background: radial-gradient(rgba(205,205,215, .1), rgba(180,180,190, .8));
+  box-shadow: inset 0 -2px 3px rgba(0, 0, 0, 0.1);
+}
+
+.square:disabled {
+  background: radial-gradient(rgba(205,205,205, .1), rgba(200,200,200, .8));
+  box-shadow: inset 0 -2px 3px rgba(0, 0, 0, 0.1);
+}
+
+.square:focus{
+  outline: none;
 }
 
 .square:not([disabled]):hover {
@@ -28,19 +47,15 @@ p {
 
 .square:not([disabled]).flag:hover {
   transition: all 0.3s ease-in-out;
-  background-color: rgb(220,190,220);
   transform: translate(10%, 10%);
+  font-size: 24px;
 }
 
-.square:not([disabled]).flag span:hover p {
-  display: none;
-}
-
-.square:not([disabled]).flag span:hover .flag-icon {
+.square:not([disabled]).flag:hover span .flag-icon {
   display: inline;
 }
 
-.flag-icon {
+.square.flag.hint span:hover .bomb-count, .flag-icon, .questionmark-icon {
   display: none;
 }
 
@@ -50,14 +65,6 @@ p {
   justify-content: space-between;
   width: 8%;
   font-size: 16px;
-}
-
-.square:disabled {
-  background-color: rgb(245,245,245)
-}
-
-.square:focus{
-  outline: none;
 }
 
 .fa-flag {
@@ -84,10 +91,6 @@ p {
   height: 100%;
   object-fit: cover;
   overflow: hidden;
-}
-
-.neighbors-1 {
-  color: rgb(34,66,252);
 }
 
 .neighbors-1 {

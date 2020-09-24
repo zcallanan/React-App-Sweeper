@@ -3,6 +3,7 @@ import Form from './Form';
 import Row from './Row';
 import Flag from './Flag';
 import Header from './Header';
+import QuestionMark from './QuestionMark';
 import { randomIntFromInterval } from '../helpers';
 
 class App extends React.Component {
@@ -21,8 +22,12 @@ class App extends React.Component {
       5: "75%"
     },
     squares: {},
-    flagMode: false,
-    flagCount: 0
+    marks: {
+      flagMode: false,
+      flagCount: 0,
+      questionMode: false
+    }
+
   }
 
   componentDidMount() {
@@ -53,14 +58,21 @@ class App extends React.Component {
     localStorage.setItem("options", JSON.stringify(options));
   }
 
-  onFlagClick = e => {
+  // Toggle state when mark buttons are clicked (flag, question mark)
+  onMarkClick = e => {
     e.preventDefault();
     // 1. Get state of flag
-    let flag = this.state.flagMode;
+    let marks = this.state.marks;
     // 2. Change flag setting
-    flag = !flag;
-    // 3. Save change
-    this.setState({ flag })
+    marks[e.target.name] = !marks[e.target.name];
+    // 3. If mode X toggles to true, then make sure mode Y is false
+    if ("flagMode" === e.target.name && marks[e.target.name]) {
+      marks["questionMode"] = false;
+    } else if ("questionMode" === e.target.name && marks[e.target.name]){
+      marks["flagMode"] = false;
+    }
+    // 4. Save change
+    this.setState({ marks })
   }
 
   // Generate initial squares state
@@ -84,7 +96,8 @@ class App extends React.Component {
       for (let k = 0; k < size; k++ ) {
         squares[`r${i}-s${k}`] = {
           bomb: false,
-          marked: false,
+          flagged: false,
+          questionMarked: false,
           clicked: false,
           hint: false,
           neighbors: [],
@@ -115,11 +128,15 @@ class App extends React.Component {
   onSquareClick = squareKey => {
     // 1. Copy state
     const squares = { ...this.state.squares };
-    const flag = this.state.flagMode;
+    const flagMode = this.state.marks.flagMode;
+    const questionMode = this.state.marks.questionMode;
     // 2. Update square
-    if (flag) {
+    if (flagMode) {
       // If marking a flag is active, then mark only that square and then save to state
-      squares[squareKey]['marked'] = !squares[squareKey]['marked'];
+      squares[squareKey]['flagged'] = !squares[squareKey]['flagged'];
+    } else if (questionMode) {
+      // If placing a question mark is active, then mark only that square and then save to state
+      squares[squareKey]['questionMarked'] = !squares[squareKey]['questionMarked'];
     } else {
       // If not marking a flag, then mark as clicked and evaluate
       squares[squareKey]['clicked'] = true;
@@ -233,8 +250,8 @@ class App extends React.Component {
       rows.push(<Row
         key={`r${i}`}
         row={`r${i}`}
-        flagMode={this.state.flagMode}
-        squares = {this.state.squares}
+        marks={this.state.marks}
+        squares={this.state.squares}
         size={this.state.options.size}
         onSquareClick={this.onSquareClick}
       />)
@@ -251,7 +268,8 @@ class App extends React.Component {
           percentages={this.state.bombPercentage}
         />
         {rows}
-        <Flag onFlagClick={this.onFlagClick} flagMode={this.state.flagMode}/>
+        <Flag onMarkClick={this.onMarkClick} flagMode={this.state.marks.flagMode}/>
+        <QuestionMark onMarkClick={this.onMarkClick} questionMode={this.state.marks.questionMode}/>
       </div>
     )
   }
