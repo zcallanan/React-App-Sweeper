@@ -116,14 +116,6 @@ class App extends React.Component {
     } else {
       // Mark as clicked and evaluate
       squares[squareKey]['clicked'] = true;
-      // Check if there are adjacent bombs
-        // Call countAdjacentBombs to count squareKey's neigbors and count bombs.
-        // The neighbors of each neighbor then has to be found, and adjacent bombs counted
-          // In order to do this, then must find the neighbors of squareKey's neighbors
-          // Then adjacent bombs must be counted
-            // Required for checkNeighbors to work
-        // If a neighbor is a bomb or has an adjacent bomb, then do not check its neighbors
-        // If adjacent bomb > -1, then count AdjacentBombs should not go through the whole routine on that square
       if (!squares[squareKey]['bomb']) {
         // Check neighbors to determine whether to click them or show their hint. Those with hints CAN be bombs
         this.checkNeighbors(squareKey, squares);
@@ -196,8 +188,6 @@ class App extends React.Component {
     this.generatePositions(positionArray, squares, bombCount, options.size, 0);
     // Save bomb positions
     this.setState({squares});
-
-    //setTimeout(() => Object.keys(squares).map(key => this.countAdjacentBombs(key)), 400);
   }
 
   checkNeighbors = (squareKey, squares) => {
