@@ -4,6 +4,7 @@ import Row from './Row';
 import Flag from './Flag';
 import Header from './Header';
 import QuestionMark from './QuestionMark';
+import Stats from './Stats';
 import { randomIntFromInterval } from '../helpers';
 
 class App extends React.Component {
@@ -11,7 +12,8 @@ class App extends React.Component {
   state = {
     options: {
       size: 0,
-      difficulty: 0
+      difficulty: 0,
+      lives: 0
     },
     bombPercentage: {
       0: "10%",
@@ -21,11 +23,26 @@ class App extends React.Component {
       4: "60%",
       5: "75%"
     },
-    squares: {},
-    marks: {
+    squares: {
+      "r0-s0": {
+        bomb: false,
+        flagged: false,
+        questionMarked: false,
+        clicked: false,
+        hint: false,
+        neighbors: [],
+        adjacentBombCount: -1
+      }
+    },
+    modes: {
       flagMode: false,
-      flagCount: 0,
       questionMode: false
+    },
+    stats: {
+      bombs: 0,
+      revealed: 0,
+      flags: 0,
+      questions: 0
     }
 
   }
@@ -62,25 +79,26 @@ class App extends React.Component {
   onMarkClick = e => {
     e.preventDefault();
     // 1. Get state of flag
-    let marks = this.state.marks;
+    let modes = this.state.modes;
     // 2. Change flag setting
-    marks[e.target.name] = !marks[e.target.name];
+    modes[e.target.name] = !modes[e.target.name];
     // 3. If mode X toggles to true, then make sure mode Y is false
-    if ("flagMode" === e.target.name && marks[e.target.name]) {
-      marks["questionMode"] = false;
-    } else if ("questionMode" === e.target.name && marks[e.target.name]){
-      marks["flagMode"] = false;
+    if ("flagMode" === e.target.name && modes[e.target.name]) {
+      modes["questionMode"] = false;
+    } else if ("questionMode" === e.target.name && modes[e.target.name]){
+      modes["flagMode"] = false;
     }
     // 4. Save change
-    this.setState({ marks })
+    this.setState({ modes })
   }
 
   onSquareClick = squareKey => {
     // 1. Copy state
     const squares = { ...this.state.squares };
-    const flagMode = this.state.marks.flagMode;
-    const questionMode = this.state.marks.questionMode;
+    const flagMode = this.state.modes.flagMode;
+    const questionMode = this.state.modes.questionMode;
     // 2. Update square
+    // TODO: Handle clicking on a bomb
     if (flagMode) {
       // If marking a flag is active, then mark only that square and then save to state
       squares[squareKey]['flagged'] = !squares[squareKey]['flagged'];
@@ -96,16 +114,17 @@ class App extends React.Component {
         squares[squareKey]['flagged'] = !squares[squareKey]['flagged']
       }
     } else {
-      // If not marking a flag, then mark as clicked and evaluate
+      // Mark as clicked and evaluate
       squares[squareKey]['clicked'] = true;
-      if (squares[squareKey]['adjacentBombCount'] > 0 && !squares[squareKey]['bomb']) {
-        // Click on a square with an adjacent bomb, reveal its hint
-        squares[squareKey]['hint'] = true;
-      }
       if (!squares[squareKey]['bomb']) {
         // Check neighbors to determine whether to click them or show their hint. Those with hints CAN be bombs
         this.checkNeighbors(squareKey, squares);
       }
+      if (squares[squareKey]['adjacentBombCount'] > 0 && !squares[squareKey]['bomb']) {
+        // Click on a square with an adjacent bomb, reveal its hint
+        squares[squareKey]['hint'] = true;
+      }
+
     }
     // 3. Save state
     this.setState({ squares });
@@ -116,17 +135,20 @@ class App extends React.Component {
     // 1. Copy state
     let squares = {...this.state.squares};
     // If size decreases, then square keys should be deleted before the board is regenerated
-    let row;
-    let column;
-    Object.keys(squares).map(square => {
-      row = parseInt(square.split("-")[0].match(/\d{1,3}/)[0]);
-      column = parseInt(square.split("-")[1].match(/(\d{1,3})/)[0]);
-      if (row > this.state.options.size - 1 || column > this.state.options.size - 1) {
-        // Check to see if squares has any rows or columns greater than the board size - 1
-        delete squares[square];
-      }
-      return squares;
-    })
+    if (Object.keys(squares).length > 1) {
+      let row;
+      let column;
+      Object.keys(squares).map(square => {
+        row = parseInt(square.split("-")[0].match(/\d{1,3}/)[0]);
+        column = parseInt(square.split("-")[1].match(/(\d{1,3})/)[0]);
+        if (row > this.state.options.size - 1 || column > this.state.options.size - 1) {
+          // Check to see if squares has any rows or columns greater than the board size - 1
+          delete squares[square];
+        }
+        return squares;
+      })
+    }
+
     // 2. Build squares object
     for (let i = 0; i < size; i++) {
       for (let k = 0; k < size; k++ ) {
@@ -137,7 +159,7 @@ class App extends React.Component {
           clicked: false,
           hint: false,
           neighbors: [],
-          adjacentBombCount: 0
+          adjacentBombCount: -1
         }
       }
     }
@@ -147,8 +169,39 @@ class App extends React.Component {
     setTimeout(() => this.setBombs(), 200);
   }
 
+  // Use user input to call bomb position fn and save positions to state
+  setBombs = () => {
+    let percentage;
+    let positionArray = []
+    // Copy game board dimension
+    const options = {...this.state.options};
+    const squares = {...this.state.squares};
+    // Get percentage of bombs
+    for (const [key, value] of Object.entries(this.state.bombPercentage)) {
+      if (parseInt(key) === options.difficulty) {
+        percentage = parseFloat(value) * .01;
+      }
+    }
+    // Calculate number of bombs
+    const bombCount = (options.size ** 2) * percentage;
+    // Generate bomb positions
+    this.generatePositions(positionArray, squares, bombCount, options.size, 0);
+    // Save bomb positions
+    this.setState({squares});
+  }
+
   checkNeighbors = (squareKey, squares) => {
-    squares[squareKey]['neighbors'].forEach(neighbor => {
+    let neighbors;
+    if ((squares[squareKey]['neighbors'] === 'undefined' || squares[squareKey]['neighbors'].length === 0) || squares[squareKey]['adjacentBombCount'] === -1 ) {
+      // If squareKey has no neighbors or its adjacent bombs have not been counted, then call countAdjacentBombs
+      neighbors = this.countAdjacentBombs(squareKey);
+    } else {
+      neighbors = squares[squareKey]['neighbors'];
+    }
+    neighbors.forEach(neighbor => {
+      if ((squares[neighbor]['neighbors'] === 'undefined' || squares[neighbor]['neighbors'].length === 0) || squares[neighbor]['adjacentBombCount'] === -1 ) {
+        this.countAdjacentBombs(neighbor);
+      }
       if (squares[neighbor]['adjacentBombCount'] > 0 && !squares[neighbor]['clicked'] && !squares[neighbor]['hint']) {
         // If a neighbor has an adjacent bomb, hasn't been clicked or had its hint revealed, then reveal its hint
         squares[neighbor]['hint'] = true;
@@ -209,6 +262,7 @@ class App extends React.Component {
     squares[square].neighbors = neighbors;
     squares[square].adjacentBombCount = adjacentBombCount;
     this.setState({ squares });
+    return neighbors;
   }
 
 
@@ -228,37 +282,13 @@ class App extends React.Component {
     this.generatePositions(positionArray, squares, bombCount, optionSize, count)
   }
 
-  // Use user input to call bomb position fn and save positions to state
-  setBombs = () => {
-    let percentage;
-    let positionArray = []
-    // Copy game board dimension
-    const options = {...this.state.options};
-    const squares = {...this.state.squares};
-    // Get percentage of bombs
-    for (const [key, value] of Object.entries(this.state.bombPercentage)) {
-      if (parseInt(key) === options.difficulty) {
-        percentage = parseFloat(value) * .01;
-      }
-    }
-    // Calculate number of bombs
-    const bombCount = (options.size ** 2) * percentage;
-    // Generate bomb positions
-    this.generatePositions(positionArray, squares, bombCount, options.size, 0);
-    // Save bomb positions
-    this.setState({squares});
-    // Determine adjacent bomb count
-    Object.keys(squares).map(key => this.countAdjacentBombs(key))
-    //setTimeout(() => Object.keys(squares).map(key => this.countAdjacentBombs(key)), 400);
-  }
-
   render() {
     const rows = [];
     for (let i = 0; i < this.state.options.size; i++) {
       rows.push(<Row
         key={`r${i}`}
         row={`r${i}`}
-        marks={this.state.marks}
+        modes={this.state.modes}
         squares={this.state.squares}
         size={this.state.options.size}
         onSquareClick={this.onSquareClick}
@@ -275,9 +305,16 @@ class App extends React.Component {
           setBombs={this.setBombs}
           percentages={this.state.bombPercentage}
         />
-        {rows}
-        <Flag onMarkClick={this.onMarkClick} flagMode={this.state.marks.flagMode}/>
-        <QuestionMark onMarkClick={this.onMarkClick} questionMode={this.state.marks.questionMode}/>
+        <div className="game-body">
+          <div className="squares">
+            {rows}
+          </div>
+          <Stats />
+        </div>
+        <div className="modes">
+          <Flag onMarkClick={this.onMarkClick} flagMode={this.state.modes.flagMode}/>
+          <QuestionMark onMarkClick={this.onMarkClick} questionMode={this.state.modes.questionMode}/>
+        </div>
       </div>
     )
   }

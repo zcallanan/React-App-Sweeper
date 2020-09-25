@@ -15,7 +15,7 @@ class Square extends React.Component {
       questionMarked: PropTypes.bool.isRequired
     }),
     onSquareClick: PropTypes.func.isRequired,
-    marks: PropTypes.object.isRequired,
+    modes: PropTypes.object.isRequired,
     square: PropTypes.string.isRequired
   }
 
@@ -57,7 +57,7 @@ class Square extends React.Component {
   generateButton = () => {
     const squares = this.props.squares;
     const square = this.props.square;
-    const marks = this.props.marks;
+    const modes = this.props.modes;
     const adjacentBombCount = squares.adjacentBombCount;
     const clicked = squares.clicked;
     const hint = squares.hint;
@@ -73,7 +73,7 @@ class Square extends React.Component {
           {this.renderSquare()}
         </button>
       );
-    } else if (marks.flagMode) {
+    } else if (modes.flagMode) {
       // Toggle placement of flags
       if (questionmarkBool) {
         className = "square flag-mode questionmarked";
@@ -98,7 +98,7 @@ class Square extends React.Component {
       } else {
         className = "square flag-mode";
       }
-    } else if (marks.questionMode) {
+    } else if (modes.questionMode) {
       // Toggle question marks
       if (flaggedBool) {
         // In questionMode, if the square is flagged

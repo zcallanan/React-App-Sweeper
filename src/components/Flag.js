@@ -29,11 +29,9 @@ class Flag extends React.Component {
 
   render() {
     return (
-      <div>
-        <form name="flagMode" onSubmit={this.props.onMarkClick}>
-          {this.renderFlagIcons()}
-        </form>
-      </div>
+      <form name="flagMode" onSubmit={this.props.onMarkClick}>
+        {this.renderFlagIcons()}
+      </form>
     )
   }
 }

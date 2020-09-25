@@ -20,6 +20,10 @@ p {
   transition: all 0.3s ease-in-out;
 }
 
+.squares {
+  display: flex;
+}
+
 .square.default, .square.flag-mode, .square.questionmark-mode {
   background: radial-gradient(rgba(77,162,207, .8), rgb(42,109,199));
   box-shadow: inset 0 -4px 6px rgba(0, 0, 0, 0.2);
@@ -71,11 +75,12 @@ p {
     display: none;
 }
 
-.flag-button, .flag-button-active {
+.flag-button, .question-button {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  width: 8%;
+  width: 200px;
+  height: 36px;
   font-size: 16px;
 }
 
@@ -89,8 +94,9 @@ p {
   flex-direction: column;
 }
 
-.game-row {
-  display: table-row;
+.game-body, .modes {
+  display: flex;
+  justify-content: center;
 }
 
 .form-fields {
