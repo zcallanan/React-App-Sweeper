@@ -77,8 +77,8 @@ class App extends React.Component {
     localStorage.setItem("options", JSON.stringify(options));
   }
 
-  // Toggle state when mark buttons are clicked (flag, question mark)
-  onMarkClick = e => {
+  // Toggle state when mode buttons are clicked (flag, question mark)
+  onModeClick = e => {
     e.preventDefault();
     // 1. Get state of flag
     let modes = this.state.modes;
@@ -97,38 +97,50 @@ class App extends React.Component {
   onSquareClick = squareKey => {
     // 1. Copy state
     const squares = { ...this.state.squares };
+    const options = { ...this.state.options }
     const bomb = squares[squareKey]['bomb'];
+    let questionMarked = squares[squareKey]['questionMarked'];
+    let flagged = squares[squareKey]['flagged'];
+    const adjacentBombCount = squares[squareKey]['adjacentBombCount'];
     const flagMode = this.state.modes.flagMode;
     const questionMode = this.state.modes.questionMode;
     // 2. Update square
-    // TODO: Handle clicking on a bomb
-    if (bomb) {
-      console.log('bomb!')
-    } else if (flagMode) {
+    if (flagMode) {
       // If marking a flag is active, then mark only that square and then save to state
-      squares[squareKey]['flagged'] = !squares[squareKey]['flagged'];
-      if (squares[squareKey]['questionMarked']) {
+      flagged = !flagged;
+      if (questionMarked) {
         // If the square is question marked when placing a flag, remove questionMarked
-        squares[squareKey]['questionMarked'] = !squares[squareKey]['questionMarked']
+        questionMarked = !questionMarked;
       }
     } else if (questionMode) {
       // If placing a question mark is active, then mark only that square and then save to state
-      squares[squareKey]['questionMarked'] = !squares[squareKey]['questionMarked'];
-      if (squares[squareKey]['flagged']) {
+      questionMarked = !questionMarked;
+      if (flagged) {
         // If the square is flagged when placing a question mark, unflag it
-        squares[squareKey]['flagged'] = !squares[squareKey]['flagged']
+        flagged = !flagged;
       }
     } else {
       // Mark as clicked and evaluate
       squares[squareKey]['clicked'] = true;
-      if (!squares[squareKey]['bomb']) {
+      if (!bomb) {
         // Check neighbors to determine whether to click them or show their hint. Those with hints CAN be bombs
         this.checkNeighbors(squareKey, squares);
+        if (adjacentBombCount > 0) {
+          // Click on a square with an adjacent bomb, reveal its hint
+          squares[squareKey]['hint'] = true;
+        }
+      } else {
+        // Clicked on a bomb
+        options.lives--;
+        this.setState({ options })
+        if (options.lives === 0) {
+          // TODO: Game over
+
+        } else {
+          // TODO: Prompt to continue
+        }
       }
-      if (squares[squareKey]['adjacentBombCount'] > 0 && !squares[squareKey]['bomb']) {
-        // Click on a square with an adjacent bomb, reveal its hint
-        squares[squareKey]['hint'] = true;
-      }
+
 
     }
     // 3. Save state
@@ -317,8 +329,8 @@ class App extends React.Component {
           <Stats />
         </div>
         <div className="modes">
-          <Flag onMarkClick={this.onMarkClick} flagMode={this.state.modes.flagMode}/>
-          <QuestionMark onMarkClick={this.onMarkClick} questionMode={this.state.modes.questionMode}/>
+          <Flag onModeClick={this.onModeClick} flagMode={this.state.modes.flagMode}/>
+          <QuestionMark onModeClick={this.onModeClick} questionMode={this.state.modes.questionMode}/>
         </div>
       </div>
     )

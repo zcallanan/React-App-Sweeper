@@ -6,7 +6,7 @@ import { faFlag as farFlag } from '@fortawesome/free-regular-svg-icons'
 
 class Flag extends React.Component {
   static propTypes = {
-    onMarkClick: PropTypes.func.isRequired,
+    onModeClick: PropTypes.func.isRequired,
     flagMode: PropTypes.bool.isRequired
   }
 
@@ -29,7 +29,7 @@ class Flag extends React.Component {
 
   render() {
     return (
-      <form name="flagMode" onSubmit={this.props.onMarkClick}>
+      <form name="flagMode" onSubmit={this.props.onModeClick}>
         {this.renderFlagIcons()}
       </form>
     )
