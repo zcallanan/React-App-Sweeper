@@ -1,6 +1,6 @@
 import React from 'react';
 import Form from './Form';
-import Row from './Row';
+import Column from './Column';
 import Flag from './Flag';
 import Header from './Header';
 import QuestionMark from './QuestionMark';
@@ -57,18 +57,20 @@ class App extends React.Component {
       // No local storage
       options["size"] = 10;
       options["difficulty"] = 2;
+      options["lives"] = 3;
     }
     this.setState({ options });
     this.initSquares(options.size);
   }
 
   // Save Player's game board options
-  saveOptions = (count, difficulty) => {
+  saveOptions = obj => {
     // 1. Copy state
     const options = this.state.options;
     // 2. Add new value to state
-    options["size"] = parseInt(count);
-    options["difficulty"] = parseInt(difficulty);
+    options["size"] = parseInt(obj["size"]);
+    options["difficulty"] = parseInt(obj["difficulty"]);
+    options["lives"] = parseInt(obj["lives"]);
     // 3. SetState
     this.setState({ options });
     // 4. Save options to local storage
@@ -95,11 +97,14 @@ class App extends React.Component {
   onSquareClick = squareKey => {
     // 1. Copy state
     const squares = { ...this.state.squares };
+    const bomb = squares[squareKey]['bomb'];
     const flagMode = this.state.modes.flagMode;
     const questionMode = this.state.modes.questionMode;
     // 2. Update square
     // TODO: Handle clicking on a bomb
-    if (flagMode) {
+    if (bomb) {
+      console.log('bomb!')
+    } else if (flagMode) {
       // If marking a flag is active, then mark only that square and then save to state
       squares[squareKey]['flagged'] = !squares[squareKey]['flagged'];
       if (squares[squareKey]['questionMarked']) {
@@ -283,11 +288,11 @@ class App extends React.Component {
   }
 
   render() {
-    const rows = [];
+    const columns = [];
     for (let i = 0; i < this.state.options.size; i++) {
-      rows.push(<Row
-        key={`r${i}`}
-        row={`r${i}`}
+      columns.push(<Column
+        key={`s${i}`}
+        column={`s${i}`}
         modes={this.state.modes}
         squares={this.state.squares}
         size={this.state.options.size}
@@ -307,7 +312,7 @@ class App extends React.Component {
         />
         <div className="game-body">
           <div className="squares">
-            {rows}
+            {columns}
           </div>
           <Stats />
         </div>

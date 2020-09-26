@@ -14,14 +14,14 @@ class Flag extends React.Component {
     if (this.props.flagMode) {
       return (
         <button className="flag-button-active">
-          <p>Set Flag</p>
+          <p>Flag Bomb</p>
           <FontAwesomeIcon icon={ faFlag } />
         </button>
       )
     }
     return (
       <button className="flag-button">
-        <p>Flag Possible Bomb</p>
+        <p>Flag Bomb</p>
         <FontAwesomeIcon icon={ farFlag } />
       </button>
     )

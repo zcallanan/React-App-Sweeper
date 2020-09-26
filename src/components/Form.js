@@ -14,41 +14,43 @@ class Form extends React.Component {
 
   // Local validation state
   state = {
-    fields: {
+    options: {
       size: -1,
-      difficulty: -1
+      difficulty: -1,
+      lives: -1
     },
     errors: {}
   }
 
   componentDidUpdate() {
     // Set an initial local state. Only do this if size: {} is not set
-    if (this.state.fields["size"] === -1) {
-      const fields = {...this.state.fields};
-      fields["size"] = this.props.options.size;
-      fields["difficulty"] = this.props.options.difficulty;
-      this.setState({ fields });
+    if (this.state.options["size"] === -1) {
+      const options = {...this.state.options};
+      options["size"] = this.props.options.size;
+      options["difficulty"] = this.props.options.difficulty;
+      options["lives"] = this.props.options.lives;
+      this.setState({ options });
     }
   }
 
   // Field Validation
   handleValidation = () => {
     // Copy local state objects
-    const fields = { ...this.state.fields };
+    const options = { ...this.state.options };
     const errors = { ...this.state.errors };
     let formIsValid = true;
 
     // Size of board
-    if (!fields["size"]) {
+    if (!options["size"]) {
       formIsValid = false;
       errors["size"] = "Square number field cannot be empty";
-    } else if(typeof fields["size"] !== "undefined"){
-      if(isNaN(parseInt(fields["size"]))){
+    } else if(typeof options["size"] !== "undefined"){
+      if(isNaN(parseInt(options["size"]))){
         // If input NaN() returns true
         formIsValid = false;
         errors["size"] = "Enter an integer number";
       }
-      else if(fields["size"] < 5 || fields["size"] > 20){
+      else if(options["size"] < 5 || options["size"] > 20){
         // If input is not in range
         formIsValid = false;
         errors["size"] = "Enter a number between 5 and 20";
@@ -56,11 +58,11 @@ class Form extends React.Component {
     }
 
     // Percentage
-    if (!fields["difficulty"]) {
+    if (!options["difficulty"]) {
       formIsValid = false;
       errors["difficulty"] = "The percentage field cannot be empty";
-    } else if(typeof fields["difficulty"] !== "undefined"){
-      if(isNaN(parseInt(fields["difficulty"]))){
+    } else if(typeof options["difficulty"] !== "undefined"){
+      if(isNaN(parseInt(options["difficulty"]))){
         // If the value of the select is not a number for some reason
         formIsValid = false;
         errors["difficulty"] = "Select a different percentage";
@@ -78,12 +80,12 @@ class Form extends React.Component {
     // 2. Validate fields
     if (this.handleValidation()){
       // Get values
-      const count = this.state.fields.size;
-      const difficulty = this.state.fields.difficulty;
+      const size = this.state.options.size;
+      const options = this.state.options;
       // Pass values to global state
-      this.props.saveOptions(count, difficulty);
+      this.props.saveOptions(options);
       // Determine positioning of bombs
-      this.props.initSquares(count);
+      this.props.initSquares(size);
     } else {
       setTimeout(() => {
         const errors = {...this.state.errors};
@@ -99,11 +101,11 @@ class Form extends React.Component {
 
   handleChange = e => {
     // 1. Copy local field state
-    const fields = this.state.fields;
+    const options = this.state.options;
     // 2. Get the changed value from the input
-    fields[e.target.name] = e.target.value;
+    options[e.target.name] = e.target.value;
     // 3. Save fields to local state
-    this.setState({ fields });
+    this.setState({ options });
   }
 
   render() {
@@ -115,7 +117,7 @@ class Form extends React.Component {
             <div>
               <label htmlFor="size">Customize the size of your game board by entering a number between 5 and 20:</label>
               <input
-                value={this.state.fields.size}
+                value={this.state.options.size}
                 onChange={this.handleChange}
                 name="size"
                 key="size"
@@ -126,7 +128,7 @@ class Form extends React.Component {
             <div>
               <label htmlFor="difficulty">Customize the percentage of bombs hidden on your game board:</label>
               <select
-                value={this.state.fields.difficulty}
+                value={this.state.options.difficulty}
                 onChange={this.handleChange}
                 name="difficulty"
                 key="difficulty"
