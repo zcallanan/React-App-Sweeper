@@ -15,17 +15,17 @@ class Stats extends React.Component {
     [ ] - ? Unknown Squares
   */
   renderLives = currentLives => {
-    // Avoid display of stats before currentLives is set
     let life = "Life";
     if (currentLives > 1) {
       life = "Lives";
     }
+    // Avoid display of stats before currentLives is set
     if (currentLives >= 0) {
       return (
-        <li key="this">
+        <li key="lifeCount">
           <span>
             <TransitionGroup component="span" className="lives">
-              <CSSTransition classNames="lives" in="true" key={currentLives} timeout={{enter: 1500, exit: 1500}} >
+              <CSSTransition classNames="lives" key={currentLives} timeout={{enter: 1500, exit: 1500}} >
                 <span>{currentLives}  </span>
               </CSSTransition>
             </TransitionGroup>
