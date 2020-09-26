@@ -107,6 +107,8 @@ class Form extends React.Component {
           alert(errors["size"]);
         } else if (errors["difficulty"]) {
           alert(errors["difficulty"]);
+        } else if (errors["lives"]){
+          alert(errors["lives"]);
         }
       }, 200);
     }
