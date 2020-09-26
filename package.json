@@ -10,14 +10,19 @@
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.3.2",
     "@testing-library/user-event": "^7.1.2",
+    "autoprefixer-stylus": "^1.0.0",
     "prop-types": "^15.7.2",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "react-scripts": "3.4.3",
-    "react-transition-group": "^4.4.1"
+    "react-transition-group": "^4.4.1",
+    "stylus": "^0.54.8"
   },
   "scripts": {
     "start": "react-scripts start",
+    "watch": "concurrently --names \"webpack, stylus\" --prefix name \"yarn start\" \"yarn styles:watch\"",
+    "styles": "stylus -u autoprefixer-stylus ./src/css/style.styl -o ./src/css/style.css",
+    "styles:watch": "yarn styles -- -w",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"

@@ -25,7 +25,7 @@ class App extends React.Component {
         5: "75%"
       },
       numberOfLives: {
-        0: "Ironman",
+        0: "0",
         1: "1",
         2: "3",
         3: "6",
@@ -49,6 +49,7 @@ class App extends React.Component {
       questionMode: false
     },
     stats: {
+      currentLives: -1,
       bombs: 0,
       revealed: 0,
       flags: 0,
@@ -59,6 +60,8 @@ class App extends React.Component {
 
   componentDidMount() {
     let options = { ...this.state.options };
+    const stats = this.state.stats;
+    const data = this.state.data;
     // Read options from local storage
     const localStorageRef = localStorage.getItem("options");
     if (localStorageRef) {
@@ -69,7 +72,10 @@ class App extends React.Component {
       options["difficulty"] = 2;
       options["lives"] = 2;
     }
+    // Get initial number of lives
+    stats["currentLives"] = parseInt(data["numberOfLives"][options["lives"]])
     this.setState({ options });
+    this.setState({ stats });
     this.initSquares(options.size);
   }
 
@@ -77,12 +83,17 @@ class App extends React.Component {
   saveOptions = obj => {
     // 1. Copy state
     const options = this.state.options;
+    const stats = this.state.stats;
+    const data = this.state.data;
     // 2. Add new value to state
     options["size"] = parseInt(obj["size"]);
     options["difficulty"] = parseInt(obj["difficulty"]);
     options["lives"] = parseInt(obj["lives"]);
+    // Get initial number of lives
+    stats["currentLives"] = parseInt(data["numberOfLives"][options["lives"]])
     // 3. SetState
     this.setState({ options });
+    this.setState({ stats });
     // 4. Save options to local storage
     localStorage.setItem("options", JSON.stringify(options));
   }
@@ -107,27 +118,27 @@ class App extends React.Component {
   onSquareClick = squareKey => {
     // 1. Copy state
     const squares = { ...this.state.squares };
-    const options = { ...this.state.options }
+    const stats = { ...this.state.stats }
     const bomb = squares[squareKey]['bomb'];
-    let questionMarked = squares[squareKey]['questionMarked'];
-    let flagged = squares[squareKey]['flagged'];
     const adjacentBombCount = squares[squareKey]['adjacentBombCount'];
     const flagMode = this.state.modes.flagMode;
     const questionMode = this.state.modes.questionMode;
     // 2. Update square
     if (flagMode) {
+      console.log('hello')
       // If marking a flag is active, then mark only that square and then save to state
-      flagged = !flagged;
-      if (questionMarked) {
+      squares[squareKey]['flagged'] = !squares[squareKey]['flagged'];
+
+      if (squares[squareKey]['questionMarked']) {
         // If the square is question marked when placing a flag, remove questionMarked
-        questionMarked = !questionMarked;
+        squares[squareKey]['questionMarked'] = !squares[squareKey]['questionMarked'];
       }
     } else if (questionMode) {
       // If placing a question mark is active, then mark only that square and then save to state
-      questionMarked = !questionMarked;
-      if (flagged) {
+      squares[squareKey]['questionMarked'] = !squares[squareKey]['questionMarked'];
+      if (squares[squareKey]['flagged']) {
         // If the square is flagged when placing a question mark, unflag it
-        flagged = !flagged;
+        squares[squareKey]['flagged'] = !squares[squareKey]['flagged'];
       }
     } else {
       // Mark as clicked and evaluate
@@ -141,17 +152,15 @@ class App extends React.Component {
         }
       } else {
         // Clicked on a bomb
-        options.lives--;
-        this.setState({ options })
-        if (options.lives === 0) {
+        stats.currentLives--;
+        this.setState({ stats })
+        if (stats.currentLives === 0) {
           // TODO: Game over
 
         } else {
           // TODO: Prompt to continue
         }
       }
-
-
     }
     // 3. Save state
     this.setState({ squares });
@@ -337,7 +346,9 @@ class App extends React.Component {
           <div className="squares">
             {columns}
           </div>
-          <Stats />
+          <Stats
+            currentLives={this.state.stats.currentLives}
+          />
         </div>
         <div className="modes">
           <Flag onModeClick={this.onModeClick} flagMode={this.state.modes.flagMode}/>
