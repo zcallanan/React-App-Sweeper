@@ -2,34 +2,34 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import Square from './Square';
 
-class Row extends React.Component {
+class Column extends React.Component {
   static propTypes = {
     size: PropTypes.number.isRequired,
-    row: PropTypes.string.isRequired,
+    column: PropTypes.string.isRequired,
     modes: PropTypes.object.isRequired,
     squares: PropTypes.object.isRequired,
     onSquareClick: PropTypes.func.isRequired
   }
 
   render() {
-    const row = [];
+    const column = [];
     for (let i = 0; i < this.props.size; i++) {
-      row.push(<Square
-        key={`${this.props.row}-s${i}`}
-        square={`${this.props.row}-s${i}`}
+      column.push(<Square
+        key={`r${i}-${this.props.column}`}
+        square={`r${i}-${this.props.column}`}
         modes={this.props.modes}
-        squares={this.props.squares[`${this.props.row}-s${i}`]}
+        squares={this.props.squares[`r${i}-${this.props.column}`]}
         onSquareClick={this.props.onSquareClick}
       />)
     }
 
     return (
-      <div className="board-row">
-        {row}
+      <div className="board-column">
+        {column}
       </div>
     );
   }
 
 }
 
-export default Row;
+export default Column;

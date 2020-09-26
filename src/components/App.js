@@ -1,6 +1,6 @@
 import React from 'react';
 import Form from './Form';
-import Row from './Row';
+import Column from './Column';
 import Flag from './Flag';
 import Header from './Header';
 import QuestionMark from './QuestionMark';
@@ -15,13 +15,23 @@ class App extends React.Component {
       difficulty: 0,
       lives: 0
     },
-    bombPercentage: {
-      0: "10%",
-      1: "20%",
-      2: "30%",
-      3: "45%",
-      4: "60%",
-      5: "75%"
+    data: {
+      bombPercentage: {
+        0: "10%",
+        1: "20%",
+        2: "30%",
+        3: "45%",
+        4: "60%",
+        5: "75%"
+      },
+      numberOfLives: {
+        0: "Ironman",
+        1: "1",
+        2: "3",
+        3: "6",
+        4: "9",
+        5: "99"
+      }
     },
     squares: {
       "r0-s0": {
@@ -57,26 +67,28 @@ class App extends React.Component {
       // No local storage
       options["size"] = 10;
       options["difficulty"] = 2;
+      options["lives"] = 2;
     }
     this.setState({ options });
     this.initSquares(options.size);
   }
 
   // Save Player's game board options
-  saveOptions = (count, difficulty) => {
+  saveOptions = obj => {
     // 1. Copy state
     const options = this.state.options;
     // 2. Add new value to state
-    options["size"] = parseInt(count);
-    options["difficulty"] = parseInt(difficulty);
+    options["size"] = parseInt(obj["size"]);
+    options["difficulty"] = parseInt(obj["difficulty"]);
+    options["lives"] = parseInt(obj["lives"]);
     // 3. SetState
     this.setState({ options });
     // 4. Save options to local storage
     localStorage.setItem("options", JSON.stringify(options));
   }
 
-  // Toggle state when mark buttons are clicked (flag, question mark)
-  onMarkClick = e => {
+  // Toggle state when mode buttons are clicked (flag, question mark)
+  onModeClick = e => {
     e.preventDefault();
     // 1. Get state of flag
     let modes = this.state.modes;
@@ -95,35 +107,50 @@ class App extends React.Component {
   onSquareClick = squareKey => {
     // 1. Copy state
     const squares = { ...this.state.squares };
+    const options = { ...this.state.options }
+    const bomb = squares[squareKey]['bomb'];
+    let questionMarked = squares[squareKey]['questionMarked'];
+    let flagged = squares[squareKey]['flagged'];
+    const adjacentBombCount = squares[squareKey]['adjacentBombCount'];
     const flagMode = this.state.modes.flagMode;
     const questionMode = this.state.modes.questionMode;
     // 2. Update square
-    // TODO: Handle clicking on a bomb
     if (flagMode) {
       // If marking a flag is active, then mark only that square and then save to state
-      squares[squareKey]['flagged'] = !squares[squareKey]['flagged'];
-      if (squares[squareKey]['questionMarked']) {
+      flagged = !flagged;
+      if (questionMarked) {
         // If the square is question marked when placing a flag, remove questionMarked
-        squares[squareKey]['questionMarked'] = !squares[squareKey]['questionMarked']
+        questionMarked = !questionMarked;
       }
     } else if (questionMode) {
       // If placing a question mark is active, then mark only that square and then save to state
-      squares[squareKey]['questionMarked'] = !squares[squareKey]['questionMarked'];
-      if (squares[squareKey]['flagged']) {
+      questionMarked = !questionMarked;
+      if (flagged) {
         // If the square is flagged when placing a question mark, unflag it
-        squares[squareKey]['flagged'] = !squares[squareKey]['flagged']
+        flagged = !flagged;
       }
     } else {
       // Mark as clicked and evaluate
       squares[squareKey]['clicked'] = true;
-      if (!squares[squareKey]['bomb']) {
+      if (!bomb) {
         // Check neighbors to determine whether to click them or show their hint. Those with hints CAN be bombs
         this.checkNeighbors(squareKey, squares);
+        if (adjacentBombCount > 0) {
+          // Click on a square with an adjacent bomb, reveal its hint
+          squares[squareKey]['hint'] = true;
+        }
+      } else {
+        // Clicked on a bomb
+        options.lives--;
+        this.setState({ options })
+        if (options.lives === 0) {
+          // TODO: Game over
+
+        } else {
+          // TODO: Prompt to continue
+        }
       }
-      if (squares[squareKey]['adjacentBombCount'] > 0 && !squares[squareKey]['bomb']) {
-        // Click on a square with an adjacent bomb, reveal its hint
-        squares[squareKey]['hint'] = true;
-      }
+
 
     }
     // 3. Save state
@@ -177,7 +204,7 @@ class App extends React.Component {
     const options = {...this.state.options};
     const squares = {...this.state.squares};
     // Get percentage of bombs
-    for (const [key, value] of Object.entries(this.state.bombPercentage)) {
+    for (const [key, value] of Object.entries(this.state.data.bombPercentage)) {
       if (parseInt(key) === options.difficulty) {
         percentage = parseFloat(value) * .01;
       }
@@ -214,10 +241,10 @@ class App extends React.Component {
     return;
   }
 
-  countAdjacentBombs = square => {
+  countAdjacentBombs = squareKey => {
     const size = this.state.options.size;
-    const row = parseInt(square.split("-")[0].match(/\d{1,3}/)[0]);
-    const column = parseInt(square.split("-")[1].match(/(\d{1,3})/)[0]);
+    const row = parseInt(squareKey.split("-")[0].match(/\d{1,3}/)[0]);
+    const column = parseInt(squareKey.split("-")[1].match(/(\d{1,3})/)[0]);
     const neighbors = [];
     if (row - 1 >= 0) {
       // If it's not the first row
@@ -259,8 +286,8 @@ class App extends React.Component {
       }
     })
     // 3. Set state neighbor count
-    squares[square].neighbors = neighbors;
-    squares[square].adjacentBombCount = adjacentBombCount;
+    squares[squareKey].neighbors = neighbors;
+    squares[squareKey].adjacentBombCount = adjacentBombCount;
     this.setState({ squares });
     return neighbors;
   }
@@ -283,11 +310,11 @@ class App extends React.Component {
   }
 
   render() {
-    const rows = [];
+    const columns = [];
     for (let i = 0; i < this.state.options.size; i++) {
-      rows.push(<Row
-        key={`r${i}`}
-        row={`r${i}`}
+      columns.push(<Column
+        key={`s${i}`}
+        column={`s${i}`}
         modes={this.state.modes}
         squares={this.state.squares}
         size={this.state.options.size}
@@ -303,17 +330,18 @@ class App extends React.Component {
           saveOptions={this.saveOptions}
           initSquares={this.initSquares}
           setBombs={this.setBombs}
-          percentages={this.state.bombPercentage}
+          percentages={this.state.data.bombPercentage}
+          lives={this.state.data.numberOfLives}
         />
         <div className="game-body">
           <div className="squares">
-            {rows}
+            {columns}
           </div>
           <Stats />
         </div>
         <div className="modes">
-          <Flag onMarkClick={this.onMarkClick} flagMode={this.state.modes.flagMode}/>
-          <QuestionMark onMarkClick={this.onMarkClick} questionMode={this.state.modes.questionMode}/>
+          <Flag onModeClick={this.onModeClick} flagMode={this.state.modes.flagMode}/>
+          <QuestionMark onModeClick={this.onModeClick} questionMode={this.state.modes.questionMode}/>
         </div>
       </div>
     )

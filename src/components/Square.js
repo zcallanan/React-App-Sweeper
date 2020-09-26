@@ -69,7 +69,7 @@ class Square extends React.Component {
       // Disable the button if it's been clicked
       className = "square";
       return (
-        <button className={className} disabled>
+        <button className={`${className} ${square}`} disabled>
           {this.renderSquare()}
         </button>
       );
@@ -88,7 +88,7 @@ class Square extends React.Component {
           className = "square flag-mode hint";
         }
         return (
-          <button className={className} onClick={() => { this.props.onSquareClick(square)}}>
+          <button className={`${className} ${square}`} onClick={() => { this.props.onSquareClick(square)}}>
             <span>
               <p className={`bomb-count neighbors-${adjacentBombCount}`}>{adjacentBombCount}</p>
               {this.renderSquare()}
@@ -113,7 +113,7 @@ class Square extends React.Component {
           className = "square questionmark-mode hint";
         }
         return (
-          <button className={className} onClick={() => { this.props.onSquareClick(square)}}>
+          <button className={`${className} ${square}`} onClick={() => { this.props.onSquareClick(square)}}>
             <span>
               <p className={`bomb-count neighbors-${adjacentBombCount}`}>{adjacentBombCount}</p>
               {this.renderSquare()}
@@ -134,7 +134,7 @@ class Square extends React.Component {
       }
 
       return (
-        <button className={className} onClick={() => { this.props.onSquareClick(square)}}>
+        <button className={`${className} ${square}`} onClick={() => { this.props.onSquareClick(square)}}>
           <span>
             <p className={`bomb-count neighbors-${adjacentBombCount}`}>{adjacentBombCount}</p>
             {this.renderSquare()}
@@ -153,7 +153,7 @@ class Square extends React.Component {
 
     }
     return (
-      <button className={className} onClick={() => { this.props.onSquareClick(square)}}>
+      <button className={`${className} ${square}`} onClick={() => { this.props.onSquareClick(square)}}>
         {this.renderSquare()}
       </button>
     );

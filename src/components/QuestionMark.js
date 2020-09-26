@@ -6,7 +6,7 @@ import { faQuestionCircle as farQuestionCircle } from '@fortawesome/free-regular
 
 class QuestionMark extends React.Component {
   static propTypes = {
-    onMarkClick: PropTypes.func.isRequired,
+    onModeClick: PropTypes.func.isRequired,
     questionMode: PropTypes.bool.isRequired
   }
 
@@ -14,7 +14,7 @@ class QuestionMark extends React.Component {
     if (this.props.questionMode) {
       return (
         <button className="question-button-active">
-          <p>Set Unknown</p>
+          <p>Mark As Unknown</p>
           <FontAwesomeIcon icon={ faQuestionCircle } />
         </button>
       )
@@ -30,7 +30,7 @@ class QuestionMark extends React.Component {
   render() {
     return (
       <div>
-        <form name="questionMode" onSubmit={this.props.onMarkClick}>
+        <form name="questionMode" onSubmit={this.props.onModeClick}>
           {this.renderQuestionIcons()}
         </form>
       </div>
