@@ -16,6 +16,10 @@ class Stats extends React.Component {
   */
   renderLives = currentLives => {
     // Avoid display of stats before currentLives is set
+    let life = "Life";
+    if (currentLives > 1) {
+      life = "Lives";
+    }
     if (currentLives >= 0) {
       return (
         <li key="this">
@@ -25,7 +29,7 @@ class Stats extends React.Component {
                 <span>{currentLives}  </span>
               </CSSTransition>
             </TransitionGroup>
-            Lives
+            {life}
           </span>
         </li>
       )
