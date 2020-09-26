@@ -15,13 +15,23 @@ class App extends React.Component {
       difficulty: 0,
       lives: 0
     },
-    bombPercentage: {
-      0: "10%",
-      1: "20%",
-      2: "30%",
-      3: "45%",
-      4: "60%",
-      5: "75%"
+    data: {
+      bombPercentage: {
+        0: "10%",
+        1: "20%",
+        2: "30%",
+        3: "45%",
+        4: "60%",
+        5: "75%"
+      },
+      numberOfLives: {
+        0: "Ironman",
+        1: "1",
+        2: "3",
+        3: "6",
+        4: "9",
+        5: "99"
+      }
     },
     squares: {
       "r0-s0": {
@@ -57,7 +67,7 @@ class App extends React.Component {
       // No local storage
       options["size"] = 10;
       options["difficulty"] = 2;
-      options["lives"] = 3;
+      options["lives"] = 2;
     }
     this.setState({ options });
     this.initSquares(options.size);
@@ -194,7 +204,7 @@ class App extends React.Component {
     const options = {...this.state.options};
     const squares = {...this.state.squares};
     // Get percentage of bombs
-    for (const [key, value] of Object.entries(this.state.bombPercentage)) {
+    for (const [key, value] of Object.entries(this.state.data.bombPercentage)) {
       if (parseInt(key) === options.difficulty) {
         percentage = parseFloat(value) * .01;
       }
@@ -320,7 +330,8 @@ class App extends React.Component {
           saveOptions={this.saveOptions}
           initSquares={this.initSquares}
           setBombs={this.setBombs}
-          percentages={this.state.bombPercentage}
+          percentages={this.state.data.bombPercentage}
+          lives={this.state.data.numberOfLives}
         />
         <div className="game-body">
           <div className="squares">

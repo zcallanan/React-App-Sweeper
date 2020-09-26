@@ -6,6 +6,7 @@ class Form extends React.Component {
     saveOptions: PropTypes.func.isRequired,
     initSquares: PropTypes.func.isRequired,
     percentages: PropTypes.object.isRequired,
+    lives: PropTypes.object.isRequired,
     options: PropTypes.shape({
       size: PropTypes.number.isRequired,
       difficulty: PropTypes.number.isRequired
@@ -110,6 +111,7 @@ class Form extends React.Component {
 
   render() {
     const percentages = this.props.percentages;
+    const lives = this.props.lives;
     return (
       <div className="form">
         <form key="optionsForm" onSubmit={this.handleSubmit}>
@@ -137,6 +139,19 @@ class Form extends React.Component {
                 {Object.keys(percentages).map(key => <option key={key} value={key}>{percentages[key]}</option>)}
               </select>
             </div>
+            <div>
+              <label htmlFor="lives">Customize the number of bombs you uncover before game over:</label>
+              <select
+                value={this.state.options.lives}
+                onChange={this.handleChange}
+                name="lives"
+                key="lives"
+                id="lives"
+              >
+                {Object.keys(lives).map(key => <option key={key} value={key}>{lives[key]}</option>)}
+              </select>
+            </div>
+
             <button type="submit">Play Sweeper</button>
           </div>
         </form>
