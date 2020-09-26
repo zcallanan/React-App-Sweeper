@@ -241,10 +241,10 @@ class App extends React.Component {
     return;
   }
 
-  countAdjacentBombs = square => {
+  countAdjacentBombs = squareKey => {
     const size = this.state.options.size;
-    const row = parseInt(square.split("-")[0].match(/\d{1,3}/)[0]);
-    const column = parseInt(square.split("-")[1].match(/(\d{1,3})/)[0]);
+    const row = parseInt(squareKey.split("-")[0].match(/\d{1,3}/)[0]);
+    const column = parseInt(squareKey.split("-")[1].match(/(\d{1,3})/)[0]);
     const neighbors = [];
     if (row - 1 >= 0) {
       // If it's not the first row
@@ -286,8 +286,8 @@ class App extends React.Component {
       }
     })
     // 3. Set state neighbor count
-    squares[square].neighbors = neighbors;
-    squares[square].adjacentBombCount = adjacentBombCount;
+    squares[squareKey].neighbors = neighbors;
+    squares[squareKey].adjacentBombCount = adjacentBombCount;
     this.setState({ squares });
     return neighbors;
   }
