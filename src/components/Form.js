@@ -70,6 +70,18 @@ class Form extends React.Component {
       }
     }
 
+    // Lives
+    if (!options["lives"]) {
+      formIsValid = false;
+      errors["lives"] = "The lives field cannot be empty";
+    } else if(typeof options["lives"] !== "undefined"){
+      if(isNaN(parseInt(options["lives"]))){
+        // If the value of the select is not a number for some reason
+        formIsValid = false;
+        errors["lives"] = "Select a different number of lives";
+      }
+    }
+
     // Save form errors to local state
     this.setState({ errors });
     return formIsValid;
