@@ -13,7 +13,7 @@ class QuestionMark extends React.Component {
   renderQuestionIcons = () => {
     if (this.props.questionMode) {
       return (
-        <button className="question-button-active">
+        <button className="question-button">
           <p>Mark As Unknown</p>
           <FontAwesomeIcon icon={ faQuestionCircle } />
         </button>

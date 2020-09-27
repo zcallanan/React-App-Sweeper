@@ -1,70 +1,59 @@
 // Import all partials
 @require './_*.styl'
 
-.flag-button, .question-button {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 200px;
-  height: 36px;
-  font-size: 16px;
-}
+.flag-mode
+  cursor crosshair
 
-.fa-flag {
-  font-size: 26px;
-  color: rgba(20,30,40, .5);
-}
+.questionmark-mode
+  cursor help
 
-.game-board {
-  display: flex;
-  flex-direction: column;
-}
+.flag-button, .question-button
+  display flex
+  align-items center
+  justify-content space-between
+  width 200px
+  height 36px
+  font-size 16px
+  cursor pointer
 
-.game-body, .modes {
-  display: flex;
-  justify-content: center;
-}
+.fa-w-16
+  font-size 26px
 
-.form-fields {
-  display: flex;
-  flex-direction: column;
-}
+.fa-flag, .fa-question-circle
+  color rgba(20,30,40, .5)
 
-.image {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  overflow: hidden;
-}
+.game-board
+  display flex
+  flex-direction column
 
-.neighbors-1 {
-  color: rgb(34,66,252);
-}
+.game-body, .modes
+  display flex
+  justify-content center
 
-.neighbors-2 {
-  color: rgb(65,120,29);
-}
+.form-fields
+  display flex
+  flex-direction column
 
-.neighbors-3 {
-  color: rgb(216,68,33);
-}
+.neighbors-1
+  color rgb(34,66,252)
 
-.neighbors-4 {
-  color: rgb(10,26,133);
-}
+.neighbors-2
+  color rgb(65,120,29)
 
-.neighbors-5 {
-  color: rgb(101,17,9);
-}
+.neighbors-3
+  color rgb(216,68,33)
 
-.neighbors-6 {
-  color: rgb(65,120,29);
-}
+.neighbors-4
+  color rgb(10,26,133)
 
-.neighbors-7 {
-  color: rgb(65,120,29);
-}
+.neighbors-5
+  color rgb(101,17,9)
 
-.neighbors-8 {
-  color: rgb(162,162,162);
-}
+.neighbors-6
+  color rgb(65,120,29)
+
+.neighbors-7
+  color rgb(95,90,59)
+
+.neighbors-8
+  color rgb(162,162,162)

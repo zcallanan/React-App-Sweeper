@@ -1,32 +1,127 @@
-.lives-enter {
+.lives-enter,
+.bombs-enter,
+.revealed-enter,
+.flags-enter,
+.questions-enter {
   transform: translateY(100%);
   -webkit-transform: translateY(100%);
 }
-.lives-enter.lives-enter-active {
+.lives-enter.lives-enter-active,
+.bombs-enter.lives-enter-active,
+.revealed-enter.lives-enter-active,
+.flags-enter.lives-enter-active,
+.questions-enter.lives-enter-active,
+.lives-enter.bombs-enter-active,
+.bombs-enter.bombs-enter-active,
+.revealed-enter.bombs-enter-active,
+.flags-enter.bombs-enter-active,
+.questions-enter.bombs-enter-active,
+.lives-enter.revealed-enter-active,
+.bombs-enter.revealed-enter-active,
+.revealed-enter.revealed-enter-active,
+.flags-enter.revealed-enter-active,
+.questions-enter.revealed-enter-active,
+.lives-enter.flags-enter-active,
+.bombs-enter.flags-enter-active,
+.revealed-enter.flags-enter-active,
+.flags-enter.flags-enter-active,
+.questions-enter.flags-enter-active,
+.lives-enter.questions-enter-active,
+.bombs-enter.questions-enter-active,
+.revealed-enter.questions-enter-active,
+.flags-enter.questions-enter-active,
+.questions-enter.questions-enter-active {
   transform: translateY(0);
   -webkit-transform: translateY(0);
   transition: 1.5s;
   -webkit-transition: 1.5s;
 }
-.lives-exit {
+.lives-exit,
+.bombs-exit,
+.revealed-exit,
+.flags-exit,
+.questions-exit {
   transform: translateY(0);
   -webkit-transform: translateY(0);
   position: absolute;
   left: 0;
   bottom: 0;
 }
-.lives-exit.lives-exit-active {
+.lives-exit.lives-exit-active,
+.bombs-exit.lives-exit-active,
+.revealed-exit.lives-exit-active,
+.flags-exit.lives-exit-active,
+.questions-exit.lives-exit-active,
+.lives-exit.bombs-exit-active,
+.bombs-exit.bombs-exit-active,
+.revealed-exit.bombs-exit-active,
+.flags-exit.bombs-exit-active,
+.questions-exit.bombs-exit-active,
+.lives-exit.revealed-exit-active,
+.bombs-exit.revealed-exit-active,
+.revealed-exit.revealed-exit-active,
+.flags-exit.revealed-exit-active,
+.questions-exit.revealed-exit-active,
+.lives-exit.flags-exit-active,
+.bombs-exit.flags-exit-active,
+.revealed-exit.flags-exit-active,
+.flags-exit.flags-exit-active,
+.questions-exit.flags-exit-active,
+.lives-exit.questions-exit-active,
+.bombs-exit.questions-exit-active,
+.revealed-exit.questions-exit-active,
+.flags-exit.questions-exit-active,
+.questions-exit.questions-exit-active {
   transform: translateY(-100%);
   -webkit-transform: translateY(-100%);
   transition: 1.5s;
   -webkit-transition: 1.5s;
 }
-span.lives {
+.total-to-reveal {
+  transform: translateY(100%);
+  -webkit-transform: translateY(100%);
+}
+.total-to-reveal.total-to-reveal-active {
+  transform: translateY(0);
+  -webkit-transform: translateY(0);
+  transition: 15s;
+  -webkit-transition: 15s;
+}
+.total-to-reveal-exit {
+  transform: translateY(0);
+  -webkit-transform: translateY(0);
+  position: absolute;
+  left: 4px;
+}
+.total-to-reveal-exit.total-to-reveal-exit-active {
+  transform: translateY(-100%);
+  -webkit-transform: translateY(-100%);
+  transition: 15s;
+  -webkit-transition: 15s;
+}
+span.lives,
+span.bombs,
+span.revealed,
+span.flags,
+span.questions {
   position: relative;
   overflow: hidden;
   float: left;
 }
-span.lives span {
+span.lives span,
+span.bombs span,
+span.revealed span,
+span.flags span,
+span.questions span {
+  display: inline-block;
+}
+span.total-to-reveal {
+  position: relative;
+  overflow: hidden;
+  float: right;
+  top: -18px;
+}
+span.total-to-reveal span {
   display: inline-block;
 }
 .squares {
@@ -47,6 +142,7 @@ span.lives span {
   text-align: center;
   width: 40px;
   transition: all 0.3s ease-in-out;
+  cursor: pointer;
 }
 .square.default,
 .square.flag-mode,
@@ -67,6 +163,7 @@ span.lives span {
 .square:disabled {
   background: radial-gradient(rgba(205,205,205,0.1), rgba(200,200,200,0.8));
   box-shadow: inset 0 -2px 3px rgba(0,0,0,0.1);
+  color: #000;
 }
 .square:focus {
   outline: none;
@@ -94,11 +191,25 @@ span.lives span {
 .square .questionmark-icon {
   display: none;
 }
+thead {
+  font-size: 26px;
+  text-align: center;
+}
 p {
-  -webkit-margin-before: 0px;
-          margin-block-start: 0px;
-  -webkit-margin-after: 0px;
-          margin-block-end: 0px;
+  -webkit-margin-before: 0;
+          margin-block-start: 0;
+  -webkit-margin-after: 0;
+          margin-block-end: 0;
+}
+ul {
+  list-style: none;
+  padding-left: 0;
+}
+.flag-mode {
+  cursor: crosshair;
+}
+.questionmark-mode {
+  cursor: help;
 }
 .flag-button,
 .question-button {
@@ -108,9 +219,13 @@ p {
   width: 200px;
   height: 36px;
   font-size: 16px;
+  cursor: pointer;
 }
-.fa-flag {
+.fa-w-16 {
   font-size: 26px;
+}
+.fa-flag,
+.fa-question-circle {
   color: rgba(20,30,40,0.5);
 }
 .game-board {
@@ -125,12 +240,6 @@ p {
 .form-fields {
   display: flex;
   flex-direction: column;
-}
-.image {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  overflow: hidden;
 }
 .neighbors-1 {
   color: #2242fc;
@@ -151,7 +260,7 @@ p {
   color: #41781d;
 }
 .neighbors-7 {
-  color: #41781d;
+  color: #5f5a3b;
 }
 .neighbors-8 {
   color: #a2a2a2;

@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faFlag, faQuestionCircle } from '@fortawesome/free-solid-svg-icons'
+import { faFlag, faQuestionCircle, faBomb } from '@fortawesome/free-solid-svg-icons'
 import { faFlag as farFlag, faQuestionCircle as farQuestionCircle } from '@fortawesome/free-regular-svg-icons'
 
 class Square extends React.Component {
@@ -29,7 +29,7 @@ class Square extends React.Component {
       // If it's a bomb and clicked, show the bomb
       return (
         <span>
-          <img className="image" src="/images/bomb.png" alt="B"/>
+          <FontAwesomeIcon icon={ faBomb } />
         </span>
       )
     } else if (flaggedBool && !clicked) {
