@@ -13,7 +13,7 @@ class Flag extends React.Component {
   renderFlagIcons = () => {
     if (this.props.flagMode) {
       return (
-        <button className="flag-button-active">
+        <button className="flag-button">
           <p>Flag Bomb</p>
           <FontAwesomeIcon icon={ faFlag } />
         </button>

@@ -1,6 +1,12 @@
 // Import all partials
 @require './_*.styl'
 
+.flag-mode
+  cursor crosshair
+
+.questionmark-mode
+  cursor help
+
 .flag-button, .question-button
   display flex
   align-items center
@@ -8,6 +14,7 @@
   width 200px
   height 36px
   font-size 16px
+  cursor pointer
 
 .fa-w-16
   font-size 26px

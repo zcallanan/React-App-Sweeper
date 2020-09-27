@@ -50,7 +50,7 @@ class App extends React.Component {
     },
     stats: {
       currentLives: -1,
-      bombs: 0,
+      bombs: -1,
       revealed: 0,
       flags: 0,
       questions: 0
@@ -144,8 +144,12 @@ class App extends React.Component {
       // Mark as clicked and evaluate
       squares[squareKey]['clicked'] = true;
       if (!bomb) {
+        // Increment revealed
+        let stats = {...this.state.stats};
+        stats['revealed']++;
         // Check neighbors to determine whether to click them or show their hint. Those with hints CAN be bombs
-        this.checkNeighbors(squareKey, squares);
+        stats = this.checkNeighbors(squareKey, squares, stats);
+        this.setState({ stats });
         if (adjacentBombCount > 0) {
           // Click on a square with an adjacent bomb, reveal its hint
           squares[squareKey]['hint'] = true;
@@ -170,6 +174,10 @@ class App extends React.Component {
   initSquares = size => {
     // 1. Copy state
     let squares = {...this.state.squares};
+    // Make sure that the revealed stat is set to zero at the start
+    const stats = {...this.state.stats};
+    stats["revealed"] = 0;
+    this.setState({stats});
     // If size decreases, then square keys should be deleted before the board is regenerated
     if (Object.keys(squares).length > 1) {
       let row;
@@ -212,6 +220,7 @@ class App extends React.Component {
     // Copy game board dimension
     const options = {...this.state.options};
     const squares = {...this.state.squares};
+    const stats = {...this.state.stats}
     // Get percentage of bombs
     for (const [key, value] of Object.entries(this.state.data.bombPercentage)) {
       if (parseInt(key) === options.difficulty) {
@@ -219,14 +228,17 @@ class App extends React.Component {
       }
     }
     // Calculate number of bombs
-    const bombCount = (options.size ** 2) * percentage;
+    const bombCount = Math.floor((options.size ** 2) * percentage);
+    // Save bombCount to stats
+    stats.bombs = bombCount;
+    this.setState({stats});
     // Generate bomb positions
     this.generatePositions(positionArray, squares, bombCount, options.size, 0);
     // Save bomb positions
     this.setState({squares});
   }
 
-  checkNeighbors = (squareKey, squares) => {
+  checkNeighbors = (squareKey, squares, stats) => {
     let neighbors;
     if ((squares[squareKey]['neighbors'] === 'undefined' || squares[squareKey]['neighbors'].length === 0) || squares[squareKey]['adjacentBombCount'] === -1 ) {
       // If squareKey has no neighbors or its adjacent bombs have not been counted, then call countAdjacentBombs
@@ -244,10 +256,12 @@ class App extends React.Component {
       } else if (squares[neighbor]['adjacentBombCount'] === 0 && !squares[neighbor]['bomb'] && !squares[neighbor]['clicked'] && !squares[neighbor]['hint']) {
         // If a neighbor has no adjacent bombs, isn't a bomb, has no revealed hint or been clicked, then mark as clicked and check its neighbors
         squares[neighbor]['clicked'] = true;
-        this.checkNeighbors(neighbor, squares);
+        // Increment revealed
+        stats['revealed']++;
+        this.checkNeighbors(neighbor, squares, stats);
       }
     })
-    return;
+    return stats;
   }
 
   countAdjacentBombs = squareKey => {
@@ -347,7 +361,8 @@ class App extends React.Component {
             {columns}
           </div>
           <Stats
-            currentLives={this.state.stats.currentLives}
+            stats={this.state.stats}
+            options={this.state.options}
           />
         </div>
         <div className="modes">

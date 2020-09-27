@@ -1,9 +1,11 @@
-.squares {
-  display: flex;
-}
+borders = rgb(180,180,180)
+
+.squares
+  display flex
+  // background-color borders
 
 .square
-  border 2px solid rgb(180,180,180)
+  border 2px solid borders
   border-radius 4px
   box-sizing border-box
   float left
@@ -17,6 +19,7 @@
   text-align center
   width 40px
   transition all 0.3s ease-in-out
+  cursor pointer
   &.default, &.flag-mode, &.questionmark-mode
     background radial-gradient(rgba(77,162,207, .8), rgb(42,109,199))
     box-shadow inset 0 -4px 6px rgba(0, 0, 0, 0.2)
