@@ -125,10 +125,17 @@ class App extends React.Component {
     const questionMode = this.state.modes.questionMode;
     // 2. Update square
     if (flagMode) {
-      console.log('hello')
       // If marking a flag is active, then mark only that square and then save to state
       squares[squareKey]['flagged'] = !squares[squareKey]['flagged'];
-
+      if (squares[squareKey]['flagged']) {
+        // If a flag is placed, increment the flag count
+        stats.flags++;
+        this.setState({ stats })
+      } else {
+        // If a flag is removed, decrement the flag count
+        stats.flags--;
+        this.setState({ stats })
+      }
       if (squares[squareKey]['questionMarked']) {
         // If the square is question marked when placing a flag, remove questionMarked
         squares[squareKey]['questionMarked'] = !squares[squareKey]['questionMarked'];
@@ -136,6 +143,15 @@ class App extends React.Component {
     } else if (questionMode) {
       // If placing a question mark is active, then mark only that square and then save to state
       squares[squareKey]['questionMarked'] = !squares[squareKey]['questionMarked'];
+      if (squares[squareKey]['questionMarked']) {
+        // If a question mark is placed, increment the question mark count
+        stats.questions++;
+        this.setState({ stats })
+      } else {
+        // If a question mark is removed, decrement the question mark count
+        stats.questions--;
+        this.setState({ stats })
+      }
       if (squares[squareKey]['flagged']) {
         // If the square is flagged when placing a question mark, unflag it
         squares[squareKey]['flagged'] = !squares[squareKey]['flagged'];
@@ -177,6 +193,8 @@ class App extends React.Component {
     // Make sure that the revealed stat is set to zero at the start
     const stats = {...this.state.stats};
     stats["revealed"] = 0;
+    stats["flags"] = 0;
+    stats["questions"] = 0;
     this.setState({stats});
     // If size decreases, then square keys should be deleted before the board is regenerated
     if (Object.keys(squares).length > 1) {

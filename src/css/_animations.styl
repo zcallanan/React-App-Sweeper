@@ -1,19 +1,19 @@
-.lives-enter, .bombs-enter, .revealed-enter
+.lives-enter, .bombs-enter, .revealed-enter, .flags-enter, .questions-enter
   transform translateY(100%)
   -webkit-transform translateY(100%)
-  &.lives-enter-active, &.bombs-enter-active, &.revealed-enter-active
+  &.lives-enter-active, &.bombs-enter-active, &.revealed-enter-active, &.flags-enter-active, &.questions-enter-active
     transform translateY(0)
     -webkit-transform translateY(0)
     transition 1.5s
     -webkit-transition 1.5s
 
-.lives-exit, .bombs-exit, .revealed-exit
+.lives-exit, .bombs-exit, .revealed-exit, .flags-exit, .questions-exit
   transform translateY(0)
   -webkit-transform translateY(0)
   position absolute
   left 0
   bottom 0
-  &.lives-exit-active, &.bombs-exit-active, &.revealed-exit-active
+  &.lives-exit-active, &.bombs-exit-active, &.revealed-exit-active, &.flags-exit-active, &.questions-exit-active
     transform translateY(-100%)
     -webkit-transform translateY(-100%)
     transition 1.5s
@@ -39,7 +39,7 @@
     transition 15s
     -webkit-transition 15s
 
-span.lives, span.bombs, span.revealed
+span.lives, span.bombs, span.revealed, span.flags, span.questions
   position relative
   overflow hidden
   float left

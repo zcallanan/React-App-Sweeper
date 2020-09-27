@@ -1,18 +1,36 @@
 .lives-enter,
 .bombs-enter,
-.revealed-enter {
+.revealed-enter,
+.flags-enter,
+.questions-enter {
   transform: translateY(100%);
   -webkit-transform: translateY(100%);
 }
 .lives-enter.lives-enter-active,
 .bombs-enter.lives-enter-active,
 .revealed-enter.lives-enter-active,
+.flags-enter.lives-enter-active,
+.questions-enter.lives-enter-active,
 .lives-enter.bombs-enter-active,
 .bombs-enter.bombs-enter-active,
 .revealed-enter.bombs-enter-active,
+.flags-enter.bombs-enter-active,
+.questions-enter.bombs-enter-active,
 .lives-enter.revealed-enter-active,
 .bombs-enter.revealed-enter-active,
-.revealed-enter.revealed-enter-active {
+.revealed-enter.revealed-enter-active,
+.flags-enter.revealed-enter-active,
+.questions-enter.revealed-enter-active,
+.lives-enter.flags-enter-active,
+.bombs-enter.flags-enter-active,
+.revealed-enter.flags-enter-active,
+.flags-enter.flags-enter-active,
+.questions-enter.flags-enter-active,
+.lives-enter.questions-enter-active,
+.bombs-enter.questions-enter-active,
+.revealed-enter.questions-enter-active,
+.flags-enter.questions-enter-active,
+.questions-enter.questions-enter-active {
   transform: translateY(0);
   -webkit-transform: translateY(0);
   transition: 1.5s;
@@ -20,7 +38,9 @@
 }
 .lives-exit,
 .bombs-exit,
-.revealed-exit {
+.revealed-exit,
+.flags-exit,
+.questions-exit {
   transform: translateY(0);
   -webkit-transform: translateY(0);
   position: absolute;
@@ -30,12 +50,28 @@
 .lives-exit.lives-exit-active,
 .bombs-exit.lives-exit-active,
 .revealed-exit.lives-exit-active,
+.flags-exit.lives-exit-active,
+.questions-exit.lives-exit-active,
 .lives-exit.bombs-exit-active,
 .bombs-exit.bombs-exit-active,
 .revealed-exit.bombs-exit-active,
+.flags-exit.bombs-exit-active,
+.questions-exit.bombs-exit-active,
 .lives-exit.revealed-exit-active,
 .bombs-exit.revealed-exit-active,
-.revealed-exit.revealed-exit-active {
+.revealed-exit.revealed-exit-active,
+.flags-exit.revealed-exit-active,
+.questions-exit.revealed-exit-active,
+.lives-exit.flags-exit-active,
+.bombs-exit.flags-exit-active,
+.revealed-exit.flags-exit-active,
+.flags-exit.flags-exit-active,
+.questions-exit.flags-exit-active,
+.lives-exit.questions-exit-active,
+.bombs-exit.questions-exit-active,
+.revealed-exit.questions-exit-active,
+.flags-exit.questions-exit-active,
+.questions-exit.questions-exit-active {
   transform: translateY(-100%);
   -webkit-transform: translateY(-100%);
   transition: 1.5s;
@@ -65,14 +101,18 @@
 }
 span.lives,
 span.bombs,
-span.revealed {
+span.revealed,
+span.flags,
+span.questions {
   position: relative;
   overflow: hidden;
   float: left;
 }
 span.lives span,
 span.bombs span,
-span.revealed span {
+span.revealed span,
+span.flags span,
+span.questions span {
   display: inline-block;
 }
 span.total-to-reveal {
@@ -150,6 +190,10 @@ span.total-to-reveal span {
 .square .flag-icon,
 .square .questionmark-icon {
   display: none;
+}
+thead {
+  font-size: 26px;
+  text-align: center;
 }
 p {
   -webkit-margin-before: 0;

@@ -6,7 +6,9 @@ class Stats extends React.Component {
   static propTypes = {
     stats: PropTypes.shape({
       currentLives: PropTypes.number.isRequired,
-      bombs: PropTypes.number.isRequired
+      bombs: PropTypes.number.isRequired,
+      flags: PropTypes.number.isRequired,
+      questions: PropTypes.number.isRequired
     })
   }
 
@@ -14,8 +16,7 @@ class Stats extends React.Component {
     localStats: {
       size: -1,
       bombs: -1,
-      totalToReveal: -1,
-      previousBombs: -1
+      totalToReveal: -1
     }
   }
 
@@ -28,8 +29,7 @@ class Stats extends React.Component {
     if (bombs > 0 && options.size > 0 && localStats.totalToReveal < 0) {
       localStats.totalToReveal = (options.size ** 2) - bombs;
       this.setState({localStats});
-    } else if (bombs > 0 && options.size > 0 && localStats.totalToReveal !== totalToReveal && bombs !== localStats.previousBombs && options.size === localStats.size && bombs !== localStats.bombs ) {
-      console.log(totalToReveal, bombs, localStats.bombs, options.size, localStats.size, localStats.previousBombs)
+    } else if (bombs > 0 && options.size > 0 && localStats.totalToReveal !== totalToReveal && options.size === localStats.size && bombs !== localStats.bombs ) {
       localStats.totalToReveal = (options.size ** 2) - bombs;
       this.setState({localStats});
     }
@@ -40,7 +40,6 @@ class Stats extends React.Component {
     }
     if ((localStats.bombs < 0 || localStats.bombs !== bombs) && bombs > 0) {
       // Set local bombs
-      localStats.previousBombs = localStats.bombs;
       localStats.bombs = bombs;
       this.setState({localStats});
     }
@@ -56,23 +55,23 @@ class Stats extends React.Component {
   renderLives = () => {
     const stats = this.props.stats;
     const currentLives = stats.currentLives;
-    let life = "Lives";
+    let life = "Lives:";
     if (currentLives === 1) {
-      life = "Life";
+      life = "Life:";
     }
     // Avoid display of stats before currentLives is set
     if (currentLives >= 0) {
       return (
-        <li key="lifeCount">
-          <span>
+        <tr key="lifeCount">
+          <td>{life}</td>
+          <td>
             <TransitionGroup component="span" className="lives">
               <CSSTransition classNames="lives" key={currentLives} timeout={{enter: 1500, exit: 1500}} >
                 <span>{currentLives}</span>
               </CSSTransition>
             </TransitionGroup>
-            {life}
-          </span>
-        </li>
+          </td>
+        </tr>
       )
     }
   }
@@ -82,16 +81,16 @@ class Stats extends React.Component {
     const bombs = stats.bombs;
     if (bombs >= 0) {
       return (
-        <li key="bombs">
-          <span>
+        <tr key="bombs">
+          <td>Hidden Bombs:</td>
+          <td>
             <TransitionGroup component="span" className="bombs">
               <CSSTransition classNames="bombs" key={bombs} timeout={{enter: 1500, exit: 1500}} >
                 <span>{bombs}</span>
               </CSSTransition>
             </TransitionGroup>
-            Bombs
-          </span>
-        </li>
+          </td>
+        </tr>
       )
     }
   }
@@ -104,21 +103,66 @@ class Stats extends React.Component {
 
     if (revealed >= 0 && totalToReveal >= 0) {
       return (
-        <li key="revealed">
-          <span>
+        <tr key="revealed">
+          <td>Squares Revealed: </td>
+          <td >
             <TransitionGroup component="span" className="revealed">
               <CSSTransition classNames="revealed" key={revealed} timeout={{enter: 1500, exit: 1500}} >
                 <span>{revealed}</span>
               </CSSTransition>
             </TransitionGroup>
-            out of
+          </td>
+          <td>/</td>
+          <td>
             <TransitionGroup component="span" className="total-to-reveal">
-              <CSSTransition classNames="total-to-reveal" key={totalToReveal} timeout={{enter: 15000, exit: 15000}} >
-                <span>{totalToReveal}</span>
+                <CSSTransition classNames="total-to-reveal" key={totalToReveal} timeout={{enter: 15000, exit: 15000}} >
+                  <span>{totalToReveal}</span>
+                </CSSTransition>
+              </TransitionGroup>
+          </td>
+        </tr>
+      )
+    }
+  }
+
+  renderFlagCount = () => {
+    const stats = this.props.stats;
+    const flags = stats.flags;
+    let flagText = "Bombs Flagged:";
+    if (flags === 1) {
+      flagText = "Bomb Flagged:";
+    }
+    if (flags >= 0) {
+      return (
+        <tr key="flags">
+          <td>{flagText}</td>
+          <td>
+            <TransitionGroup component="span" className="flags">
+              <CSSTransition classNames="flags" key={flags} timeout={{enter: 1500, exit: 1500}} >
+                <span>{flags}</span>
               </CSSTransition>
             </TransitionGroup>
-          </span>
-        </li>
+          </td>
+        </tr>
+      )
+    }
+  }
+
+  renderQuestionsCount = () => {
+    const stats = this.props.stats;
+    const questions = stats.questions;
+    if (questions >= 0) {
+      return (
+        <tr key="questions">
+          <td>Marked Unknown:</td>
+          <td>
+            <TransitionGroup component="span" className="questions">
+              <CSSTransition classNames="questions" key={questions} timeout={{enter: 1500, exit: 1500}} >
+                <span>{questions}</span>
+              </CSSTransition>
+            </TransitionGroup>
+          </td>
+        </tr>
       )
     }
   }
@@ -126,12 +170,17 @@ class Stats extends React.Component {
   render() {
     return (
       <div>
-        <h2>Stats</h2>
-        <ul>
-          {this.renderLives()}
-          {this.renderBombCount()}
-          {this.renderRevealed()}
-        </ul>
+
+        <table>
+          <thead>Stats</thead>
+          <tbody>
+            {this.renderLives()}
+            {this.renderBombCount()}
+            {this.renderRevealed()}
+            {this.renderFlagCount()}
+            {this.renderQuestionsCount()}
+          </tbody>
+        </table>
       </div>
     )
   }
