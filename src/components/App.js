@@ -42,7 +42,11 @@ class App extends React.Component {
         hint: false,
         neighbors: [],
         adjacentBombCount: -1,
-        explode: false
+        explosion: {
+          explodeTrigger: false,
+          explodeTimer: false,
+          explodeCleanup: false
+        }
       }
     },
     modes: {
@@ -116,16 +120,40 @@ class App extends React.Component {
     this.setState({ modes })
   }
 
+  explodeCleanup = squareKey => {
+    let squares = {...this.state.squares};
+    squares[squareKey].explosion.explodeTrigger = false;
+    squares[squareKey].explosion.explodeTimer = false;
+    squares[squareKey].explosion.explodeCleanup = true;
+    this.setState({squares});
+    // TODO: Display component that a bomb was struck, reset bomb square back to default
+  }
+
   explode = squareKey => {
     let squares = {...this.state.squares};
-    squares[squareKey]['explode'] = false;
-    this.setState({squares})
-    setTimeout(() => {
-      squares = {...this.state.squares};
-      squares[squareKey]['explode'] = true;
+    if (!squares[squareKey].explosion.explodeCleanup) {
+      // Prevent further animations if it's time to cleanup
+      squares[squareKey].explosion.explodeTrigger = false;
       this.setState({squares})
-    }, 1000)
-
+      setTimeout(() => {
+        // Prompt bomb animation every second
+        squares = {...this.state.squares};
+        squares[squareKey].explosion.explodeTrigger = true;
+        this.setState({squares})
+      }, 1000)
+      if (!squares[squareKey].explosion.explodeTimer) {
+        // Start a timer to stop bomb animation
+        squares = {...this.state.squares};
+        // Timer started, prevent it from starting again
+        squares[squareKey].explosion.explodeTimer = true;
+        setTimeout(() => {
+          this.explodeCleanup(squareKey);
+        }, 5000)
+      }
+    } else {
+      // Reset cleanup back to default
+      squares[squareKey].explosion.explodeCleanup = false;
+    }
   }
 
   onSquareClick = squareKey => {
@@ -185,7 +213,7 @@ class App extends React.Component {
         }
       } else {
         // Clicked on a bomb
-        squares[squareKey]['explode'] = true;
+        squares[squareKey].explosion.explodeTrigger = true;
         this.setState({squares})
 
         stats.currentLives--;
@@ -239,7 +267,11 @@ class App extends React.Component {
           hint: false,
           neighbors: [],
           adjacentBombCount: -1,
-          explode: false
+          explosion: {
+            explodeTrigger: false,
+            explodeTimer: false,
+            explodeCleanup: false
+          }
         }
       }
     }

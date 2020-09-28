@@ -24,36 +24,10 @@ class Square extends React.Component {
     bombStatus: {}
   }
 
-  componentDidUpdate() {
-    const squares = this.props.squares;
-    const square = this.props.square;
-
-    let bombStatus = {...this.state.bombStatus};
-    if (!bombStatus[square]) {
-      bombStatus[square] = {
-        explodeTrigger: false,
-        explodeUpdateOne: false,
-        explodeUpdateTwo: false,
-        explodeUpdateThree: false
-      }
-      this.setState({bombStatus});
-    }
-
-    if (squares.explode) {
-      const bombStatus = {...this.state.bombStatus};
-      if (!bombStatus[square]['explodeUpdateOne']) {
-        bombStatus[square]['explodeUpdateOne'] = true;
-        bombStatus[square]['explodeTrigger'] = true;
-        // Trigger other explode booleans with timeouts
-      }
-    }
-
-  }
-
   renderSquare = () => {
     const squares = this.props.squares;
     const square = this.props.square;
-    const explode = squares.explode;
+    const explodeTrigger = squares.explosion.explodeTrigger;
     const bomb = squares.bomb;
 
     const clicked = squares.clicked;
@@ -64,8 +38,8 @@ class Square extends React.Component {
       // If it's a bomb and clicked, show the bomb
       return (
         <TransitionGroup component="span" className="bomba">
-        {explode && (
-          <CSSTransition classNames="bomba" key={square} in={explode} appear={explode} onEnter={() => this.props.explode(square)} timeout={{enter: 1000, exit: 1000}} >
+        {explodeTrigger && (
+          <CSSTransition classNames="bomba" key={square} in={explodeTrigger} appear={explodeTrigger} onEnter={() => this.props.explode(square)} timeout={{enter: 1000, exit: 1000}} >
             <FontAwesomeIcon key={square} icon={ faBomb } />
           </CSSTransition>
         )}

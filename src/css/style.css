@@ -217,11 +217,47 @@ thead {
   font-size: 26px;
   text-align: center;
 }
+body {
+  margin: 0;
+}
+header {
+  background-color: #fff;
+  height: 50px;
+  display: flex;
+}
+header span {
+  display: flex;
+  align-items: center;
+  padding-left: 20px;
+}
+header span span {
+  padding-left: 0;
+  display: flex;
+  font-size: 32px;
+  margin: 0;
+  position: relative;
+  color: rgba(240,0,0,0.9);
+}
+header span span.sw {
+  margin-left: -2px;
+}
+header span span.ee {
+  padding-left: 3px;
+  color: #fff;
+}
+header span span.per {
+  margin-left: 2px;
+}
+header span svg {
+  position: absolute;
+  left: 56px;
+}
+header span svg.header-icon {
+  font-size: 46px;
+  color: rgba(240,0,0,0.65);
+}
 p {
-  -webkit-margin-before: 0;
-          margin-block-start: 0;
-  -webkit-margin-after: 0;
-          margin-block-end: 0;
+  margin: 0;
 }
 ul {
   list-style: none;
