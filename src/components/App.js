@@ -5,6 +5,7 @@ import Flag from './Flag';
 import Header from './Header';
 import QuestionMark from './QuestionMark';
 import Stats from './Stats';
+import Notice from './Notice';
 import { randomIntFromInterval } from '../helpers';
 
 class App extends React.Component {
@@ -59,7 +60,8 @@ class App extends React.Component {
       revealed: 0,
       flags: 0,
       questions: 0
-    }
+    },
+    displayNotice: false
 
   }
 
@@ -126,7 +128,18 @@ class App extends React.Component {
     squares[squareKey].explosion.explodeTimer = false;
     squares[squareKey].explosion.explodeCleanup = true;
     this.setState({squares});
-    // TODO: Display component that a bomb was struck, reset bomb square back to default
+    // Remove display notice
+    let displayNotice = this.state.displayNotice;
+    displayNotice = false;
+    this.setState({displayNotice});
+    // TODO: update lives count here instead
+    // Reset square
+    setTimeout(() => {
+      let squares = {...this.state.squares};
+      squares[squareKey].clicked = false;
+      this.setState({squares});
+    }, 1000);
+
   }
 
   explode = squareKey => {
@@ -213,6 +226,9 @@ class App extends React.Component {
         }
       } else {
         // Clicked on a bomb
+        let displayNotice = this.state.displayNotice;
+        displayNotice = true;
+        this.setState({displayNotice} )
         squares[squareKey].explosion.explodeTrigger = true;
         this.setState({squares})
 
@@ -429,10 +445,14 @@ class App extends React.Component {
           <div className="squares">
             {columns}
           </div>
-          <Stats
-            stats={this.state.stats}
-            options={this.state.options}
-          />
+          <div>
+            <Notice displayNotice={this.state.displayNotice} />
+            <Stats
+              stats={this.state.stats}
+              options={this.state.options}
+            />
+          </div>
+
         </div>
         <div className="modes">
           <Flag onModeClick={this.onModeClick} flagMode={this.state.modes.flagMode}/>

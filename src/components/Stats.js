@@ -170,7 +170,6 @@ class Stats extends React.Component {
   render() {
     return (
       <div>
-
         <table>
           <thead>
             <tr>

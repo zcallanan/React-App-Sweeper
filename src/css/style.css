@@ -125,10 +125,10 @@ span.total-to-reveal span {
   display: inline-block;
 }
 .bomba-enter {
-  color: #ffa500;
+  color: #f00;
 }
 .bomba-enter.bomba-enter-active {
-  color: #f00;
+  color: #ffa500;
   transition: 1s;
 }
 .bomba-exit {
@@ -254,7 +254,7 @@ header span svg {
 }
 header span svg.header-icon {
   font-size: 46px;
-  color: rgba(240,0,0,0.65);
+  color: rgba(240,0,0,0.85);
 }
 p {
   margin: 0;
