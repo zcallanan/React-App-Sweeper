@@ -172,7 +172,11 @@ class Stats extends React.Component {
       <div>
 
         <table>
-          <thead>Stats</thead>
+          <thead>
+            <tr>
+              <th>Stats</th>
+            </tr>
+          </thead>
           <tbody>
             {this.renderLives()}
             {this.renderBombCount()}

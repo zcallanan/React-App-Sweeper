@@ -20,6 +20,7 @@ class Column extends React.Component {
         modes={this.props.modes}
         squares={this.props.squares[`r${i}-${this.props.column}`]}
         onSquareClick={this.props.onSquareClick}
+        explode={this.props.explode}
       />)
     }
 

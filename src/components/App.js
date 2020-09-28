@@ -41,7 +41,8 @@ class App extends React.Component {
         clicked: false,
         hint: false,
         neighbors: [],
-        adjacentBombCount: -1
+        adjacentBombCount: -1,
+        explode: false
       }
     },
     modes: {
@@ -115,6 +116,18 @@ class App extends React.Component {
     this.setState({ modes })
   }
 
+  explode = squareKey => {
+    let squares = {...this.state.squares};
+    squares[squareKey]['explode'] = false;
+    this.setState({squares})
+    setTimeout(() => {
+      squares = {...this.state.squares};
+      squares[squareKey]['explode'] = true;
+      this.setState({squares})
+    }, 1000)
+
+  }
+
   onSquareClick = squareKey => {
     // 1. Copy state
     const squares = { ...this.state.squares };
@@ -172,6 +185,9 @@ class App extends React.Component {
         }
       } else {
         // Clicked on a bomb
+        squares[squareKey]['explode'] = true;
+        this.setState({squares})
+
         stats.currentLives--;
         this.setState({ stats })
         if (stats.currentLives === 0) {
@@ -179,6 +195,7 @@ class App extends React.Component {
 
         } else {
           // TODO: Prompt to continue
+
         }
       }
     }
@@ -221,7 +238,8 @@ class App extends React.Component {
           clicked: false,
           hint: false,
           neighbors: [],
-          adjacentBombCount: -1
+          adjacentBombCount: -1,
+          explode: false
         }
       }
     }
@@ -360,6 +378,7 @@ class App extends React.Component {
         squares={this.state.squares}
         size={this.state.options.size}
         onSquareClick={this.onSquareClick}
+        explode={this.explode}
       />)
     }
 

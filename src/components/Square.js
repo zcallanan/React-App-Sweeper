@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { TransitionGroup, CSSTransition } from 'react-transition-group';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faFlag, faQuestionCircle, faBomb } from '@fortawesome/free-solid-svg-icons'
 import { faFlag as farFlag, faQuestionCircle as farQuestionCircle } from '@fortawesome/free-regular-svg-icons'
@@ -19,18 +20,56 @@ class Square extends React.Component {
     square: PropTypes.string.isRequired
   }
 
+  state = {
+    bombStatus: {}
+  }
+
+  componentDidUpdate() {
+    const squares = this.props.squares;
+    const square = this.props.square;
+
+    let bombStatus = {...this.state.bombStatus};
+    if (!bombStatus[square]) {
+      bombStatus[square] = {
+        explodeTrigger: false,
+        explodeUpdateOne: false,
+        explodeUpdateTwo: false,
+        explodeUpdateThree: false
+      }
+      this.setState({bombStatus});
+    }
+
+    if (squares.explode) {
+      const bombStatus = {...this.state.bombStatus};
+      if (!bombStatus[square]['explodeUpdateOne']) {
+        bombStatus[square]['explodeUpdateOne'] = true;
+        bombStatus[square]['explodeTrigger'] = true;
+        // Trigger other explode booleans with timeouts
+      }
+    }
+
+  }
+
   renderSquare = () => {
     const squares = this.props.squares;
+    const square = this.props.square;
+    const explode = squares.explode;
     const bomb = squares.bomb;
+
     const clicked = squares.clicked;
     const flaggedBool = squares.flagged;
     const questionmarkBool = squares.questionMarked
     if (bomb && clicked) {
+      console.log('yep')
       // If it's a bomb and clicked, show the bomb
       return (
-        <span>
-          <FontAwesomeIcon icon={ faBomb } />
-        </span>
+        <TransitionGroup component="span" className="bomba">
+        {explode && (
+          <CSSTransition classNames="bomba" key={square} in={explode} appear={explode} onEnter={() => this.props.explode(square)} timeout={{enter: 1000, exit: 1000}} >
+            <FontAwesomeIcon key={square} icon={ faBomb } />
+          </CSSTransition>
+        )}
+        </TransitionGroup>
       )
     } else if (flaggedBool && !clicked) {
       return (
