@@ -66,7 +66,7 @@ class Stats extends React.Component {
           <td>{life}</td>
           <td>
             <TransitionGroup component="span" className="lives">
-              <CSSTransition classNames="lives" key={currentLives} timeout={{enter: 1500, exit: 1500}} >
+              <CSSTransition classNames="lives" key={currentLives} timeout={{enter: 3000, exit: 3000}} >
                 <span>{currentLives}</span>
               </CSSTransition>
             </TransitionGroup>
@@ -170,9 +170,12 @@ class Stats extends React.Component {
   render() {
     return (
       <div>
-
         <table>
-          <thead>Stats</thead>
+          <thead>
+            <tr>
+              <th>Stats</th>
+            </tr>
+          </thead>
           <tbody>
             {this.renderLives()}
             {this.renderBombCount()}

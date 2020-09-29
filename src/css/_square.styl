@@ -1,4 +1,5 @@
 borders = rgb(180,180,180)
+blu = rgba(77,162,207, .8)
 
 .squares
   display flex
@@ -30,6 +31,7 @@ borders = rgb(180,180,180)
     background radial-gradient(rgba(205,205,205, .1), rgba(200,200,200, .8))
     box-shadow inset 0 -2px 3px rgba(0, 0, 0, 0.1)
     color rgb(0,0,0)
+    cursor default
   &:focus
     outline none
   &:not([disabled]):hover
@@ -44,3 +46,23 @@ borders = rgb(180,180,180)
     display inline
   &.flag-mode.hint span:hover .bomb-count, &.questionmark-mode.hint span:hover .bomb-count, &.flagged.hint span .bomb-count, &.questionmarked.hint span .bomb-count, .flag-icon, .questionmark-icon
     display none
+
+/* Animations */
+
+.bomba-enter
+  color red
+  &.bomba-enter-active
+    color orange
+    transition 1s
+
+.bomba-exit
+  color black
+  &.bomba-exit-active
+    color red
+    transition 1s
+
+.bomba-appear
+  color black
+  &.bomba-appear-active
+    color red
+    transition 1s

@@ -5,6 +5,7 @@ import Flag from './Flag';
 import Header from './Header';
 import QuestionMark from './QuestionMark';
 import Stats from './Stats';
+import Notice from './Notice';
 import { randomIntFromInterval } from '../helpers';
 
 class App extends React.Component {
@@ -41,7 +42,12 @@ class App extends React.Component {
         clicked: false,
         hint: false,
         neighbors: [],
-        adjacentBombCount: -1
+        adjacentBombCount: -1,
+        explosion: {
+          explodeTrigger: false,
+          explodeTimer: false,
+          explodeCleanup: false
+        }
       }
     },
     modes: {
@@ -54,8 +60,10 @@ class App extends React.Component {
       revealed: 0,
       flags: 0,
       questions: 0
+    },
+    notices: {
+      bombNotice: false
     }
-
   }
 
   componentDidMount() {
@@ -115,6 +123,58 @@ class App extends React.Component {
     this.setState({ modes })
   }
 
+  explodeCleanup = squareKey => {
+    let squares = {...this.state.squares};
+    squares[squareKey].explosion.explodeTrigger = false;
+    squares[squareKey].explosion.explodeTimer = false;
+    squares[squareKey].explosion.explodeCleanup = true;
+    this.setState({squares});
+    // Remove display notice
+    let notices = {...this.state.notices};
+    notices.bombNotice = false;
+    this.setState({notices});
+    // Reset square
+    setTimeout(() => {
+      let squares = {...this.state.squares};
+      squares[squareKey].clicked = false;
+      this.setState({squares});
+    }, 1000);
+
+  }
+
+  explode = squareKey => {
+    let squares = {...this.state.squares};
+    if (!squares[squareKey].explosion.explodeCleanup) {
+      // Prevent further animations if it's time to cleanup
+      squares[squareKey].explosion.explodeTrigger = false;
+      this.setState({squares})
+      setTimeout(() => {
+        // Prompt bomb animation every second
+        squares = {...this.state.squares};
+        squares[squareKey].explosion.explodeTrigger = true;
+        this.setState({squares})
+      }, 1000)
+      if (!squares[squareKey].explosion.explodeTimer) {
+        // Start a timer to stop bomb animation
+        squares = {...this.state.squares};
+        // Timer started, prevent it from starting again
+        squares[squareKey].explosion.explodeTimer = true;
+        setTimeout(() => {
+          // Update lives count here
+          const stats = {...this.state.stats};
+          stats.currentLives--;
+          this.setState({ stats })
+        }, 2000)
+        setTimeout(() => {
+          this.explodeCleanup(squareKey);
+        }, 5000)
+      }
+    } else {
+      // Reset cleanup back to default
+      squares[squareKey].explosion.explodeCleanup = false;
+    }
+  }
+
   onSquareClick = squareKey => {
     // 1. Copy state
     const squares = { ...this.state.squares };
@@ -172,13 +232,18 @@ class App extends React.Component {
         }
       } else {
         // Clicked on a bomb
-        stats.currentLives--;
-        this.setState({ stats })
+        let notices = {...this.state.notices};
+        notices.bombNotice = true;
+        this.setState({notices} )
+        squares[squareKey].explosion.explodeTrigger = true;
+        this.setState({squares})
+
         if (stats.currentLives === 0) {
           // TODO: Game over
 
         } else {
           // TODO: Prompt to continue
+
         }
       }
     }
@@ -221,7 +286,12 @@ class App extends React.Component {
           clicked: false,
           hint: false,
           neighbors: [],
-          adjacentBombCount: -1
+          adjacentBombCount: -1,
+          explosion: {
+            explodeTrigger: false,
+            explodeTimer: false,
+            explodeCleanup: false
+          }
         }
       }
     }
@@ -360,6 +430,7 @@ class App extends React.Component {
         squares={this.state.squares}
         size={this.state.options.size}
         onSquareClick={this.onSquareClick}
+        explode={this.explode}
       />)
     }
 
@@ -378,10 +449,14 @@ class App extends React.Component {
           <div className="squares">
             {columns}
           </div>
-          <Stats
-            stats={this.state.stats}
-            options={this.state.options}
-          />
+          <div>
+            <Notice notices={this.state.notices} />
+            <Stats
+              stats={this.state.stats}
+              options={this.state.options}
+            />
+          </div>
+
         </div>
         <div className="modes">
           <Flag onModeClick={this.onModeClick} flagMode={this.state.modes.flagMode}/>

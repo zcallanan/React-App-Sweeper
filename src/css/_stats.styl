@@ -1,3 +1,82 @@
 thead
   font-size 26px
   text-align center
+
+/* Animations */
+
+.lives-enter
+  transform translateY(100%)
+  -webkit-transform translateY(100%)
+  &.lives-enter-active
+    transform translateY(0)
+    -webkit-transform translateY(0)
+    transition 3s
+    -webkit-transition 3s
+
+.lives-exit
+  transform translateY(0)
+  -webkit-transform translateY(0)
+  position absolute
+  left 0
+  bottom 0
+  &.lives-exit-active
+    transform translateY(-100%)
+    -webkit-transform translateY(-100%)
+    transition 3s
+    -webkit-transition 3s
+
+.bombs-enter, .revealed-enter, .flags-enter, .questions-enter
+  transform translateY(100%)
+  -webkit-transform translateY(100%)
+  &.bombs-enter-active, &.revealed-enter-active, &.flags-enter-active, &.questions-enter-active
+    transform translateY(0)
+    -webkit-transform translateY(0)
+    transition 1.5s
+    -webkit-transition 1.5s
+
+.bombs-exit, .revealed-exit, .flags-exit, .questions-exit
+  transform translateY(0)
+  -webkit-transform translateY(0)
+  position absolute
+  left 0
+  bottom 0
+  &.bombs-exit-active, &.revealed-exit-active, &.flags-exit-active, &.questions-exit-active
+    transform translateY(-100%)
+    -webkit-transform translateY(-100%)
+    transition 1.5s
+    -webkit-transition 1.5s
+
+.total-to-reveal
+  transform translateY(100%)
+  -webkit-transform translateY(100%)
+  &.total-to-reveal-active
+    transform translateY(0)
+    -webkit-transform translateY(0)
+    transition 15s
+    -webkit-transition 15s
+
+.total-to-reveal-exit
+  transform translateY(0)
+  -webkit-transform translateY(0)
+  position absolute
+  left 4px;
+  &.total-to-reveal-exit-active
+    transform translateY(-100%)
+    -webkit-transform translateY(-100%)
+    transition 15s
+    -webkit-transition 15s
+
+span.lives, span.bombs, span.revealed, span.flags, span.questions
+  position relative
+  overflow hidden
+  float left
+  span
+    display inline-block
+
+span.total-to-reveal
+  position relative
+  overflow hidden
+  float right
+  top -18px
+  span
+    display inline-block
