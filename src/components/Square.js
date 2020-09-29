@@ -24,7 +24,7 @@ class Square extends React.Component {
     bombStatus: {}
   }
 
-  renderSquare = () => {
+  renderIcons = () => {
     const squareData = this.props.squareData;
     const squareKey = this.props.squareKey;
     const explodeTrigger = squareData.explosion.explodeTrigger;
@@ -72,18 +72,38 @@ class Square extends React.Component {
     return attribute;
   }
 
+  buttonMarkup = (className, attribute, element) => {
+    const squareKey = this.props.squareKey;
+    return (
+      <button className={className} {...attribute} onClick={() => { this.props.onSquareClick(squareKey)}}>
+        <span>
+          {this.insertElement(element)}
+          {this.renderIcons()}
+        </span>
+      </button>
+    )
+  }
+
+  insertElement = element => {
+    if (element) {
+      const adjacentBombCount = this.props.squareData.adjacentBombCount;
+      return (
+        <p className={`bomb-count neighbors-${adjacentBombCount}`}>{adjacentBombCount}</p>
+      )
+    }
+  }
+
   // Handles button modes
   generateButton = () => {
     const squareData = this.props.squareData;
-    const squareKey = this.props.squareKey;
     const modes = this.props.modes;
-    const adjacentBombCount = squareData.adjacentBombCount;
     const clicked = squareData.clicked;
     const hint = squareData.hint;
     const flaggedBool = squareData.flagged;
     const questionmarkBool = squareData.questionMarked;
     let className;
     let attribute = {};
+    let element = true;
 
     if (clicked) {
       // Disable the button if it's been clicked
@@ -91,7 +111,7 @@ class Square extends React.Component {
       attribute["disabled"] = "disabled";
       return (
         <button className={className} {...attribute}>
-          {this.renderSquare()}
+          {this.renderIcons()}
         </button>
       );
     } else if (modes.flagMode) {
@@ -108,14 +128,7 @@ class Square extends React.Component {
         } else {
           className = "square flag-mode hint";
         }
-        return (
-          <button className={className} onClick={() => { this.props.onSquareClick(squareKey)}}>
-            <span>
-              <p className={`bomb-count neighbors-${adjacentBombCount}`}>{adjacentBombCount}</p>
-              {this.renderSquare()}
-            </span>
-          </button>
-        );
+        return this.buttonMarkup(className, attribute, element);
       } else {
         className = "square flag-mode";
       }
@@ -133,14 +146,7 @@ class Square extends React.Component {
         } else {
           className = "square questionmark-mode hint";
         }
-        return (
-          <button className={className} onClick={() => { this.props.onSquareClick(squareKey)}}>
-            <span>
-              <p className={`bomb-count neighbors-${adjacentBombCount}`}>{adjacentBombCount}</p>
-              {this.renderSquare()}
-            </span>
-          </button>
-        );
+        return this.buttonMarkup(className, attribute, element);
       } else {
         className = "square questionmark-mode";
       }
@@ -154,15 +160,10 @@ class Square extends React.Component {
         className = (!modes.bombMode ? "square hint" : "square hint bomb-mode");
       }
       attribute = this.disableButtons(attribute)
-      return (
-        <button className={className} {...attribute} onClick={() => { this.props.onSquareClick(squareKey)}}>
-          <span>
-            <p className={`bomb-count neighbors-${adjacentBombCount}`}>{adjacentBombCount}</p>
-            {this.renderSquare()}
-          </span>
-        </button>
-      );
+      return this.buttonMarkup(className, attribute, element);
     } else {
+      element = false;
+      attribute = this.disableButtons(attribute)
       if (flaggedBool) {
         className = (!modes.bombMode ? "square flagged" : "square flagged bomb-mode");
       } else if (questionmarkBool) {
@@ -171,13 +172,9 @@ class Square extends React.Component {
         // Default functional button
         className = (!modes.bombMode ? "square default" : "square default bomb-mode");
       }
-      attribute = this.disableButtons(attribute)
+
     }
-    return (
-      <button className={className} {...attribute} onClick={() => { this.props.onSquareClick(squareKey)}}>
-        {this.renderSquare()}
-      </button>
-    );
+    return this.buttonMarkup(className, attribute, element);
   }
 
   render() {
