@@ -149,16 +149,14 @@ class Square extends React.Component {
     } else if (hint) {
       if (flaggedBool) {
         className = "square flagged hint";
-        attribute = this.disableButtons(attribute)
+
       } else if (questionmarkBool) {
         className = "square questionmarked hint";
-        attribute = this.disableButtons(attribute)
       } else {
         // Toggle display of hints
         className="square hint";
-        attribute = this.disableButtons(attribute)
       }
-
+      attribute = this.disableButtons(attribute)
       return (
         <button className={className} {...attribute} onClick={() => { this.props.onSquareClick(square)}}>
           <span>
@@ -170,16 +168,13 @@ class Square extends React.Component {
     } else {
       if (flaggedBool) {
         className = "square flagged"
-        attribute = this.disableButtons(attribute)
       } else if (questionmarkBool) {
         className = "square questionmarked"
-        attribute = this.disableButtons(attribute)
       } else {
         // Default functional button
         className = "square default";
-        attribute = this.disableButtons(attribute)
-
       }
+      attribute = this.disableButtons(attribute)
 
     }
     return (
