@@ -16,9 +16,9 @@ class Column extends React.Component {
     for (let i = 0; i < this.props.size; i++) {
       column.push(<Square
         key={`r${i}-${this.props.column}`}
-        square={`r${i}-${this.props.column}`}
+        squareKey={`r${i}-${this.props.column}`}
         modes={this.props.modes}
-        squares={this.props.squares[`r${i}-${this.props.column}`]}
+        squareData={this.props.squares[`r${i}-${this.props.column}`]}
         onSquareClick={this.props.onSquareClick}
         explode={this.props.explode}
       />)

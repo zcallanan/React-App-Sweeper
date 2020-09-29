@@ -11,12 +11,12 @@ import { randomIntFromInterval } from '../helpers';
 class App extends React.Component {
   // Initialize state
   state = {
-    options: {
+    options: { // user input settings, loaded from localStorage if available
       size: 0,
       difficulty: 0,
       lives: 0
     },
-    data: {
+    data: { // hard coded data
       bombPercentage: {
         0: "10%",
         1: "20%",
@@ -34,7 +34,7 @@ class App extends React.Component {
         5: "99"
       }
     },
-    squares: {
+    squares: { // game board framework
       "r0-s0": {
         bomb: false,
         flagged: false,
@@ -55,14 +55,14 @@ class App extends React.Component {
       flagMode: false, // Place a flag on a square
       questionMode: false // Place a question mark on a square
     },
-    stats: {
+    stats: { // game stats
       currentLives: -1,
       bombs: -1,
       revealed: 0,
       flags: 0,
       questions: 0
     },
-    notices: {
+    notices: { // game notices
       bombNotice: false
     }
   }
@@ -122,6 +122,7 @@ class App extends React.Component {
     this.setState({ modes })
   }
 
+  // Cleanup bombMode, resetting bomb square, reset bombNotice, and remove disabled from clickable squares
   explodeCleanup = squareKey => {
     const squares = {...this.state.squares};
     squares[squareKey].explosion.explodeTrigger = false;
@@ -131,7 +132,6 @@ class App extends React.Component {
     const notices = {...this.state.notices};
     notices.bombNotice = false;
     this.setState({squares, notices});
-
     setTimeout(() => {
       const squares = {...this.state.squares};
       const modes = {...this.state.modes};
@@ -144,6 +144,7 @@ class App extends React.Component {
 
   }
 
+  // Called by square component when clicking on a bomb square
   explode = squareKey => {
     let squares = {...this.state.squares};
     if (!squares[squareKey].explosion.explodeCleanup) {
@@ -177,6 +178,7 @@ class App extends React.Component {
     }
   }
 
+  // Called by square component when clicking on a square
   onSquareClick = squareKey => {
     // 1. Copy state
     const squares = { ...this.state.squares };
@@ -329,6 +331,7 @@ class App extends React.Component {
     this.setState({squares});
   }
 
+  // Called by this.onSquareClick() to determine whether a square's neighbors are bombs or have adjacent bombs
   checkNeighbors = (squareKey, squares, stats) => {
     let neighbors;
     if ((squares[squareKey]['neighbors'] === 'undefined' || squares[squareKey]['neighbors'].length === 0) || squares[squareKey]['adjacentBombCount'] === -1 ) {
@@ -355,6 +358,7 @@ class App extends React.Component {
     return stats;
   }
 
+  // Called by this.checkNeighbors() to determine who is a neighbor of a square and tally that square's adjacent bomb count
   countAdjacentBombs = squareKey => {
     const size = this.state.options.size;
     const row = parseInt(squareKey.split("-")[0].match(/\d{1,3}/)[0]);
@@ -407,7 +411,7 @@ class App extends React.Component {
   }
 
 
-  // Recursive function that returns an object with bombCount positions
+  // Called by this.setBombs(), recursive function that determines whether a square has a bomb
   generatePositions = (positionArray, squares, bombCount, optionSize, count) => {
     if (count > bombCount - 1) {
       // stop recursive call

@@ -7,7 +7,7 @@ import { faFlag as farFlag, faQuestionCircle as farQuestionCircle } from '@forta
 
 class Square extends React.Component {
   static propTypes = {
-    squares: PropTypes.shape({
+    squareData: PropTypes.shape({
       adjacentBombCount: PropTypes.number.isRequired,
       bomb: PropTypes.bool.isRequired,
       clicked: PropTypes.bool.isRequired,
@@ -25,22 +25,20 @@ class Square extends React.Component {
   }
 
   renderSquare = () => {
-    const squares = this.props.squares;
-    const square = this.props.square;
-    const explodeTrigger = squares.explosion.explodeTrigger;
-    const bomb = squares.bomb;
-
-    const clicked = squares.clicked;
-    const flaggedBool = squares.flagged;
-    const questionmarkBool = squares.questionMarked
+    const squareData = this.props.squareData;
+    const squareKey = this.props.squareKey;
+    const explodeTrigger = squareData.explosion.explodeTrigger;
+    const bomb = squareData.bomb;
+    const clicked = squareData.clicked;
+    const flaggedBool = squareData.flagged;
+    const questionmarkBool = squareData.questionMarked
     if (bomb && clicked) {
-      console.log('yep')
       // If it's a bomb and clicked, show the bomb
       return (
         <TransitionGroup component="span" className="bomba">
         {explodeTrigger && (
-          <CSSTransition classNames="bomba" key={square} in={explodeTrigger} appear={explodeTrigger} onEnter={() => this.props.explode(square)} timeout={{enter: 1000, exit: 1000}} >
-            <FontAwesomeIcon key={square} icon={ faBomb } />
+          <CSSTransition classNames="bomba" key={squareKey} in={explodeTrigger} appear={explodeTrigger} onEnter={() => this.props.explode(squareKey)} timeout={{enter: 1000, exit: 1000}} >
+            <FontAwesomeIcon key={squareKey} icon={ faBomb } />
           </CSSTransition>
         )}
         </TransitionGroup>
@@ -76,14 +74,14 @@ class Square extends React.Component {
 
   // Handles button modes
   generateButton = () => {
-    const squares = this.props.squares;
-    const square = this.props.square;
+    const squareData = this.props.squareData;
+    const squareKey = this.props.squareKey;
     const modes = this.props.modes;
-    const adjacentBombCount = squares.adjacentBombCount;
-    const clicked = squares.clicked;
-    const hint = squares.hint;
-    const flaggedBool = squares.flagged;
-    const questionmarkBool = squares.questionMarked;
+    const adjacentBombCount = squareData.adjacentBombCount;
+    const clicked = squareData.clicked;
+    const hint = squareData.hint;
+    const flaggedBool = squareData.flagged;
+    const questionmarkBool = squareData.questionMarked;
     let className;
     let attribute = {};
 
@@ -111,7 +109,7 @@ class Square extends React.Component {
           className = "square flag-mode hint";
         }
         return (
-          <button className={className} onClick={() => { this.props.onSquareClick(square)}}>
+          <button className={className} onClick={() => { this.props.onSquareClick(squareKey)}}>
             <span>
               <p className={`bomb-count neighbors-${adjacentBombCount}`}>{adjacentBombCount}</p>
               {this.renderSquare()}
@@ -136,7 +134,7 @@ class Square extends React.Component {
           className = "square questionmark-mode hint";
         }
         return (
-          <button className={className} onClick={() => { this.props.onSquareClick(square)}}>
+          <button className={className} onClick={() => { this.props.onSquareClick(squareKey)}}>
             <span>
               <p className={`bomb-count neighbors-${adjacentBombCount}`}>{adjacentBombCount}</p>
               {this.renderSquare()}
@@ -157,7 +155,7 @@ class Square extends React.Component {
       }
       attribute = this.disableButtons(attribute)
       return (
-        <button className={className} {...attribute} onClick={() => { this.props.onSquareClick(square)}}>
+        <button className={className} {...attribute} onClick={() => { this.props.onSquareClick(squareKey)}}>
           <span>
             <p className={`bomb-count neighbors-${adjacentBombCount}`}>{adjacentBombCount}</p>
             {this.renderSquare()}
@@ -176,7 +174,7 @@ class Square extends React.Component {
       attribute = this.disableButtons(attribute)
     }
     return (
-      <button className={className} {...attribute} onClick={() => { this.props.onSquareClick(square)}}>
+      <button className={className} {...attribute} onClick={() => { this.props.onSquareClick(squareKey)}}>
         {this.renderSquare()}
       </button>
     );
