@@ -94,6 +94,10 @@ header span svg.header-icon {
   color: #000;
   cursor: default;
 }
+.square.bomb-mode:disabled {
+  background: radial-gradient(rgba(150,150,150,0.1), rgba(130,130,130,0.9));
+  cursor: default;
+}
 .square:focus {
   outline: none;
 }

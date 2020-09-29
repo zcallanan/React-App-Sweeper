@@ -148,13 +148,12 @@ class Square extends React.Component {
       }
     } else if (hint) {
       if (flaggedBool) {
-        className = "square flagged hint";
-
+        className = (!modes.bombMode ? "square flagged hint" : "square flagged hint bomb-mode");
       } else if (questionmarkBool) {
-        className = "square questionmarked hint";
+        className = (!modes.bombMode ? "square questionmarked hint" : "square questionmarked hint bomb-mode");
       } else {
         // Toggle display of hints
-        className="square hint";
+        className = (!modes.bombMode ? "square hint" : "square hint bomb-mode");
       }
       attribute = this.disableButtons(attribute)
       return (
@@ -167,15 +166,14 @@ class Square extends React.Component {
       );
     } else {
       if (flaggedBool) {
-        className = "square flagged"
+        className = (!modes.bombMode ? "square flagged" : "square flagged bomb-mode");
       } else if (questionmarkBool) {
-        className = "square questionmarked"
+        className = (!modes.bombMode ? "square questionmarked" : "square questionmarked bomb-mode");
       } else {
         // Default functional button
-        className = "square default";
+        className = (!modes.bombMode ? "square default" : "square default bomb-mode");
       }
       attribute = this.disableButtons(attribute)
-
     }
     return (
       <button className={className} {...attribute} onClick={() => { this.props.onSquareClick(square)}}>
