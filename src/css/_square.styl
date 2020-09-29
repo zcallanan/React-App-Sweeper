@@ -32,6 +32,9 @@ blu = rgba(77,162,207, .8)
     box-shadow inset 0 -2px 3px rgba(0, 0, 0, 0.1)
     color rgb(0,0,0)
     cursor default
+  &.bomb-mode:disabled
+    background radial-gradient(rgba(150,150,150, .1), rgba(130,130,130, .9))
+    cursor default
   &:focus
     outline none
   &:not([disabled]):hover

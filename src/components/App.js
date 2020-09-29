@@ -51,8 +51,9 @@ class App extends React.Component {
       }
     },
     modes: {
-      flagMode: false,
-      questionMode: false
+      bombMode: false, // Struck a bomb, locks input
+      flagMode: false, // Place a flag on a square
+      questionMode: false // Place a question mark on a square
     },
     stats: {
       currentLives: -1,
@@ -82,8 +83,7 @@ class App extends React.Component {
     }
     // Get initial number of lives
     stats["currentLives"] = parseInt(data["numberOfLives"][options["lives"]])
-    this.setState({ options });
-    this.setState({ stats });
+    this.setState({ options, stats });
     this.initSquares(options.size);
   }
 
@@ -100,8 +100,7 @@ class App extends React.Component {
     // Get initial number of lives
     stats["currentLives"] = parseInt(data["numberOfLives"][options["lives"]])
     // 3. SetState
-    this.setState({ options });
-    this.setState({ stats });
+    this.setState({ options, stats });
     // 4. Save options to local storage
     localStorage.setItem("options", JSON.stringify(options));
   }
@@ -124,20 +123,23 @@ class App extends React.Component {
   }
 
   explodeCleanup = squareKey => {
-    let squares = {...this.state.squares};
+    const squares = {...this.state.squares};
     squares[squareKey].explosion.explodeTrigger = false;
     squares[squareKey].explosion.explodeTimer = false;
     squares[squareKey].explosion.explodeCleanup = true;
-    this.setState({squares});
     // Remove display notice
-    let notices = {...this.state.notices};
+    const notices = {...this.state.notices};
     notices.bombNotice = false;
-    this.setState({notices});
-    // Reset square
+    this.setState({squares, notices});
+
     setTimeout(() => {
-      let squares = {...this.state.squares};
+      const squares = {...this.state.squares};
+      const modes = {...this.state.modes};
+      // Reset square and hide the bomb
       squares[squareKey].clicked = false;
-      this.setState({squares});
+      // Remove disabling of buttons
+      modes.bombMode = false;
+      this.setState({squares, modes});
     }, 1000);
 
   }
@@ -232,11 +234,12 @@ class App extends React.Component {
         }
       } else {
         // Clicked on a bomb
-        let notices = {...this.state.notices};
+        const notices = {...this.state.notices};
+        const modes = {...this.state.modes}
+        modes.bombMode = true;
         notices.bombNotice = true;
-        this.setState({notices} )
         squares[squareKey].explosion.explodeTrigger = true;
-        this.setState({squares})
+        this.setState({squares, notices, modes})
 
         if (stats.currentLives === 0) {
           // TODO: Game over

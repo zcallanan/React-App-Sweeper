@@ -66,6 +66,14 @@ class Square extends React.Component {
     );
   }
 
+  disableButtons = attribute => {
+    const modes = this.props.modes;
+    if (modes.bombMode) {
+      attribute["disabled"] = "disabled";
+    }
+    return attribute;
+  }
+
   // Handles button modes
   generateButton = () => {
     const squares = this.props.squares;
@@ -77,12 +85,14 @@ class Square extends React.Component {
     const flaggedBool = squares.flagged;
     const questionmarkBool = squares.questionMarked;
     let className;
+    let attribute = {};
 
     if (clicked) {
       // Disable the button if it's been clicked
       className = "square";
+      attribute["disabled"] = "disabled";
       return (
-        <button className={className} disabled>
+        <button className={className} {...attribute}>
           {this.renderSquare()}
         </button>
       );
@@ -138,16 +148,16 @@ class Square extends React.Component {
       }
     } else if (hint) {
       if (flaggedBool) {
-        className = "square flagged hint";
+        className = (!modes.bombMode ? "square flagged hint" : "square flagged hint bomb-mode");
       } else if (questionmarkBool) {
-        className = "square questionmarked hint";
+        className = (!modes.bombMode ? "square questionmarked hint" : "square questionmarked hint bomb-mode");
       } else {
         // Toggle display of hints
-        className="square hint";
+        className = (!modes.bombMode ? "square hint" : "square hint bomb-mode");
       }
-
+      attribute = this.disableButtons(attribute)
       return (
-        <button className={className} onClick={() => { this.props.onSquareClick(square)}}>
+        <button className={className} {...attribute} onClick={() => { this.props.onSquareClick(square)}}>
           <span>
             <p className={`bomb-count neighbors-${adjacentBombCount}`}>{adjacentBombCount}</p>
             {this.renderSquare()}
@@ -156,17 +166,17 @@ class Square extends React.Component {
       );
     } else {
       if (flaggedBool) {
-        className = "square flagged"
+        className = (!modes.bombMode ? "square flagged" : "square flagged bomb-mode");
       } else if (questionmarkBool) {
-        className = "square questionmarked"
+        className = (!modes.bombMode ? "square questionmarked" : "square questionmarked bomb-mode");
       } else {
         // Default functional button
-        className = "square default";
+        className = (!modes.bombMode ? "square default" : "square default bomb-mode");
       }
-
+      attribute = this.disableButtons(attribute)
     }
     return (
-      <button className={className} onClick={() => { this.props.onSquareClick(square)}}>
+      <button className={className} {...attribute} onClick={() => { this.props.onSquareClick(square)}}>
         {this.renderSquare()}
       </button>
     );
