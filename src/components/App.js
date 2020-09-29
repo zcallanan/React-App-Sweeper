@@ -61,8 +61,9 @@ class App extends React.Component {
       flags: 0,
       questions: 0
     },
-    displayNotice: false
-
+    notices: {
+      bombNotice: false
+    }
   }
 
   componentDidMount() {
@@ -129,10 +130,9 @@ class App extends React.Component {
     squares[squareKey].explosion.explodeCleanup = true;
     this.setState({squares});
     // Remove display notice
-    let displayNotice = this.state.displayNotice;
-    displayNotice = false;
-    this.setState({displayNotice});
-    // TODO: update lives count here instead
+    let notices = {...this.state.notices};
+    notices.bombNotice = false;
+    this.setState({notices});
     // Reset square
     setTimeout(() => {
       let squares = {...this.state.squares};
@@ -159,6 +159,12 @@ class App extends React.Component {
         squares = {...this.state.squares};
         // Timer started, prevent it from starting again
         squares[squareKey].explosion.explodeTimer = true;
+        setTimeout(() => {
+          // Update lives count here
+          const stats = {...this.state.stats};
+          stats.currentLives--;
+          this.setState({ stats })
+        }, 2000)
         setTimeout(() => {
           this.explodeCleanup(squareKey);
         }, 5000)
@@ -226,14 +232,12 @@ class App extends React.Component {
         }
       } else {
         // Clicked on a bomb
-        let displayNotice = this.state.displayNotice;
-        displayNotice = true;
-        this.setState({displayNotice} )
+        let notices = {...this.state.notices};
+        notices.bombNotice = true;
+        this.setState({notices} )
         squares[squareKey].explosion.explodeTrigger = true;
         this.setState({squares})
 
-        stats.currentLives--;
-        this.setState({ stats })
         if (stats.currentLives === 0) {
           // TODO: Game over
 
@@ -446,7 +450,7 @@ class App extends React.Component {
             {columns}
           </div>
           <div>
-            <Notice displayNotice={this.state.displayNotice} />
+            <Notice notices={this.state.notices} />
             <Stats
               stats={this.state.stats}
               options={this.state.options}

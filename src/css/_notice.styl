@@ -1,0 +1,21 @@
+.notice-box
+  width 250px
+  height 20px
+  overflow hidden
+
+.bomb-notice
+  display inline-block // for TranslateX
+
+
+/* Animations */
+
+.notices-enter
+  transform translateX(-120%)
+  &.notices-enter-active
+    transform translatex(0)
+    transition 2.5s
+.notices-exit
+  transform translatex(0)
+  &.notices-exit-active
+    transform translateX(120%)
+    transition 2.5s

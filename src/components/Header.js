@@ -10,13 +10,10 @@ class Header extends React.Component {
           <FontAwesomeIcon className="header-icon" icon={ faBomb } />
           <span className="header-title">
             <span className="sw">
-              Sw
+              S
             </span>
-            <span className="ee">
-              ee
-            </span>
-            <span className="per">
-              per
+            <span className="eeper">
+              weeper
             </span>
           </span>
         </span>

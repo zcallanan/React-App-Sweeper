@@ -46,3 +46,23 @@ blu = rgba(77,162,207, .8)
     display inline
   &.flag-mode.hint span:hover .bomb-count, &.questionmark-mode.hint span:hover .bomb-count, &.flagged.hint span .bomb-count, &.questionmarked.hint span .bomb-count, .flag-icon, .questionmark-icon
     display none
+
+/* Animations */
+
+.bomba-enter
+  color red
+  &.bomba-enter-active
+    color orange
+    transition 1s
+
+.bomba-exit
+  color black
+  &.bomba-exit-active
+    color red
+    transition 1s
+
+.bomba-appear
+  color black
+  &.bomba-appear-active
+    color red
+    transition 1s

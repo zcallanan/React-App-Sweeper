@@ -127,11 +127,12 @@ class Form extends React.Component {
     const percentages = this.props.percentages;
     const lives = this.props.lives;
     return (
-      <div className="form">
+      <div className="settings">
+        <h2>Custom game board settings</h2>
         <form key="optionsForm" onSubmit={this.handleSubmit}>
           <div className="form-fields">
             <div>
-              <label htmlFor="size">Customize the size of your game board by entering a number between 5 and 20:</label>
+              <label htmlFor="size">Squares along a side:</label>
               <input
                 value={this.state.options.size}
                 onChange={this.handleChange}
@@ -142,7 +143,7 @@ class Form extends React.Component {
               />
             </div>
             <div>
-              <label htmlFor="difficulty">Customize the percentage of bombs hidden on your game board:</label>
+              <label htmlFor="difficulty">Percentage of bombs:</label>
               <select
                 value={this.state.options.difficulty}
                 onChange={this.handleChange}
@@ -154,7 +155,7 @@ class Form extends React.Component {
               </select>
             </div>
             <div>
-              <label htmlFor="lives">Customize the number of bombs you uncover before game over:</label>
+              <label htmlFor="lives">Number of Lives:</label>
               <select
                 value={this.state.options.lives}
                 onChange={this.handleChange}
