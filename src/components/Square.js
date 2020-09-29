@@ -66,6 +66,14 @@ class Square extends React.Component {
     );
   }
 
+  disableButtons = attribute => {
+    const modes = this.props.modes;
+    if (modes.bombMode) {
+      attribute["disabled"] = "disabled";
+    }
+    return attribute;
+  }
+
   // Handles button modes
   generateButton = () => {
     const squares = this.props.squares;
@@ -77,7 +85,7 @@ class Square extends React.Component {
     const flaggedBool = squares.flagged;
     const questionmarkBool = squares.questionMarked;
     let className;
-    const attribute = {};
+    let attribute = {};
 
     if (clicked) {
       // Disable the button if it's been clicked
@@ -141,20 +149,14 @@ class Square extends React.Component {
     } else if (hint) {
       if (flaggedBool) {
         className = "square flagged hint";
-        if (modes.bombMode) {
-          attribute["disabled"] = "disabled";
-        }
+        attribute = this.disableButtons(attribute)
       } else if (questionmarkBool) {
         className = "square questionmarked hint";
-        if (modes.bombMode) {
-          attribute["disabled"] = "disabled";
-        }
+        attribute = this.disableButtons(attribute)
       } else {
         // Toggle display of hints
         className="square hint";
-        if (modes.bombMode) {
-          attribute["disabled"] = "disabled";
-        }
+        attribute = this.disableButtons(attribute)
       }
 
       return (
@@ -168,20 +170,14 @@ class Square extends React.Component {
     } else {
       if (flaggedBool) {
         className = "square flagged"
-        if (modes.bombMode) {
-          attribute["disabled"] = "disabled";
-        }
+        attribute = this.disableButtons(attribute)
       } else if (questionmarkBool) {
         className = "square questionmarked"
-        if (modes.bombMode) {
-          attribute["disabled"] = "disabled";
-        }
+        attribute = this.disableButtons(attribute)
       } else {
         // Default functional button
         className = "square default";
-        if (modes.bombMode) {
-          attribute["disabled"] = "disabled";
-        }
+        attribute = this.disableButtons(attribute)
 
       }
 
