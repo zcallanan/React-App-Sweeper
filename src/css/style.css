@@ -1,3 +1,20 @@
+.columns {
+  display: inline-block;
+  overflow: hidden;
+}
+.columns .board-column {
+  display: inline-block;
+}
+.columns-appear {
+  transform: translateY(-100%);
+  -webkit-transform: translateY(-100%);
+}
+.columns-appear.columns-appear-active {
+  transform: translateY(0);
+  -webkit-transform: translateY(0);
+  transition: 3s;
+  -webkit-transition: 3s;
+}
 header {
   background-color: #fff;
   height: 55px;

@@ -1,4 +1,5 @@
 import React from 'react';
+import { TransitionGroup, CSSTransition } from 'react-transition-group';
 import Form from './Form';
 import Column from './Column';
 import Flag from './Flag';
@@ -51,6 +52,7 @@ class App extends React.Component {
       }
     },
     modes: {
+      newGame: false, // Denotes the start of a new game before a square is selected
       bombMode: false, // Struck a bomb, locks input
       flagMode: false, // Place a flag on a square
       questionMode: false // Place a question mark on a square
@@ -64,11 +66,17 @@ class App extends React.Component {
     },
     notices: { // game notices
       bombNotice: false
+    },
+    animations: {
+      columnScroll: false,
+      seed: randomIntFromInterval(1,9999)
     }
   }
 
   componentDidMount() {
     let options = { ...this.state.options };
+    let modes = {...this.state.modes};
+    modes.newGame = true;
     const stats = this.state.stats;
     const data = this.state.data;
     // Read options from local storage
@@ -83,8 +91,15 @@ class App extends React.Component {
     }
     // Get initial number of lives
     stats["currentLives"] = parseInt(data["numberOfLives"][options["lives"]])
-    this.setState({ options, stats });
+    this.setState({ options, stats, modes });
     this.initSquares(options.size);
+  }
+
+  toggleColumnScroll = bool => {
+    const animations = {...this.state.animations};
+    animations.columnScroll = bool;
+    this.setState({animations});
+    console.log('hello', bool)
   }
 
   // Save Player's game board options
@@ -93,6 +108,12 @@ class App extends React.Component {
     const options = this.state.options;
     const stats = this.state.stats;
     const data = this.state.data;
+    const modes = {...this.state.modes};
+    const animations = {...this.state.animations}
+    modes.newGame = true;
+    this.toggleColumnScroll(true);
+    // Reset seed
+    animations.seed = randomIntFromInterval(1,9999);
     // 2. Add new value to state
     options["size"] = parseInt(obj["size"]);
     options["difficulty"] = parseInt(obj["difficulty"]);
@@ -100,7 +121,7 @@ class App extends React.Component {
     // Get initial number of lives
     stats["currentLives"] = parseInt(data["numberOfLives"][options["lives"]])
     // 3. SetState
-    this.setState({ options, stats });
+    this.setState({ options, stats, modes, animations });
     // 4. Save options to local storage
     localStorage.setItem("options", JSON.stringify(options));
   }
@@ -164,9 +185,13 @@ class App extends React.Component {
         squares[squareKey].explosion.explodeTimer = true;
         setTimeout(() => {
           // Update lives count here
+          const modes = {...this.state.modes};
           const stats = {...this.state.stats};
-          stats.currentLives--;
-          this.setState({ stats })
+          if (!modes.newGame) {
+            // Prevent loss of lives if the board is reset during the timeout
+            stats.currentLives--;
+            this.setState({ stats })
+          }
         }, 2000)
         setTimeout(() => {
           this.explodeCleanup(squareKey);
@@ -182,11 +207,15 @@ class App extends React.Component {
   onSquareClick = squareKey => {
     // 1. Copy state
     const squares = { ...this.state.squares };
-    const stats = { ...this.state.stats }
+    const stats = { ...this.state.stats };
+    const modes = {...this.state.modes};
     const bomb = squares[squareKey]['bomb'];
     const adjacentBombCount = squares[squareKey]['adjacentBombCount'];
-    const flagMode = this.state.modes.flagMode;
-    const questionMode = this.state.modes.questionMode;
+    const flagMode = modes.flagMode;
+    const questionMode = modes.questionMode;
+    if (modes.newGame) {
+      modes.newGame = false;
+    }
     // 2. Update square
     if (flagMode) {
       // If marking a flag is active, then mark only that square and then save to state
@@ -428,17 +457,27 @@ class App extends React.Component {
   }
 
   render() {
+    const modes = {...this.state.modes};
+    let columnScroll = modes.newGame && !this.state.animations.columnScroll ? true : false
     const columns = [];
+    let columnKey;
     for (let i = 0; i < this.state.options.size; i++) {
-      columns.push(<Column
-        key={`s${i}`}
-        columnKey={`s${i}`}
-        modes={this.state.modes}
-        squares={this.state.squares}
-        size={this.state.options.size}
-        onSquareClick={this.onSquareClick}
-        explode={this.explode}
-      />)
+      columnKey = `s${i}`;
+      columns.push(
+        <TransitionGroup component="div" className="columns" key={`${columnKey}-${this.state.animations.seed}`}>
+          <CSSTransition classNames="columns" in={columnScroll} appear={columnScroll} key={`${columnKey}-${this.state.animations.seed}`} onEnter={() => this.toggleColumnScroll(false)} timeout={{enter: 3000}} >
+            <Column
+              key={`${columnKey}-${this.state.animations.seed}`}
+              columnKey={columnKey}
+              modes={this.state.modes}
+              squares={this.state.squares}
+              size={this.state.options.size}
+              onSquareClick={this.onSquareClick}
+              explode={this.explode}
+            />
+          </CSSTransition>
+        </TransitionGroup>
+      )
     }
 
     return (

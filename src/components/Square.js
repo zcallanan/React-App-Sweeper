@@ -17,7 +17,7 @@ class Square extends React.Component {
     }),
     onSquareClick: PropTypes.func.isRequired,
     modes: PropTypes.object.isRequired,
-    square: PropTypes.string.isRequired
+    squareKey: PropTypes.string.isRequired
   }
 
   renderIcons = () => {

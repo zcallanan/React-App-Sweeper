@@ -45,13 +45,6 @@ class Stats extends React.Component {
     }
   }
 
-  /* Display:
-    [X] - Lives
-    [X] - Bomb Count
-    [X] - Revealed Squares (clicked: true, not bomb): Clicked Squares out of Size** - Bomb Count
-    [ ] - Flagged Squares
-    [ ] - ? Unknown Squares
-  */
   renderLives = () => {
     const stats = this.props.stats;
     const currentLives = stats.currentLives;
