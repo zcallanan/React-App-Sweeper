@@ -100,7 +100,7 @@ class Square extends React.Component {
     const questionmarkBool = squareData.questionMarked;
     let className;
     let attribute = {};
-    let element = true;
+    let element = false;
 
     if (clicked) {
       // Disable the button if it's been clicked
@@ -123,6 +123,7 @@ class Square extends React.Component {
           // In flagMode, if the square has a solid question mark over a hint, display it (hint should be hidden)
           className = "square flag-mode questionmarked hint"
         } else {
+          element = true;
           className = "square flag-mode hint";
         }
         return this.buttonMarkup(className, attribute, element);
@@ -141,6 +142,7 @@ class Square extends React.Component {
           // In questionMode, if the square has a solid flag over a hint, display it
           className = "square questionmark-mode flagged hint"
         } else {
+          element = true;
           className = "square questionmark-mode hint";
         }
         return this.buttonMarkup(className, attribute, element);
@@ -154,12 +156,12 @@ class Square extends React.Component {
         className = (!modes.bombMode ? "square questionmarked hint" : "square questionmarked hint bomb-mode");
       } else {
         // Toggle display of hints
+        element = true;
         className = (!modes.bombMode ? "square hint" : "square hint bomb-mode");
       }
       attribute = this.disableButtons(attribute)
       return this.buttonMarkup(className, attribute, element);
     } else {
-      element = false;
       attribute = this.disableButtons(attribute)
       if (flaggedBool) {
         className = (!modes.bombMode ? "square flagged" : "square flagged bomb-mode");
