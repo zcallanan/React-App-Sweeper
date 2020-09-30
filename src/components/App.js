@@ -11,12 +11,12 @@ import { randomIntFromInterval } from '../helpers';
 class App extends React.Component {
   // Initialize state
   state = {
-    options: {
+    options: { // user input settings, loaded from localStorage if available
       size: 0,
       difficulty: 0,
       lives: 0
     },
-    data: {
+    data: { // hard coded data
       bombPercentage: {
         0: "10%",
         1: "20%",
@@ -34,7 +34,7 @@ class App extends React.Component {
         5: "99"
       }
     },
-    squares: {
+    squares: { // game board framework
       "r0-s0": {
         bomb: false,
         flagged: false,
@@ -51,24 +51,31 @@ class App extends React.Component {
       }
     },
     modes: {
+      newGame: false, // Denotes the start of a new game before a square is selected
       bombMode: false, // Struck a bomb, locks input
       flagMode: false, // Place a flag on a square
       questionMode: false // Place a question mark on a square
     },
-    stats: {
+    stats: { // game stats
       currentLives: -1,
       bombs: -1,
       revealed: 0,
       flags: 0,
       questions: 0
     },
-    notices: {
+    notices: { // game notices
       bombNotice: false
+    },
+    animations: {
+      squareScroll: false,
+      seed: randomIntFromInterval(1,9999)
     }
   }
 
   componentDidMount() {
     let options = { ...this.state.options };
+    let modes = {...this.state.modes};
+    modes.newGame = true;
     const stats = this.state.stats;
     const data = this.state.data;
     // Read options from local storage
@@ -83,8 +90,15 @@ class App extends React.Component {
     }
     // Get initial number of lives
     stats["currentLives"] = parseInt(data["numberOfLives"][options["lives"]])
-    this.setState({ options, stats });
+    this.setState({ options, stats, modes });
     this.initSquares(options.size);
+  }
+
+  // prop for squares to update squareScroll state
+  toggleScroll = (bool, anim) => {
+    const animations = {...this.state.animations};
+    animations[anim] = bool;
+    this.setState({animations});
   }
 
   // Save Player's game board options
@@ -93,6 +107,12 @@ class App extends React.Component {
     const options = this.state.options;
     const stats = this.state.stats;
     const data = this.state.data;
+    const modes = {...this.state.modes};
+    const animations = {...this.state.animations}
+    modes.newGame = true;
+    this.toggleScroll(true, 'squareScroll');
+    // Reset seed
+    animations.seed = randomIntFromInterval(1,9999);
     // 2. Add new value to state
     options["size"] = parseInt(obj["size"]);
     options["difficulty"] = parseInt(obj["difficulty"]);
@@ -100,7 +120,7 @@ class App extends React.Component {
     // Get initial number of lives
     stats["currentLives"] = parseInt(data["numberOfLives"][options["lives"]])
     // 3. SetState
-    this.setState({ options, stats });
+    this.setState({ options, stats, modes, animations });
     // 4. Save options to local storage
     localStorage.setItem("options", JSON.stringify(options));
   }
@@ -122,6 +142,7 @@ class App extends React.Component {
     this.setState({ modes })
   }
 
+  // Cleanup bombMode, resetting bomb square, reset bombNotice, and remove disabled from clickable squares
   explodeCleanup = squareKey => {
     const squares = {...this.state.squares};
     squares[squareKey].explosion.explodeTrigger = false;
@@ -131,7 +152,6 @@ class App extends React.Component {
     const notices = {...this.state.notices};
     notices.bombNotice = false;
     this.setState({squares, notices});
-
     setTimeout(() => {
       const squares = {...this.state.squares};
       const modes = {...this.state.modes};
@@ -144,6 +164,7 @@ class App extends React.Component {
 
   }
 
+  // Called by square component when clicking on a bomb square
   explode = squareKey => {
     let squares = {...this.state.squares};
     if (!squares[squareKey].explosion.explodeCleanup) {
@@ -163,9 +184,13 @@ class App extends React.Component {
         squares[squareKey].explosion.explodeTimer = true;
         setTimeout(() => {
           // Update lives count here
+          const modes = {...this.state.modes};
           const stats = {...this.state.stats};
-          stats.currentLives--;
-          this.setState({ stats })
+          if (!modes.newGame) {
+            // Prevent loss of lives if the board is reset during the timeout
+            stats.currentLives--;
+            this.setState({ stats })
+          }
         }, 2000)
         setTimeout(() => {
           this.explodeCleanup(squareKey);
@@ -177,14 +202,19 @@ class App extends React.Component {
     }
   }
 
+  // Called by square component when clicking on a square
   onSquareClick = squareKey => {
     // 1. Copy state
     const squares = { ...this.state.squares };
-    const stats = { ...this.state.stats }
+    const stats = { ...this.state.stats };
+    const modes = {...this.state.modes};
     const bomb = squares[squareKey]['bomb'];
     const adjacentBombCount = squares[squareKey]['adjacentBombCount'];
-    const flagMode = this.state.modes.flagMode;
-    const questionMode = this.state.modes.questionMode;
+    const flagMode = modes.flagMode;
+    const questionMode = modes.questionMode;
+    if (modes.newGame) {
+      modes.newGame = false;
+    }
     // 2. Update square
     if (flagMode) {
       // If marking a flag is active, then mark only that square and then save to state
@@ -329,6 +359,7 @@ class App extends React.Component {
     this.setState({squares});
   }
 
+  // Called by this.onSquareClick() to determine whether a square's neighbors are bombs or have adjacent bombs
   checkNeighbors = (squareKey, squares, stats) => {
     let neighbors;
     if ((squares[squareKey]['neighbors'] === 'undefined' || squares[squareKey]['neighbors'].length === 0) || squares[squareKey]['adjacentBombCount'] === -1 ) {
@@ -355,6 +386,7 @@ class App extends React.Component {
     return stats;
   }
 
+  // Called by this.checkNeighbors() to determine who is a neighbor of a square and tally that square's adjacent bomb count
   countAdjacentBombs = squareKey => {
     const size = this.state.options.size;
     const row = parseInt(squareKey.split("-")[0].match(/\d{1,3}/)[0]);
@@ -407,7 +439,7 @@ class App extends React.Component {
   }
 
 
-  // Recursive function that returns an object with bombCount positions
+  // Called by this.setBombs(), recursive function that determines whether a square has a bomb
   generatePositions = (positionArray, squares, bombCount, optionSize, count) => {
     if (count > bombCount - 1) {
       // stop recursive call
@@ -425,16 +457,22 @@ class App extends React.Component {
 
   render() {
     const columns = [];
+    let columnKey;
     for (let i = 0; i < this.state.options.size; i++) {
-      columns.push(<Column
-        key={`s${i}`}
-        column={`s${i}`}
-        modes={this.state.modes}
-        squares={this.state.squares}
-        size={this.state.options.size}
-        onSquareClick={this.onSquareClick}
-        explode={this.explode}
-      />)
+      columnKey = `s${i}`;
+      columns.push(
+        <Column
+          key={columnKey}
+          columnKey={columnKey}
+          modes={this.state.modes}
+          animations={this.state.animations}
+          squares={this.state.squares}
+          size={this.state.options.size}
+          onSquareClick={this.onSquareClick}
+          toggleScroll={this.toggleScroll}
+          explode={this.explode}
+        />
+      )
     }
 
     return (

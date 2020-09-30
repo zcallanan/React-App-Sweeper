@@ -5,21 +5,26 @@ import Square from './Square';
 class Column extends React.Component {
   static propTypes = {
     size: PropTypes.number.isRequired,
-    column: PropTypes.string.isRequired,
+    columnKey: PropTypes.string.isRequired,
     modes: PropTypes.object.isRequired,
+    animations: PropTypes.object.isRequired,
     squares: PropTypes.object.isRequired,
-    onSquareClick: PropTypes.func.isRequired
+    onSquareClick: PropTypes.func.isRequired,
+    toggleScroll: PropTypes.func.isRequired,
+    explode: PropTypes.func.isRequired
   }
 
   render() {
     const column = [];
     for (let i = 0; i < this.props.size; i++) {
       column.push(<Square
-        key={`r${i}-${this.props.column}`}
-        square={`r${i}-${this.props.column}`}
+        key={`r${i}-${this.props.columnKey}`}
+        squareKey={`r${i}-${this.props.columnKey}`}
         modes={this.props.modes}
-        squares={this.props.squares[`r${i}-${this.props.column}`]}
+        animations={this.props.animations}
+        squareData={this.props.squares[`r${i}-${this.props.columnKey}`]}
         onSquareClick={this.props.onSquareClick}
+        toggleScroll={this.props.toggleScroll}
         explode={this.props.explode}
       />)
     }
