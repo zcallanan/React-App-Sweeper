@@ -5,7 +5,7 @@ import Square from './Square';
 class Column extends React.Component {
   static propTypes = {
     size: PropTypes.number.isRequired,
-    column: PropTypes.string.isRequired,
+    columnKey: PropTypes.string.isRequired,
     modes: PropTypes.object.isRequired,
     squares: PropTypes.object.isRequired,
     onSquareClick: PropTypes.func.isRequired
@@ -15,10 +15,10 @@ class Column extends React.Component {
     const column = [];
     for (let i = 0; i < this.props.size; i++) {
       column.push(<Square
-        key={`r${i}-${this.props.column}`}
-        squareKey={`r${i}-${this.props.column}`}
+        key={`r${i}-${this.props.columnKey}`}
+        squareKey={`r${i}-${this.props.columnKey}`}
         modes={this.props.modes}
-        squareData={this.props.squares[`r${i}-${this.props.column}`]}
+        squareData={this.props.squares[`r${i}-${this.props.columnKey}`]}
         onSquareClick={this.props.onSquareClick}
         explode={this.props.explode}
       />)

@@ -20,10 +20,6 @@ class Square extends React.Component {
     square: PropTypes.string.isRequired
   }
 
-  state = {
-    bombStatus: {}
-  }
-
   renderIcons = () => {
     const squareData = this.props.squareData;
     const squareKey = this.props.squareKey;
@@ -72,6 +68,15 @@ class Square extends React.Component {
     return attribute;
   }
 
+  insertElement = element => {
+    if (element) {
+      const adjacentBombCount = this.props.squareData.adjacentBombCount;
+      return (
+        <p className={`bomb-count neighbors-${adjacentBombCount}`}>{adjacentBombCount}</p>
+      )
+    }
+  }
+
   buttonMarkup = (className, attribute, element) => {
     const squareKey = this.props.squareKey;
     return (
@@ -82,15 +87,6 @@ class Square extends React.Component {
         </span>
       </button>
     )
-  }
-
-  insertElement = element => {
-    if (element) {
-      const adjacentBombCount = this.props.squareData.adjacentBombCount;
-      return (
-        <p className={`bomb-count neighbors-${adjacentBombCount}`}>{adjacentBombCount}</p>
-      )
-    }
   }
 
   // Handles button modes

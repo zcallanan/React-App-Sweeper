@@ -432,7 +432,7 @@ class App extends React.Component {
     for (let i = 0; i < this.state.options.size; i++) {
       columns.push(<Column
         key={`s${i}`}
-        column={`s${i}`}
+        columnKey={`s${i}`}
         modes={this.state.modes}
         squares={this.state.squares}
         size={this.state.options.size}
