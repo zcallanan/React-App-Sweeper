@@ -1,5 +1,4 @@
 import React from 'react';
-import { TransitionGroup, CSSTransition } from 'react-transition-group';
 import Form from './Form';
 import Column from './Column';
 import Flag from './Flag';
