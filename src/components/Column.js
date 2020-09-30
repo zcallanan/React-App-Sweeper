@@ -7,8 +7,11 @@ class Column extends React.Component {
     size: PropTypes.number.isRequired,
     columnKey: PropTypes.string.isRequired,
     modes: PropTypes.object.isRequired,
+    animations: PropTypes.object.isRequired,
     squares: PropTypes.object.isRequired,
-    onSquareClick: PropTypes.func.isRequired
+    onSquareClick: PropTypes.func.isRequired,
+    toggleScroll: PropTypes.func.isRequired,
+    explode: PropTypes.func.isRequired
   }
 
   render() {
@@ -18,8 +21,10 @@ class Column extends React.Component {
         key={`r${i}-${this.props.columnKey}`}
         squareKey={`r${i}-${this.props.columnKey}`}
         modes={this.props.modes}
+        animations={this.props.animations}
         squareData={this.props.squares[`r${i}-${this.props.columnKey}`]}
         onSquareClick={this.props.onSquareClick}
+        toggleScroll={this.props.toggleScroll}
         explode={this.props.explode}
       />)
     }

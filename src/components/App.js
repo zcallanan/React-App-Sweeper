@@ -68,7 +68,7 @@ class App extends React.Component {
       bombNotice: false
     },
     animations: {
-      columnScroll: false,
+      squareScroll: false,
       seed: randomIntFromInterval(1,9999)
     }
   }
@@ -95,11 +95,11 @@ class App extends React.Component {
     this.initSquares(options.size);
   }
 
-  toggleColumnScroll = bool => {
+  // prop for squares to update squareScroll state
+  toggleScroll = (bool, anim) => {
     const animations = {...this.state.animations};
-    animations.columnScroll = bool;
+    animations[anim] = bool;
     this.setState({animations});
-    console.log('hello', bool)
   }
 
   // Save Player's game board options
@@ -111,7 +111,7 @@ class App extends React.Component {
     const modes = {...this.state.modes};
     const animations = {...this.state.animations}
     modes.newGame = true;
-    this.toggleColumnScroll(true);
+    this.toggleScroll(true, 'squareScroll');
     // Reset seed
     animations.seed = randomIntFromInterval(1,9999);
     // 2. Add new value to state
@@ -457,26 +457,22 @@ class App extends React.Component {
   }
 
   render() {
-    const modes = {...this.state.modes};
-    let columnScroll = modes.newGame && !this.state.animations.columnScroll ? true : false
     const columns = [];
     let columnKey;
     for (let i = 0; i < this.state.options.size; i++) {
       columnKey = `s${i}`;
       columns.push(
-        <TransitionGroup component="div" className="columns" key={`${columnKey}-${this.state.animations.seed}`}>
-          <CSSTransition classNames="columns" in={columnScroll} appear={columnScroll} key={`${columnKey}-${this.state.animations.seed}`} onEnter={() => this.toggleColumnScroll(false)} timeout={{enter: 3000}} >
-            <Column
-              key={`${columnKey}-${this.state.animations.seed}`}
-              columnKey={columnKey}
-              modes={this.state.modes}
-              squares={this.state.squares}
-              size={this.state.options.size}
-              onSquareClick={this.onSquareClick}
-              explode={this.explode}
-            />
-          </CSSTransition>
-        </TransitionGroup>
+        <Column
+          key={columnKey}
+          columnKey={columnKey}
+          modes={this.state.modes}
+          animations={this.state.animations}
+          squares={this.state.squares}
+          size={this.state.options.size}
+          onSquareClick={this.onSquareClick}
+          toggleScroll={this.toggleScroll}
+          explode={this.explode}
+        />
       )
     }
 

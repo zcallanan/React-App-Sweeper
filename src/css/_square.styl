@@ -3,6 +3,7 @@ blu = rgba(77,162,207, .8)
 
 .squares
   display flex
+  overflow hidden
   // background-color borders
 
 .square
@@ -69,3 +70,14 @@ blu = rgba(77,162,207, .8)
   &.bomba-appear-active
     color red
     transition 1s
+
+.squares-appear
+  transform  translate(-250%, -250%)
+  -webkit-transform  translate(-250%, -250%)
+  &.squares-appear-active
+    transform  translate(0)
+    -webkit-transform  translate(0)
+    transition 1.5s
+    -webkit-transition 1.5s
+
+

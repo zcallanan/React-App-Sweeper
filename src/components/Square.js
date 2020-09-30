@@ -79,6 +79,7 @@ class Square extends React.Component {
 
   buttonMarkup = (className, attribute, element) => {
     const squareKey = this.props.squareKey;
+
     return (
       <button className={className} {...attribute} onClick={() => { this.props.onSquareClick(squareKey)}}>
         <span>
@@ -174,10 +175,15 @@ class Square extends React.Component {
   }
 
   render() {
+    const squareKey = this.props.squareKey;
+    const modes = this.props.modes;
+    let squareScroll = modes.newGame && !this.props.animations.squareScroll ? true : false;
     return (
-      <div>
-        {this.generateButton()}
-      </div>
+      <TransitionGroup component="div" className="squares" key={`${squareKey}-${this.props.animations.seed}`}>
+        <CSSTransition classNames="squares" in={squareScroll} appear={squareScroll} key={`${squareKey}-${this.props.animations.seed}`} onEnter={() => this.props.toggleScroll(false)} timeout={{enter: 1500}} >
+          {this.generateButton()}
+        </CSSTransition>
+      </TransitionGroup>
     );
   }
 
