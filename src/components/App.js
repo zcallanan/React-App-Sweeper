@@ -129,11 +129,11 @@ class App extends React.Component {
     // Reset seed
     animations.seed = randomIntFromInterval(1,9999);
     // 2. Add new value to state
-    gameState.options.size = parseInt(obj["size"]);
-    gameState.options.difficulty = parseInt(obj["difficulty"]);
-    gameState.options.lives = parseInt(obj["lives"]);
+    gameState.options.size = parseInt(obj.size);
+    gameState.options.difficulty = parseInt(obj.difficulty);
+    gameState.options.lives = parseInt(obj.lives);
     // Get initial number of lives
-    stats["currentLives"] = parseInt(data["numberOfLives"][gameState.options.lives])
+    stats.currentLives = parseInt(data.numberOfLives[gameState.options.lives])
     // 3. SetState
     this.setState({ gameState, stats, modes, animations });
     // 4. Save options to local storage
@@ -237,14 +237,14 @@ class App extends React.Component {
         stats.flags--;
         this.setState({ stats })
       }
-      if (squares[squareKey]['questionMarked']) {
+      if (squares[squareKey].questionMarked) {
         // If the square is question marked when placing a flag, remove questionMarked
-        squares[squareKey]['questionMarked'] = !squares[squareKey]['questionMarked'];
+        squares[squareKey].questionMarked = !squares[squareKey].questionMarked;
       }
     } else if (questionMode) {
       // If placing a question mark is active, then mark only that square and then save to state
-      squares[squareKey]['questionMarked'] = !squares[squareKey]['questionMarked'];
-      if (squares[squareKey]['questionMarked']) {
+      squares[squareKey].questionMarked = !squares[squareKey].questionMarked;
+      if (squares[squareKey].questionMarked) {
         // If a question mark is placed, increment the question mark count
         stats.questions++;
         this.setState({ stats })
@@ -253,23 +253,23 @@ class App extends React.Component {
         stats.questions--;
         this.setState({ stats })
       }
-      if (squares[squareKey]['flagged']) {
+      if (squares[squareKey].flagged) {
         // If the square is flagged when placing a question mark, unflag it
-        squares[squareKey]['flagged'] = !squares[squareKey]['flagged'];
+        squares[squareKey].flagged = !squares[squareKey].flagged;
       }
     } else {
       // Mark as clicked and evaluate
-      squares[squareKey]['clicked'] = true;
+      squares[squareKey].clicked = true;
       // let stats = {...this.state.stats};
       if (!bomb) {
         // Increment revealed
-        stats['revealed']++;
+        stats.revealed++;
         // Check neighbors to determine whether to click them or show their hint. Those with hints CAN be bombs
         stats = this.checkNeighbors(squareKey, squares, stats);
         this.setState({ stats });
         if (adjacentBombCount > 0) {
           // Click on a square with an adjacent bomb, reveal its hint
-          squares[squareKey]['hint'] = true;
+          squares[squareKey].hint = true;
         }
         // Win
           // Send a notice that you revealed all squares
@@ -289,7 +289,6 @@ class App extends React.Component {
         const stats = {...this.state.stats};
         stats.currentLives--;
         modes.bombMode = true;
-        console.log(stats.currentLives)
         if (!(stats.currentLives < 0)) {
           // Defeat notice triggers instead in this case
           notices.bombNotice = true;
@@ -303,7 +302,6 @@ class App extends React.Component {
             // Bombs animate and explode
             // Modal pops up to play another game?
         if (stats.currentLives < 0) {
-          console.log('loss?')
           gameState.progress = -1;
           notices.defeatNotice = true;
           this.setState({gameState, notices});
@@ -396,24 +394,24 @@ class App extends React.Component {
   // Called by this.onSquareClick() to determine whether a square's neighbors are bombs or have adjacent bombs
   checkNeighbors = (squareKey, squares, stats) => {
     let neighbors;
-    if ((squares[squareKey]['neighbors'] === 'undefined' || squares[squareKey]['neighbors'].length === 0) || squares[squareKey]['adjacentBombCount'] === -1 ) {
+    if ((squares[squareKey].neighbors === 'undefined' || squares[squareKey].neighbors.length === 0) || squares[squareKey].adjacentBombCount === -1 ) {
       // If squareKey has no neighbors or its adjacent bombs have not been counted, then call countAdjacentBombs
       neighbors = this.countAdjacentBombs(squareKey);
     } else {
-      neighbors = squares[squareKey]['neighbors'];
+      neighbors = squares[squareKey].neighbors;
     }
     neighbors.forEach(neighbor => {
-      if ((squares[neighbor]['neighbors'] === 'undefined' || squares[neighbor]['neighbors'].length === 0) || squares[neighbor]['adjacentBombCount'] === -1 ) {
+      if ((squares[neighbor].neighbors === 'undefined' || squares[neighbor].neighbors.length === 0) || squares[neighbor].adjacentBombCount === -1 ) {
         this.countAdjacentBombs(neighbor);
       }
-      if (squares[neighbor]['adjacentBombCount'] > 0 && !squares[neighbor]['clicked'] && !squares[neighbor]['hint']) {
+      if (squares[neighbor].adjacentBombCount > 0 && !squares[neighbor].clicked && !squares[neighbor].hint) {
         // If a neighbor has an adjacent bomb, hasn't been clicked or had its hint revealed, then reveal its hint
-        squares[neighbor]['hint'] = true;
-      } else if (squares[neighbor]['adjacentBombCount'] === 0 && !squares[neighbor]['bomb'] && !squares[neighbor]['clicked'] && !squares[neighbor]['hint']) {
+        squares[neighbor].hint = true;
+      } else if (squares[neighbor].adjacentBombCount === 0 && !squares[neighbor].bomb && !squares[neighbor].clicked && !squares[neighbor].hint) {
         // If a neighbor has no adjacent bombs, isn't a bomb, has no revealed hint or been clicked, then mark as clicked and check its neighbors
-        squares[neighbor]['clicked'] = true;
+        squares[neighbor].clicked = true;
         // Increment revealed
-        stats['revealed']++;
+        stats.revealed++;
         this.checkNeighbors(neighbor, squares, stats);
       }
     })
@@ -481,7 +479,7 @@ class App extends React.Component {
     }
     let tempPosition = `r${randomIntFromInterval(0, optionSize - 1)}-s${randomIntFromInterval(0, optionSize - 1)}`;
     if (!positionArray.includes(tempPosition)) {
-      squares[tempPosition]['bomb'] = true;
+      squares[tempPosition].bomb = true;
       positionArray.push(tempPosition);
       count++;
     }

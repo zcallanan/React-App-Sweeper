@@ -25,11 +25,11 @@ class Form extends React.Component {
 
   componentDidUpdate() {
     // Set an initial local state. Only do this if size: {} is not set
-    if (this.state.options["size"] === -1) {
+    if (this.state.options.size === -1) {
       const options = {...this.state.options};
-      options["size"] = this.props.options.size;
-      options["difficulty"] = this.props.options.difficulty;
-      options["lives"] = this.props.options.lives;
+      options.size = this.props.options.size;
+      options.difficulty = this.props.options.difficulty;
+      options.lives = this.props.options.lives;
       this.setState({ options });
     }
   }
@@ -42,43 +42,43 @@ class Form extends React.Component {
     let formIsValid = true;
 
     // Size of board
-    if (!options["size"]) {
+    if (!options.size) {
       formIsValid = false;
-      errors["size"] = "Square number field cannot be empty";
-    } else if(typeof options["size"] !== "undefined"){
+      errors.size = "Square number field cannot be empty";
+    } else if(typeof options.size !== "undefined"){
       if(isNaN(parseInt(options["size"]))){
         // If input NaN() returns true
         formIsValid = false;
-        errors["size"] = "Enter an integer number";
+        errors.size = "Enter an integer number";
       }
-      else if(options["size"] < 5 || options["size"] > 20){
+      else if(options.size < 5 || options.size > 20){
         // If input is not in range
         formIsValid = false;
-        errors["size"] = "Enter a number between 5 and 20";
+        errors.size = "Enter a number between 5 and 20";
       }
     }
 
     // Percentage
-    if (!options["difficulty"]) {
+    if (!options.difficulty) {
       formIsValid = false;
-      errors["difficulty"] = "The percentage field cannot be empty";
-    } else if(typeof options["difficulty"] !== "undefined"){
+      errors.difficulty = "The percentage field cannot be empty";
+    } else if(typeof options.difficulty !== "undefined"){
       if(isNaN(parseInt(options["difficulty"]))){
         // If the value of the select is not a number for some reason
         formIsValid = false;
-        errors["difficulty"] = "Select a different percentage";
+        errors.difficulty = "Select a different percentage";
       }
     }
 
     // Lives
-    if (!options["lives"]) {
+    if (!options.lives) {
       formIsValid = false;
-      errors["lives"] = "The lives field cannot be empty";
-    } else if(typeof options["lives"] !== "undefined"){
-      if(isNaN(parseInt(options["lives"]))){
+      errors.lives = "The lives field cannot be empty";
+    } else if(typeof options.lives !== "undefined"){
+      if(isNaN(parseInt(options.lives))){
         // If the value of the select is not a number for some reason
         formIsValid = false;
-        errors["lives"] = "Select a different number of lives";
+        errors.lives = "Select a different number of lives";
       }
     }
 
@@ -103,12 +103,12 @@ class Form extends React.Component {
       setTimeout(() => {
         const errors = {...this.state.errors};
         // TODO fix this
-        if (errors["size"]) {
-          alert(errors["size"]);
-        } else if (errors["difficulty"]) {
-          alert(errors["difficulty"]);
-        } else if (errors["lives"]){
-          alert(errors["lives"]);
+        if (errors.size) {
+          alert(errors.size);
+        } else if (errors.difficulty) {
+          alert(errors.difficulty);
+        } else if (errors.lives){
+          alert(errors.lives);
         }
       }, 200);
     }
