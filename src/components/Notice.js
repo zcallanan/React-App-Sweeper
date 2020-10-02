@@ -11,7 +11,8 @@ class Notice extends React.Component {
   }
 
   handleNotice = () => {
-    const bombNotice = this.props.notices.bombNotice;
+    const notices = this.props.notices;
+    const bombNotice = notices.bombNotice;
     if (bombNotice) {
       return (
         <CSSTransition classNames="notices" key="bomb" timeout={{enter: 2500, exit: 2500}} >

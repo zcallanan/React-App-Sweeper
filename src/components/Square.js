@@ -123,6 +123,7 @@ class Square extends React.Component {
           // In flagMode, if the square has a solid question mark over a hint, display it (hint should be hidden)
           className = "square flag-mode questionmarked hint"
         } else {
+          // Toggle display of hints if hint is true and it doesn't have a flag or question mark
           element = true;
           className = "square flag-mode hint";
         }
@@ -142,6 +143,7 @@ class Square extends React.Component {
           // In questionMode, if the square has a solid flag over a hint, display it
           className = "square questionmark-mode flagged hint"
         } else {
+          // Toggle display of hints if hint is true and it doesn't have a flag or question mark
           element = true;
           className = "square questionmark-mode hint";
         }
