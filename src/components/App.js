@@ -149,9 +149,9 @@ class App extends React.Component {
     modes[e.target.name] = !modes[e.target.name];
     // 3. If mode X toggles to true, then make sure mode Y is false
     if ("flagMode" === e.target.name && modes[e.target.name]) {
-      modes["questionMode"] = false;
+      modes.questionMode = false;
     } else if ("questionMode" === e.target.name && modes[e.target.name]){
-      modes["flagMode"] = false;
+      modes.flagMode = false;
     }
     // 4. Save change
     this.setState({ modes })
@@ -215,8 +215,8 @@ class App extends React.Component {
     const gameState = {...this.state.gameState};
     const notices = {...this.state.notices};
     const modes = {...this.state.modes};
-    const bomb = squares[squareKey]['bomb'];
-    const adjacentBombCount = squares[squareKey]['adjacentBombCount'];
+    const bomb = squares[squareKey].bomb;
+    const adjacentBombCount = squares[squareKey].adjacentBombCount;
     const flagMode = modes.flagMode;
     const questionMode = modes.questionMode;
     if (modes.newGame) {
@@ -227,8 +227,8 @@ class App extends React.Component {
     // 2. Update square
     if (flagMode) {
       // If marking a flag is active, then mark only that square and then save to state
-      squares[squareKey]['flagged'] = !squares[squareKey]['flagged'];
-      if (squares[squareKey]['flagged']) {
+      squares[squareKey].flagged = !squares[squareKey].flagged;
+      if (squares[squareKey].flagged) {
         // If a flag is placed, increment the flag count
         stats.flags++;
         this.setState({ stats })

@@ -6,36 +6,38 @@ class Notice extends React.Component {
 
   static propTypes = {
     notices: PropTypes.shape({
-      bombNotice: PropTypes.bool.isRequired
+      bombNotice: PropTypes.bool.isRequired,
+      victoryNotice: PropTypes.bool.isRequired,
+      defeatNotice: PropTypes.bool.isRequired
     })
   }
 
   handleNotice = () => {
-    const notices = this.props.notices;
-    const bombNotice = notices.bombNotice;
-    const victoryNotice = notices.victoryNotice;
-    const defeatNotice = notices.defeatNotice;
+    const { bombNotice, victoryNotice, defeatNotice} = this.props.notices;
+    let notice = {};
     if (bombNotice) {
-      return (
-        <CSSTransition classNames="notices" key="bomb" timeout={{enter: 2500, exit: 2500}} >
-          <span key="bomb" className="notice">
-            <strong>You struck a bomb and lost a life!</strong>
-          </span>
-        </CSSTransition>
-      )
+      // Notice content
+      notice = {
+        key: "bomb",
+        message: "You struck a bomb and lost a life!"
+      }
     } else if (victoryNotice) {
-      return (
-        <CSSTransition classNames="notices" key="victory" timeout={{enter: 2500, exit: 2500}} >
-          <span key="victory" className="notice">
-            <strong>You revealed the final square!</strong>
-          </span>
-        </CSSTransition>
-      )
+      notice = {
+        key: "victory",
+        message: "You revealed the final square!"
+      }
     } else if (defeatNotice) {
+      notice = {
+        key: "defeat",
+        message: "You ran out of lives!"
+      }
+    }
+    if (Object.keys(notice).length > 0) {
+      // If there's content to display, render it
       return (
-        <CSSTransition classNames="notices" key="defeat" timeout={{enter: 2500, exit: 2500}} >
-          <span key="defeat" className="notice">
-            <strong>You ran out of lives!</strong>
+        <CSSTransition classNames="notices" key={notice.key} timeout={{enter: 2500, exit: 2500}} >
+          <span key={notice.key} className="notice">
+            <strong>{notice.message}</strong>
           </span>
         </CSSTransition>
       )
