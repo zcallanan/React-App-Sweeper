@@ -69,7 +69,7 @@ class App extends React.Component {
     },
     notices: { // game notices
       bombNotice: false,
-      revealedNotice: false,
+      victoryNotice: false,
       defeatNotice: false
     },
     animations: {
@@ -279,7 +279,7 @@ class App extends React.Component {
 
         if (stats.revealed === stats.totalToReveal) {
           gameState.progress = 1;
-          notices.revealedNotice = true;
+          notices.victoryNotice = true;
           this.setState({gameState, notices});
         }
       } else {
@@ -289,7 +289,11 @@ class App extends React.Component {
         const stats = {...this.state.stats};
         stats.currentLives--;
         modes.bombMode = true;
-        notices.bombNotice = true;
+        console.log(stats.currentLives)
+        if (!(stats.currentLives < 0)) {
+          // Defeat notice triggers instead in this case
+          notices.bombNotice = true;
+        }
         squares[squareKey].explosion.explodeTrigger = true;
         this.setState({squares, notices, modes, stats})
         // Loss
@@ -314,12 +318,16 @@ class App extends React.Component {
   initSquares = size => {
     // 1. Copy state
     let squares = {...this.state.squares};
-    // Make sure that the revealed stat is set to zero at the start
+    // Cleanup a previous game
     const stats = {...this.state.stats};
-    stats["revealed"] = 0;
-    stats["flags"] = 0;
-    stats["questions"] = 0;
-    this.setState({stats});
+    const notices = {...this.state.notices};
+    stats.revealed = 0;
+    stats.flags = 0;
+    stats.questions = 0;
+    notices.bombNotice = false;
+    notices.victoryNotice = false;
+    notices.defeatNotice = false;
+    this.setState({stats, notices});
     // If size decreases, then square keys should be deleted before the board is regenerated
     if (Object.keys(squares).length > 1) {
       let row;

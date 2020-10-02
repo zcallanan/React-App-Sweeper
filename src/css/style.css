@@ -35,7 +35,7 @@ header span svg.header-icon {
   height: 20px;
   overflow: hidden;
 }
-.bomb-notice {
+.notice {
   display: inline-block;
 }
 .notices-enter {
