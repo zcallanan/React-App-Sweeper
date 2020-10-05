@@ -22,6 +22,7 @@ class Square extends React.Component {
 
   renderIcons = () => {
     const squareData = this.props.squareData;
+    const gameState = this.props.gameState;
     const squareKey = this.props.squareKey;
     const explodeTrigger = squareData.explosion.explodeTrigger;
     const bomb = squareData.bomb;
@@ -29,6 +30,7 @@ class Square extends React.Component {
     const flaggedBool = squareData.flagged;
     const questionmarkBool = squareData.questionMarked
     if (bomb && clicked) {
+      console.log(squareKey, explodeTrigger)
       // If it's a bomb and clicked, show the bomb
       return (
         <TransitionGroup component="span" className="bomba">
@@ -52,12 +54,15 @@ class Square extends React.Component {
         </span>
       )
     }
-    return (
-      <span>
-        <FontAwesomeIcon className="flag-icon" icon={ farFlag } />
-        <FontAwesomeIcon className="questionmark-icon" icon={ farQuestionCircle } />
-      </span>
-    );
+    if (gameState.progress !== -1) {
+      return (
+        <span>
+          <FontAwesomeIcon className="flag-icon" icon={ farFlag } />
+          <FontAwesomeIcon className="questionmark-icon" icon={ farQuestionCircle } />
+        </span>
+      );
+    }
+
   }
 
   disableButtons = attribute => {
@@ -106,11 +111,7 @@ class Square extends React.Component {
       // Disable the button if it's been clicked
       className = "square";
       attribute["disabled"] = "disabled";
-      return (
-        <button className={className} {...attribute}>
-          {this.renderIcons()}
-        </button>
-      );
+      return this.buttonMarkup(className, attribute, element);
     } else if (modes.flagMode) {
       // Toggle placement of flags
       if (questionmarkBool) {

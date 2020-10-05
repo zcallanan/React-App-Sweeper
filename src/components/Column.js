@@ -26,6 +26,7 @@ class Column extends React.Component {
         onSquareClick={this.props.onSquareClick}
         toggleScroll={this.props.toggleScroll}
         explode={this.props.explode}
+        gameState={this.props.gameState}
       />)
     }
 

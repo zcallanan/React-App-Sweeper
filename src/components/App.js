@@ -160,6 +160,7 @@ class App extends React.Component {
   // Cleanup bombMode, resetting bomb square, reset bombNotice, and remove disabled from clickable squares
   explodeCleanup = squareKey => {
     const squares = {...this.state.squares};
+    const gameState = {...this.state.gameState};
     squares[squareKey].explosion.explodeTrigger = false;
     squares[squareKey].explosion.explodeTimer = false;
     squares[squareKey].explosion.explodeCleanup = true;
@@ -171,7 +172,9 @@ class App extends React.Component {
       const squares = {...this.state.squares};
       const modes = {...this.state.modes};
       // Reset square and hide the bomb
-      squares[squareKey].clicked = false;
+      if (gameState.progress !== -1) {
+        squares[squareKey].clicked = false;
+      }
       // Remove disabling of buttons
       modes.bombMode = false;
       this.setState({squares, modes});
@@ -302,9 +305,22 @@ class App extends React.Component {
             // Bombs animate and explode
             // Modal pops up to play another game?
         if (stats.currentLives < 0) {
+          // Flag gamestate as defeat
           gameState.progress = -1;
+          // Show the you lost all lives notice
           notices.defeatNotice = true;
-          this.setState({gameState, notices});
+          Object.keys(squares).map(key => {
+            if (!squares[key].clicked) {
+              // Reveal the board when you lose
+              squares[key].clicked = true;
+              if (squares[key].bomb) {
+                // Trigger all bombs to play their explosion animation
+                squares[key].explosion.explodeTrigger = true;
+              }
+            }
+            return squares;
+          })
+          this.setState({squares, gameState, notices});
         }
       }
     }
@@ -503,6 +519,7 @@ class App extends React.Component {
           onSquareClick={this.onSquareClick}
           toggleScroll={this.toggleScroll}
           explode={this.explode}
+          gameState={this.state.gameState}
         />
       )
     }
