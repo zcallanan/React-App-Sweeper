@@ -125,6 +125,33 @@ header span svg.header-icon {
 .square .questionmark-icon {
   display: none;
 }
+.fire {
+  color: #f00;
+}
+.fire-enter {
+  color: #808080;
+}
+.fire-enter.fire-enter-active {
+  color: #ffa500;
+  transition: 10s;
+}
+.fire-enter-done {
+  color: #f00;
+}
+.fire-appear {
+  color: #00f;
+}
+.fire-appear.fire-appear-active {
+  color: #f00;
+  transition: 10s;
+}
+.fire-exit {
+  color: #ffa500;
+}
+.fire-exit.fire-exit-active {
+  color: #f00;
+  transition: 10s;
+}
 .bomba-enter {
   color: #f00;
 }

@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { TransitionGroup, CSSTransition } from 'react-transition-group';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faFlag, faQuestionCircle, faBomb } from '@fortawesome/free-solid-svg-icons'
+import { faFlag, faQuestionCircle, faBomb, faFireAlt } from '@fortawesome/free-solid-svg-icons'
 import { faFlag as farFlag, faQuestionCircle as farQuestionCircle } from '@fortawesome/free-regular-svg-icons'
 
 class Square extends React.Component {
@@ -20,25 +20,50 @@ class Square extends React.Component {
     squareKey: PropTypes.string.isRequired
   }
 
+  cssTransition = (squareKey, explodeTrigger, fire) => {
+    console.log(explodeTrigger, fire)
+    if (explodeTrigger && !fire) {
+      return (
+        <CSSTransition classNames="bomba" key={squareKey} in={explodeTrigger} appear={explodeTrigger} onEnter={() => this.props.explode(squareKey)} timeout={{enter: 1000, exit: 1000}} >
+          <FontAwesomeIcon key={squareKey} icon={ faBomb } />
+        </CSSTransition>
+      )
+    } else if (!explodeTrigger && fire) {
+      return (
+        <CSSTransition classname="fire-enter" classNames="fire" mountOnEnter key={squareKey} in={fire} appear={fire} timeout={{enter: 10000, exit: 20000}} >
+          <FontAwesomeIcon key={squareKey} icon={ faFireAlt } />
+        </CSSTransition>
+      )
+    }
+  }
+
+  componentDidMount() {
+    const squareData = this.props.squareData;
+    const gameState = this.props.gameState;
+    const squareKey = this.props.squareKey;
+
+    if (gameState.progress === -1 && squareData[squareKey].explosion.explodeFire) {
+      /* Call function that sets global state of explodeFire
+      to false to force a reflow on mounting in order
+      to immediately display exit anim */
+    }
+  }
+
   renderIcons = () => {
     const squareData = this.props.squareData;
     const gameState = this.props.gameState;
     const squareKey = this.props.squareKey;
     const explodeTrigger = squareData.explosion.explodeTrigger;
+    let fire = squareData.explosion.explodeFire;
     const bomb = squareData.bomb;
     const clicked = squareData.clicked;
     const flaggedBool = squareData.flagged;
     const questionmarkBool = squareData.questionMarked
     if (bomb && clicked) {
-      console.log(squareKey, explodeTrigger)
       // If it's a bomb and clicked, show the bomb
       return (
         <TransitionGroup component="span" className="bomba">
-        {explodeTrigger && (
-          <CSSTransition classNames="bomba" key={squareKey} in={explodeTrigger} appear={explodeTrigger} onEnter={() => this.props.explode(squareKey)} timeout={{enter: 1000, exit: 1000}} >
-            <FontAwesomeIcon key={squareKey} icon={ faBomb } />
-          </CSSTransition>
-        )}
+          {this.cssTransition(squareKey, explodeTrigger, fire)}
         </TransitionGroup>
       )
     } else if (flaggedBool && !clicked) {

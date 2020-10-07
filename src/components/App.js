@@ -49,7 +49,8 @@ class App extends React.Component {
         explosion: {
           explodeTrigger: false,
           explodeTimer: false,
-          explodeCleanup: false
+          explodeCleanup: false,
+          explodeFire: false
         }
       }
     },
@@ -80,6 +81,7 @@ class App extends React.Component {
 
   componentDidMount() {
     let gameState = { ...this.state.gameState };
+    gameState.progress = 0;
     let modes = {...this.state.modes};
     modes.newGame = true;
     const stats = this.state.stats;
@@ -132,6 +134,8 @@ class App extends React.Component {
     gameState.options.size = parseInt(obj.size);
     gameState.options.difficulty = parseInt(obj.difficulty);
     gameState.options.lives = parseInt(obj.lives);
+    // Reset progress to wipe a win or loss
+    gameState.progress = 0;
     // Get initial number of lives
     stats.currentLives = parseInt(data.numberOfLives[gameState.options.lives])
     // 3. SetState
@@ -157,31 +161,6 @@ class App extends React.Component {
     this.setState({ modes })
   }
 
-  // Cleanup bombMode, resetting bomb square, reset bombNotice, and remove disabled from clickable squares
-  explodeCleanup = squareKey => {
-    const squares = {...this.state.squares};
-    const gameState = {...this.state.gameState};
-    squares[squareKey].explosion.explodeTrigger = false;
-    squares[squareKey].explosion.explodeTimer = false;
-    squares[squareKey].explosion.explodeCleanup = true;
-    // Remove display notice
-    const notices = {...this.state.notices};
-    notices.bombNotice = false;
-    this.setState({squares, notices});
-    setTimeout(() => {
-      const squares = {...this.state.squares};
-      const modes = {...this.state.modes};
-      // Reset square and hide the bomb
-      if (gameState.progress !== -1) {
-        squares[squareKey].clicked = false;
-      }
-      // Remove disabling of buttons
-      modes.bombMode = false;
-      this.setState({squares, modes});
-    }, 1000);
-
-  }
-
   // Called by square component when clicking on a bomb square
   explode = squareKey => {
     let squares = {...this.state.squares};
@@ -202,12 +181,44 @@ class App extends React.Component {
         squares[squareKey].explosion.explodeTimer = true;
         setTimeout(() => {
           this.explodeCleanup(squareKey);
-        }, 5000)
+        }, 3000) // bomb explosion timer
       }
     } else {
       // Reset cleanup back to default
       squares[squareKey].explosion.explodeCleanup = false;
     }
+  }
+
+  // Cleanup bombMode, resetting bomb square, reset bombNotice, and remove disabled from clickable squares
+  explodeCleanup = squareKey => {
+    const squares = {...this.state.squares};
+    const gameState = {...this.state.gameState};
+    squares[squareKey].explosion.explodeTrigger = false;
+    squares[squareKey].explosion.explodeTimer = false;
+    squares[squareKey].explosion.explodeCleanup = true;
+    // Remove display notice
+    const notices = {...this.state.notices};
+    notices.bombNotice = false;
+    this.setState({squares, notices});
+    setTimeout(() => {
+      const squares = {...this.state.squares};
+      const modes = {...this.state.modes};
+      // Reset square and hide the bomb
+      if (gameState.progress !== -1) {
+        squares[squareKey].clicked = false;
+      } else {
+        squares[squareKey].explosion.explodeTrigger = false;
+        squares[squareKey].explosion.explodeFire = true;
+        this.setState({squares});
+        setTimeout(() => {
+          squares[squareKey].explosion.explodeFire = false;
+          this.setState({squares});
+        }, 10000)
+      }
+      // Remove disabling of buttons
+      modes.bombMode = false;
+      this.setState({squares, modes});
+    }, 1000); // triggers bomb explosion enter anim
   }
 
   // Called by square component when clicking on a square
@@ -371,7 +382,8 @@ class App extends React.Component {
           explosion: {
             explodeTrigger: false,
             explodeTimer: false,
-            explodeCleanup: false
+            explodeCleanup: false,
+            explodeFire: false
           }
         }
       }
