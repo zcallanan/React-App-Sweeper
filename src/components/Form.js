@@ -23,7 +23,7 @@ class Form extends React.Component {
     errors: {}
   }
 
-  componentDidUpdate() {
+  componentDidMount() {
     // Set an initial local state. Only do this if size: {} is not set
     if (this.state.options.size === -1) {
       const options = {...this.state.options};
@@ -92,6 +92,8 @@ class Form extends React.Component {
     e.preventDefault();
     // 2. Validate fields
     if (this.handleValidation()){
+      // Close the modal on a submit
+        this.props.toggleModal();
       // Get values
       const size = this.state.options.size;
       const options = this.state.options;

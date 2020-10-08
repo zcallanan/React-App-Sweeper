@@ -6,7 +6,10 @@ import Header from './Header';
 import QuestionMark from './QuestionMark';
 import Stats from './Stats';
 import Notice from './Notice';
+import ReactModal from 'react-modal';
 import { randomIntFromInterval } from '../helpers';
+
+ReactModal.setAppElement('#main')
 
 class App extends React.Component {
   // Initialize state
@@ -77,6 +80,9 @@ class App extends React.Component {
     animations: {
       squareScroll: false,
       seed: randomIntFromInterval(1,9999)
+    },
+    modal: {
+      isVisible: false
     }
   }
 
@@ -527,6 +533,47 @@ class App extends React.Component {
     this.generatePositions(positionArray, squares, bombCount, optionSize, count)
   }
 
+  toggleModal = () => {
+    const modal = {...this.state.modal};
+    modal.isVisible = !modal.isVisible;
+    this.setState({modal});
+    return modal.isVisible;
+  }
+
+  renderModal = () => {
+    const modal = {...this.state.modal};
+    if (modal.isVisible) {
+      return (
+        <div>
+          <button onClick={this.toggleModal}>Customize Settings</button>
+          <ReactModal
+            isOpen={this.state.modal.isVisible}
+            onRequestClose={this.toggleModal} // Handles closing modal on ESC or clicking on overlay
+            contentLabel="Custom Settings Dialog" // Screen readers
+            shouldCloseOnOverlayClick={true} // Enable close on overlay click
+            shouldCloseOnEsc={true} // Enable close on clicking ESC
+            className="modal" // custom class name
+            overlayClassName="overlay" // custom overlay class name
+            closeTimeoutMS={500} // transition delay
+          >
+            <Form
+              toggleModal={this.toggleModal}
+              options={this.state.gameState.options}
+              saveOptions={this.saveOptions}
+              initSquares={this.initSquares}
+              setBombs={this.setBombs}
+              percentages={this.state.data.bombPercentage}
+              lives={this.state.data.numberOfLives}
+            />
+          </ReactModal>
+        </div>
+      )
+    }
+    return (
+      <button onClick={this.toggleModal}>Customize Settings</button>
+    )
+  }
+
   render() {
     const columns = [];
     let columnKey;
@@ -551,15 +598,10 @@ class App extends React.Component {
     return (
       <div className="game-board">
         <Header />
-        <Form
-          options={this.state.gameState.options}
-          saveOptions={this.saveOptions}
-          initSquares={this.initSquares}
-          setBombs={this.setBombs}
-          percentages={this.state.data.bombPercentage}
-          lives={this.state.data.numberOfLives}
-        />
         <div className="game-body">
+          <div>
+            {this.renderModal()}
+          </div>
           <div className="squares">
             {columns}
           </div>
