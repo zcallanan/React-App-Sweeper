@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { TransitionGroup, CSSTransition } from 'react-transition-group';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faFlag, faQuestionCircle, faBomb } from '@fortawesome/free-solid-svg-icons'
+import { faFlag, faQuestionCircle, faBomb, faFireAlt } from '@fortawesome/free-solid-svg-icons'
 import { faFlag as farFlag, faQuestionCircle as farQuestionCircle } from '@fortawesome/free-regular-svg-icons'
 
 class Square extends React.Component {
@@ -20,10 +20,29 @@ class Square extends React.Component {
     squareKey: PropTypes.string.isRequired
   }
 
+  cssTransition = (squareKey, explodeTrigger, fire) => {
+    console.log(explodeTrigger, fire)
+    if (explodeTrigger && !fire) {
+      return (
+        <CSSTransition classNames="bomba" key={squareKey} in={explodeTrigger} appear={explodeTrigger} onEnter={() => this.props.explode(squareKey)} timeout={{enter: 1000, exit: 1000}} >
+          <FontAwesomeIcon key={squareKey} icon={ faBomb } />
+        </CSSTransition>
+      )
+    } else if (!explodeTrigger && fire) {
+      return (
+        <CSSTransition className="fire-enter" classNames="fire" mountOnEnter key={squareKey} in={fire} appear={fire} timeout={{enter: 10000, exit: 20000}} >
+          <FontAwesomeIcon key={squareKey} icon={ faFireAlt } />
+        </CSSTransition>
+      )
+    }
+  }
+
   renderIcons = () => {
     const squareData = this.props.squareData;
+    const gameState = this.props.gameState;
     const squareKey = this.props.squareKey;
     const explodeTrigger = squareData.explosion.explodeTrigger;
+    let fire = squareData.explosion.explodeFire;
     const bomb = squareData.bomb;
     const clicked = squareData.clicked;
     const flaggedBool = squareData.flagged;
@@ -32,11 +51,7 @@ class Square extends React.Component {
       // If it's a bomb and clicked, show the bomb
       return (
         <TransitionGroup component="span" className="bomba">
-        {explodeTrigger && (
-          <CSSTransition classNames="bomba" key={squareKey} in={explodeTrigger} appear={explodeTrigger} onEnter={() => this.props.explode(squareKey)} timeout={{enter: 1000, exit: 1000}} >
-            <FontAwesomeIcon key={squareKey} icon={ faBomb } />
-          </CSSTransition>
-        )}
+          {this.cssTransition(squareKey, explodeTrigger, fire)}
         </TransitionGroup>
       )
     } else if (flaggedBool && !clicked) {
@@ -52,12 +67,15 @@ class Square extends React.Component {
         </span>
       )
     }
-    return (
-      <span>
-        <FontAwesomeIcon className="flag-icon" icon={ farFlag } />
-        <FontAwesomeIcon className="questionmark-icon" icon={ farQuestionCircle } />
-      </span>
-    );
+    if (gameState.progress !== -1) {
+      return (
+        <span>
+          <FontAwesomeIcon className="flag-icon" icon={ farFlag } />
+          <FontAwesomeIcon className="questionmark-icon" icon={ farQuestionCircle } />
+        </span>
+      );
+    }
+
   }
 
   disableButtons = attribute => {
@@ -100,17 +118,13 @@ class Square extends React.Component {
     const questionmarkBool = squareData.questionMarked;
     let className;
     let attribute = {};
-    let element = true;
+    let element = false;
 
     if (clicked) {
       // Disable the button if it's been clicked
       className = "square";
       attribute["disabled"] = "disabled";
-      return (
-        <button className={className} {...attribute}>
-          {this.renderIcons()}
-        </button>
-      );
+      return this.buttonMarkup(className, attribute, element);
     } else if (modes.flagMode) {
       // Toggle placement of flags
       if (questionmarkBool) {
@@ -123,6 +137,8 @@ class Square extends React.Component {
           // In flagMode, if the square has a solid question mark over a hint, display it (hint should be hidden)
           className = "square flag-mode questionmarked hint"
         } else {
+          // Toggle display of hints if hint is true and it doesn't have a flag or question mark
+          element = true;
           className = "square flag-mode hint";
         }
         return this.buttonMarkup(className, attribute, element);
@@ -141,6 +157,8 @@ class Square extends React.Component {
           // In questionMode, if the square has a solid flag over a hint, display it
           className = "square questionmark-mode flagged hint"
         } else {
+          // Toggle display of hints if hint is true and it doesn't have a flag or question mark
+          element = true;
           className = "square questionmark-mode hint";
         }
         return this.buttonMarkup(className, attribute, element);
@@ -154,12 +172,12 @@ class Square extends React.Component {
         className = (!modes.bombMode ? "square questionmarked hint" : "square questionmarked hint bomb-mode");
       } else {
         // Toggle display of hints
+        element = true;
         className = (!modes.bombMode ? "square hint" : "square hint bomb-mode");
       }
       attribute = this.disableButtons(attribute)
       return this.buttonMarkup(className, attribute, element);
     } else {
-      element = false;
       attribute = this.disableButtons(attribute)
       if (flaggedBool) {
         className = (!modes.bombMode ? "square flagged" : "square flagged bomb-mode");

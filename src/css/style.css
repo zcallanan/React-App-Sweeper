@@ -35,7 +35,7 @@ header span svg.header-icon {
   height: 20px;
   overflow: hidden;
 }
-.bomb-notice {
+.notice {
   display: inline-block;
 }
 .notices-enter {
@@ -124,6 +124,27 @@ header span svg.header-icon {
 .square .flag-icon,
 .square .questionmark-icon {
   display: none;
+}
+.fire-enter {
+  color: #ffa500;
+}
+.fire-enter.fire-enter-active {
+  color: #ffa500;
+  transition: 10s;
+}
+.fire-appear {
+  color: #00f;
+}
+.fire-appear.fire-appear-active {
+  color: #f00;
+  transition: 10s;
+}
+.fire-exit {
+  color: #ffa500;
+}
+.fire-exit.fire-exit-active {
+  color: #f00;
+  transition: 10s;
 }
 .bomba-enter {
   color: #f00;

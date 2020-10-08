@@ -9,7 +9,9 @@ class Stats extends React.Component {
       bombs: PropTypes.number.isRequired,
       flags: PropTypes.number.isRequired,
       questions: PropTypes.number.isRequired
-    })
+    }),
+    options: PropTypes.object.isRequired,
+    revealTarget: PropTypes.func.isRequired
   }
 
   state = {
@@ -28,21 +30,30 @@ class Stats extends React.Component {
     const totalToReveal = (options.size ** 2) - bombs;
     if (bombs > 0 && options.size > 0 && localStats.totalToReveal < 0) {
       localStats.totalToReveal = (options.size ** 2) - bombs;
-      this.setState({localStats});
+      if (localStats.totalToReveal > 0) {
+        this.setState({localStats});
+      }
     } else if (bombs > 0 && options.size > 0 && localStats.totalToReveal !== totalToReveal && options.size === localStats.size && bombs !== localStats.bombs ) {
       localStats.totalToReveal = (options.size ** 2) - bombs;
-      this.setState({localStats});
+      if (localStats.totalToReveal > 0) {
+        this.setState({localStats});
+      }
     }
     if ((localStats.size < 0 || localStats.size !== options.size ) && options.size > 0) {
       // Save local size
       localStats.size = options.size;
-      this.setState({localStats});
+      if (localStats.size > 0) {
+        this.setState({localStats});
+      }
     }
     if ((localStats.bombs < 0 || localStats.bombs !== bombs) && bombs > 0) {
       // Set local bombs
       localStats.bombs = bombs;
-      this.setState({localStats});
+      if (localStats.bombs > 0) {
+        this.setState({localStats});
+      }
     }
+    this.props.revealTarget(localStats.totalToReveal);
   }
 
   renderLives = () => {
