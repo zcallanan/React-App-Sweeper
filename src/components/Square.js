@@ -21,7 +21,6 @@ class Square extends React.Component {
   }
 
   cssTransition = (squareKey, explodeTrigger, fire) => {
-    console.log(explodeTrigger, fire)
     if (explodeTrigger && !fire) {
       return (
         <CSSTransition classNames="bomba" key={squareKey} in={explodeTrigger} appear={explodeTrigger} onEnter={() => this.props.explode(squareKey)} timeout={{enter: 1000, exit: 1000}} >

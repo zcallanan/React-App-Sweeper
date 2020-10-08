@@ -16,13 +16,13 @@ class App extends React.Component {
   state = {
     gameState : {
       progress: 0, // -1 defeat, 0 mid-game, 1 victory
-      options: { // user input settings, loaded from localStorage if available
+      options: { // User input settings, loaded from localStorage if available
         size: 0,
         difficulty: 0,
         lives: 0
       }
     },
-    data: { // hard coded data
+    data: { // Hard coded data
       bombPercentage: {
         0: "10%",
         1: "20%",
@@ -40,7 +40,7 @@ class App extends React.Component {
         5: "99"
       }
     },
-    squares: { // game board framework
+    squares: { // Game board framework
       "r0-s0": {
         bomb: false,
         flagged: false,
@@ -64,7 +64,7 @@ class App extends React.Component {
       questionMode: false, // Place a question mark on a square
       drawing: true // On square init the initial board draws. After 1.5 seconds this is marked false
     },
-    stats: { // game stats
+    stats: { // Game stats
       currentLives: -1,
       bombs: -1,
       revealed: 0,
@@ -72,17 +72,18 @@ class App extends React.Component {
       flags: 0,
       questions: 0
     },
-    notices: { // game notices
+    notices: { // Game notices
       bombNotice: false,
       victoryNotice: false,
       defeatNotice: false
     },
-    animations: {
+    animations: { // Animation data to prompt reflows
       squareScroll: false,
       seed: randomIntFromInterval(1,9999)
     },
-    modal: {
-      isVisible: false
+    modal: { // Custom Settings && win/loss modal
+      isVisible: false, // Is the modal visible?
+      timer: false // Prevents multiple timers from starting in order to show a delayed modal on win/loss
     }
   }
 
@@ -219,7 +220,8 @@ class App extends React.Component {
       // Reset square and hide the bomb
       if (gameState.progress !== -1) {
         squares[squareKey].clicked = false;
-      } else {
+      } else if (gameState.progress === -1) {
+        // Handle defeat bomb explosion progression
         squares[squareKey].explosion.explodeTrigger = false;
         squares[squareKey].explosion.explodeFire = true;
         this.setState({squares});
@@ -227,6 +229,14 @@ class App extends React.Component {
           squares[squareKey].explosion.explodeFire = false;
           this.setState({squares});
         }, 1000)
+        const modal = {...this.state.modal}
+        if (!modal.isVisible) {
+          if (!modal.timer) {
+            modal.timer = true;
+            this.setState({modal});
+            setTimeout(() => this.toggleModal(), 5000);
+          }
+        }
       }
       // Remove disabling of buttons
       modes.bombMode = false;
@@ -564,6 +574,7 @@ class App extends React.Component {
               setBombs={this.setBombs}
               percentages={this.state.data.bombPercentage}
               lives={this.state.data.numberOfLives}
+              gameState={this.state.gameState}
             />
           </ReactModal>
         </div>

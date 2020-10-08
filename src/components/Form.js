@@ -10,7 +10,8 @@ class Form extends React.Component {
     options: PropTypes.shape({
       size: PropTypes.number.isRequired,
       difficulty: PropTypes.number.isRequired
-    })
+    }),
+    gameState: PropTypes.object.isRequired
   }
 
   // Local validation state
@@ -125,6 +126,12 @@ class Form extends React.Component {
     this.setState({ options });
   }
 
+  submitButtonText = () => {
+    const gameState = this.props.gameState;
+    // If the player won or lost, ask if they want to Play Another Game. If from customize settings, display Play Sweeper
+    return gameState.progress !== 0 ? "Play Another Game?" : "Play Sweeper";
+  }
+
   render() {
     const percentages = this.props.percentages;
     const lives = this.props.lives;
@@ -168,8 +175,7 @@ class Form extends React.Component {
                 {Object.keys(lives).map(key => <option key={key} value={key}>{lives[key]}</option>)}
               </select>
             </div>
-
-            <button type="submit">Play Sweeper</button>
+            <button type="submit">{this.submitButtonText()}</button>
           </div>
         </form>
       </div>
