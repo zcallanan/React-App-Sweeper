@@ -231,6 +231,7 @@ class App extends React.Component {
         }, 1000)
         const modal = {...this.state.modal}
         if (!modal.isVisible) {
+          // Handle displaying the play again modal upon defeat
           if (!modal.timer) {
             modal.timer = true;
             this.setState({modal});
