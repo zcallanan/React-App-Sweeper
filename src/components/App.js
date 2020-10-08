@@ -29,7 +29,8 @@ class App extends React.Component {
         2: "30%",
         3: "45%",
         4: "60%",
-        5: "75%"
+        5: "75%",
+        6: "5%"
       },
       numberOfLives: {
         0: "0",
@@ -117,10 +118,10 @@ class App extends React.Component {
     this.setState({animations});
   }
 
-  // Prop function for stats to pass totalToReveal to global state
+  // Prop function for stats to pass to global state
   revealTarget = totalToReveal => {
     const stats = this.state.stats;
-    if (totalToReveal > 0 && stats.totalToReveal <= 0) {
+    if ((totalToReveal > 0 && stats.totalToReveal <= 0) || totalToReveal !== stats.totalToReveal) {
       stats.totalToReveal = totalToReveal;
       this.setState({stats});
     }
@@ -218,7 +219,7 @@ class App extends React.Component {
       const squares = {...this.state.squares};
       const modes = {...this.state.modes};
       // Reset square and hide the bomb
-      if (gameState.progress !== -1) {
+      if (gameState.progress === 0) {
         squares[squareKey].clicked = false;
       } else if (gameState.progress === -1) {
         // Handle defeat bomb explosion progression
@@ -319,6 +320,18 @@ class App extends React.Component {
           gameState.progress = 1;
           notices.victoryNotice = true;
           this.setState({gameState, notices});
+          const squares = { ...this.state.squares };
+          Object.keys(squares).map(key => {
+            if (!squares[key].clicked) {
+              // Reveal the board when you lose
+              squares[key].clicked = true;
+              if (squares[key].bomb) {
+                // Trigger all bombs to play their explosion animation
+                // squares[key].explosion.explodeTrigger = true;
+              }
+            }
+            return squares;
+          })
         }
       } else {
         // Clicked on a bomb
@@ -333,12 +346,7 @@ class App extends React.Component {
         }
         squares[squareKey].explosion.explodeTrigger = true;
         this.setState({squares, notices, modes, stats})
-        // Loss
-          // Disable the board
-            // Fire a loss notice - You struck a bomb and you're out of lives
-            // Reveal all bombs
-            // Bombs animate and explode
-            // Modal pops up to play another game?
+        // Handle defeat
         if (stats.currentLives < 0) {
           // Flag gamestate as defeat
           gameState.progress = -1;

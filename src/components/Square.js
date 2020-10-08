@@ -20,7 +20,12 @@ class Square extends React.Component {
     squareKey: PropTypes.string.isRequired
   }
 
-  cssTransition = (squareKey, explodeTrigger, fire) => {
+  cssTransition = () => {
+    // TODO: Need a state to display a disabled bomb for the victory reveal
+    const squareData = this.props.squareData;
+    const squareKey = this.props.squareKey;
+    const explodeTrigger = squareData.explosion.explodeTrigger;
+    const fire = squareData.explosion.explodeFire;
     if (explodeTrigger && !fire) {
       return (
         <CSSTransition classNames="bomba" key={squareKey} in={explodeTrigger} appear={explodeTrigger} onEnter={() => this.props.explode(squareKey)} timeout={{enter: 1000, exit: 1000}} >
@@ -39,9 +44,6 @@ class Square extends React.Component {
   renderIcons = () => {
     const squareData = this.props.squareData;
     const gameState = this.props.gameState;
-    const squareKey = this.props.squareKey;
-    const explodeTrigger = squareData.explosion.explodeTrigger;
-    let fire = squareData.explosion.explodeFire;
     const bomb = squareData.bomb;
     const clicked = squareData.clicked;
     const flaggedBool = squareData.flagged;
@@ -50,7 +52,7 @@ class Square extends React.Component {
       // If it's a bomb and clicked, show the bomb
       return (
         <TransitionGroup component="span" className="bomba">
-          {this.cssTransition(squareKey, explodeTrigger, fire)}
+          {this.cssTransition()}
         </TransitionGroup>
       )
     } else if (flaggedBool && !clicked) {
@@ -66,7 +68,7 @@ class Square extends React.Component {
         </span>
       )
     }
-    if (gameState.progress !== -1) {
+    if (gameState.progress === 0) {
       return (
         <span>
           <FontAwesomeIcon className="flag-icon" icon={ farFlag } />
