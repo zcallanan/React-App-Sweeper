@@ -136,7 +136,7 @@ class Square extends React.Component {
       } else if (hint) {
         if (questionmarkBool) {
           // In flagMode, if the square has a solid question mark over a hint, display it (hint should be hidden)
-          className = "square flag-mode questionmarked hint"
+          className = "square flag-mode questionmarked hint";
         } else {
           // Toggle display of hints if hint is true and it doesn't have a flag or question mark
           element = true;
@@ -156,7 +156,7 @@ class Square extends React.Component {
       } else if (hint) {
         if (flaggedBool) {
           // In questionMode, if the square has a solid flag over a hint, display it
-          className = "square questionmark-mode flagged hint"
+          className = "square questionmark-mode flagged hint";
         } else {
           // Toggle display of hints if hint is true and it doesn't have a flag or question mark
           element = true;
@@ -168,8 +168,10 @@ class Square extends React.Component {
       }
     } else if (hint) {
       if (flaggedBool) {
+        // If a square eligible to display a hint is flagged, display the flag
         className = (!modes.bombMode ? "square flagged hint" : "square flagged hint bomb-mode");
       } else if (questionmarkBool) {
+        // If a square eligible to display a hint is question marked, display the question mark
         className = (!modes.bombMode ? "square questionmarked hint" : "square questionmarked hint bomb-mode");
       } else {
         // Toggle display of hints
@@ -181,8 +183,10 @@ class Square extends React.Component {
     } else {
       attribute = this.disableButtons(attribute)
       if (flaggedBool) {
+        // if a square is clickable or a bomb is active, display the flag on the square
         className = (!modes.bombMode ? "square flagged" : "square flagged bomb-mode");
       } else if (questionmarkBool) {
+        // if a square is clickable or a bomb is active, display the question mark on the square
         className = (!modes.bombMode ? "square questionmarked" : "square questionmarked bomb-mode");
       } else {
         if (drawingBool) {
@@ -194,7 +198,6 @@ class Square extends React.Component {
           className = (!modes.bombMode ? "square default" : "square default bomb-mode");
         }
       }
-
     }
     return this.buttonMarkup(className, attribute, element);
   }
