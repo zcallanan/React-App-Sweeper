@@ -137,7 +137,7 @@ class Form extends React.Component {
     const lives = this.props.lives;
     return (
       <div className="settings">
-        <h2>Custom game board settings</h2>
+        <h2>Custom Settings</h2>
         <form key="optionsForm" onSubmit={this.handleSubmit}>
           <div className="form-fields">
             <div>

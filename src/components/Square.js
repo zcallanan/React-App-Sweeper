@@ -21,7 +21,8 @@ class Square extends React.Component {
   }
 
   cssTransition = () => {
-    // TODO: Need a state to display a disabled bomb for the victory reveal
+    const gameState = this.props.gameState;
+    const bombFade = this.props.animations.bombFade;
     const squareData = this.props.squareData;
     const squareKey = this.props.squareKey;
     const explodeTrigger = squareData.explosion.explodeTrigger;
@@ -36,6 +37,13 @@ class Square extends React.Component {
       return (
         <CSSTransition className="fire-enter" classNames="fire" mountOnEnter key={squareKey} in={fire} appear={fire} timeout={{enter: 10000, exit: 20000}} >
           <FontAwesomeIcon key={squareKey} icon={ faFireAlt } />
+        </CSSTransition>
+      )
+    } else if (gameState.progress === 1) {
+      // On win, change bomb opacity
+      return (
+        <CSSTransition  classNames="win" mountOnEnter key={squareKey} in={bombFade} appear={bombFade} timeout={{enter: 3000, exit: 3000}} >
+          <FontAwesomeIcon key={squareKey} icon={ faBomb } />
         </CSSTransition>
       )
     }

@@ -80,7 +80,8 @@ class App extends React.Component {
     },
     animations: { // Animation data to prompt reflows
       squareScroll: false,
-      seed: randomIntFromInterval(1,9999)
+      seed: randomIntFromInterval(1,9999),
+      bombFade: false
     },
     modal: { // Custom Settings && win/loss modal
       isVisible: false, // Is the modal visible?
@@ -310,25 +311,27 @@ class App extends React.Component {
           // Click on a square with an adjacent bomb, reveal its hint
           squares[squareKey].hint = true;
         }
-        // Win
-          // Send a notice that you revealed all squares
-          // Reveal all bomb positions
-          // You won message, Modal to play again?
-            // Should fully reset board, notices, and gameState.progress
-
+        // Handle Win
         if (stats.revealed === stats.totalToReveal) {
           gameState.progress = 1;
           notices.victoryNotice = true;
-          this.setState({gameState, notices});
           const squares = { ...this.state.squares };
+          const animations = {...this.state.animations}
+          const modal = {...this.state.modal}
+          animations.bombFade = true;
+          if (!modal.isVisible) {
+          // Handle displaying the play again modal upon win
+            if (!modal.timer) {
+              modal.timer = true;
+              this.setState({modal});
+              setTimeout(() => this.toggleModal(), 3500);
+            }
+          }
+          this.setState({gameState, notices, animations, modal});
           Object.keys(squares).map(key => {
             if (!squares[key].clicked) {
-              // Reveal the board when you lose
+              // Reveal the board
               squares[key].clicked = true;
-              if (squares[key].bomb) {
-                // Trigger all bombs to play their explosion animation
-                // squares[key].explosion.explodeTrigger = true;
-              }
             }
             return squares;
           })
@@ -341,7 +344,7 @@ class App extends React.Component {
         stats.currentLives--;
         modes.bombMode = true;
         if (!(stats.currentLives < 0)) {
-          // Defeat notice triggers instead in this case
+          // If currentLives is >= 0, show bomb notice
           notices.bombNotice = true;
         }
         squares[squareKey].explosion.explodeTrigger = true;
@@ -559,6 +562,21 @@ class App extends React.Component {
     return modal.isVisible;
   }
 
+  modalMessage = () => {
+    const gameState = {...this.state.gameState};
+    if (gameState.progress === 1) {
+      // Win message
+      return (
+        <h1>Congrats, You Won!</h1>
+      )
+    } else if ( gameState.progress === -1) {
+      // Defeat message
+      return (
+        <h1>You Lost!</h1>
+      );
+    }
+  }
+
   renderModal = () => {
     const modal = {...this.state.modal};
     if (modal.isVisible) {
@@ -575,6 +593,7 @@ class App extends React.Component {
             overlayClassName="overlay" // custom overlay class name
             closeTimeoutMS={500} // transition delay
           >
+            {this.modalMessage()}
             <Form
               toggleModal={this.toggleModal}
               options={this.state.gameState.options}
