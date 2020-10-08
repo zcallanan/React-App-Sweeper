@@ -118,13 +118,19 @@ class App extends React.Component {
     }
   }
 
+  triggerFire = squareKey => {
+    const squares = {...this.state.squares};
+    squares[squareKey].explosion.explodeFire = false;
+    this.setState({squares});
+  }
+
   // Save Player's game board options
   saveOptions = obj => {
     // 1. Copy state
     const gameState = this.state.gameState;
     const stats = this.state.stats;
-    const data = this.state.data;
     const modes = {...this.state.modes};
+    const data = {...this.state.data};
     const animations = {...this.state.animations}
     modes.newGame = true;
     this.toggleScroll(true, 'squareScroll');
@@ -213,7 +219,7 @@ class App extends React.Component {
         setTimeout(() => {
           squares[squareKey].explosion.explodeFire = false;
           this.setState({squares});
-        }, 10000)
+        }, 1000)
       }
       // Remove disabling of buttons
       modes.bombMode = false;

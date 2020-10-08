@@ -30,22 +30,10 @@ class Square extends React.Component {
       )
     } else if (!explodeTrigger && fire) {
       return (
-        <CSSTransition classname="fire-enter" classNames="fire" mountOnEnter key={squareKey} in={fire} appear={fire} timeout={{enter: 10000, exit: 20000}} >
+        <CSSTransition className="fire-enter" classNames="fire" mountOnEnter key={squareKey} in={fire} appear={fire} timeout={{enter: 10000, exit: 20000}} >
           <FontAwesomeIcon key={squareKey} icon={ faFireAlt } />
         </CSSTransition>
       )
-    }
-  }
-
-  componentDidMount() {
-    const squareData = this.props.squareData;
-    const gameState = this.props.gameState;
-    const squareKey = this.props.squareKey;
-
-    if (gameState.progress === -1 && squareData[squareKey].explosion.explodeFire) {
-      /* Call function that sets global state of explodeFire
-      to false to force a reflow on mounting in order
-      to immediately display exit anim */
     }
   }
 
