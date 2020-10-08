@@ -80,7 +80,7 @@ class Square extends React.Component {
 
   disableButtons = attribute => {
     const modes = this.props.modes;
-    if (modes.bombMode) {
+    if (modes.bombMode || modes.drawing) {
       attribute["disabled"] = "disabled";
     }
     return attribute;
@@ -116,6 +116,7 @@ class Square extends React.Component {
     const hint = squareData.hint;
     const flaggedBool = squareData.flagged;
     const questionmarkBool = squareData.questionMarked;
+    const drawingBool = modes.drawing;
     let className;
     let attribute = {};
     let element = false;
@@ -175,7 +176,7 @@ class Square extends React.Component {
         element = true;
         className = (!modes.bombMode ? "square hint" : "square hint bomb-mode");
       }
-      attribute = this.disableButtons(attribute)
+      attribute = this.disableButtons(attribute);
       return this.buttonMarkup(className, attribute, element);
     } else {
       attribute = this.disableButtons(attribute)
@@ -184,8 +185,14 @@ class Square extends React.Component {
       } else if (questionmarkBool) {
         className = (!modes.bombMode ? "square questionmarked" : "square questionmarked bomb-mode");
       } else {
-        // Default functional button
-        className = (!modes.bombMode ? "square default" : "square default bomb-mode");
+        if (drawingBool) {
+          // If the board is drawing, disable the buttons
+          className = "drawing default";
+          attribute = this.disableButtons(attribute);
+        } else {
+          // Default functional button
+          className = (!modes.bombMode ? "square default" : "square default bomb-mode");
+        }
       }
 
     }

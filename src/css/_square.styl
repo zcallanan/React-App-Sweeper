@@ -4,9 +4,29 @@ blu = rgba(77,162,207, .8)
 .squares
   display flex
   overflow hidden
-  // background-color borders
 
-.square
+// .drawing
+//   border 2px solid borders
+//   border-radius 4px
+//   box-sizing border-box
+//   float left
+//   font-size 24px
+//   font-weight bold
+//   line-height 32px
+//   height 40px
+//   margin-right -1px
+//   margin-top -1px
+//   padding 2px
+//   text-align center
+//   width 40px
+//   transition all 0.3s ease-in-out
+//   cursor default
+//   background radial-gradient(rgba(77,162,207, .8), rgb(42,109,199))
+//   box-shadow inset 0 -4px 6px rgba(0, 0, 0, 0.2)
+//   &.flag-mode.hint span:hover .bomb-count, &.questionmark-mode.hint span:hover .bomb-count, &.flagged.hint span .bomb-count, &.questionmarked.hint span .bomb-count, .flag-icon, .questionmark-icon
+//     display none
+
+.square, .drawing
   border 2px solid borders
   border-radius 4px
   box-sizing border-box
@@ -28,11 +48,6 @@ blu = rgba(77,162,207, .8)
   &.hint, &.flagged, &.questionmarked, &.flag-mode.flagged, &.flag-mode.questionmarked, &.questionmark-mode.questionmarked, &.questionmark-mode.flagged
     background radial-gradient(rgba(205,205,215, .1), rgba(180,180,190, .8))
     box-shadow inset 0 -2px 3px rgba(0, 0, 0, 0.1)
-  &:disabled
-    background radial-gradient(rgba(205,205,205, .1), rgba(200,200,200, .8))
-    box-shadow inset 0 -2px 3px rgba(0, 0, 0, 0.1)
-    color rgb(0,0,0)
-    cursor default
   &.bomb-mode:disabled
     background radial-gradient(rgba(150,150,150, .1), rgba(130,130,130, .9))
     cursor default
@@ -51,6 +66,13 @@ blu = rgba(77,162,207, .8)
   &.flag-mode.hint span:hover .bomb-count, &.questionmark-mode.hint span:hover .bomb-count, &.flagged.hint span .bomb-count, &.questionmarked.hint span .bomb-count, .flag-icon, .questionmark-icon
     display none
 
+.square
+  &:disabled // drawing squares should not be styled differently, so this is separate
+    background radial-gradient(rgba(205,205,205, .1), rgba(200,200,200, .8))
+    box-shadow inset 0 -2px 3px rgba(0, 0, 0, 0.1)
+    color rgb(0,0,0)
+    cursor default
+
 /* Animations */
 
 .fire-enter
@@ -58,8 +80,6 @@ blu = rgba(77,162,207, .8)
   &.fire-enter-active
     color orange
     transition 10s
-// .fire-enter-done
-//   color red
 
 .fire-appear
   color blue
