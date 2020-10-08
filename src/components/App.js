@@ -58,7 +58,8 @@ class App extends React.Component {
       newGame: false, // Denotes the start of a new game before a square is selected
       bombMode: false, // Struck a bomb, locks input
       flagMode: false, // Place a flag on a square
-      questionMode: false // Place a question mark on a square
+      questionMode: false, // Place a question mark on a square
+      drawing: true // On square init the initial board draws. After 1.5 seconds this is marked false
     },
     stats: { // game stats
       currentLives: -1,
@@ -398,6 +399,11 @@ class App extends React.Component {
     this.setState({ squares });
     // 4. Determine what squares have bombs
     setTimeout(() => this.setBombs(), 200);
+    setTimeout(() => { // When the board initially draws input is disabled. This timer enables the board
+      const modes = {...this.state.modes};
+      modes.drawing = false;
+      this.setState({modes});
+    }, 1500) // Timer synced with square draw anim transition of 1.5s
   }
 
   // Use user input to call bomb position fn and save positions to state
