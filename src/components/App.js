@@ -6,20 +6,23 @@ import Header from './Header';
 import QuestionMark from './QuestionMark';
 import Stats from './Stats';
 import Notice from './Notice';
+import ReactModal from 'react-modal';
 import { randomIntFromInterval } from '../helpers';
+
+ReactModal.setAppElement('#main')
 
 class App extends React.Component {
   // Initialize state
   state = {
     gameState : {
       progress: 0, // -1 defeat, 0 mid-game, 1 victory
-      options: { // user input settings, loaded from localStorage if available
+      options: { // User input settings, loaded from localStorage if available
         size: 0,
         difficulty: 0,
         lives: 0
       }
     },
-    data: { // hard coded data
+    data: { // Hard coded data
       bombPercentage: {
         0: "10%",
         1: "20%",
@@ -37,7 +40,7 @@ class App extends React.Component {
         5: "99"
       }
     },
-    squares: { // game board framework
+    squares: { // Game board framework
       "r0-s0": {
         bomb: false,
         flagged: false,
@@ -61,7 +64,7 @@ class App extends React.Component {
       questionMode: false, // Place a question mark on a square
       drawing: true // On square init the initial board draws. After 1.5 seconds this is marked false
     },
-    stats: { // game stats
+    stats: { // Game stats
       currentLives: -1,
       bombs: -1,
       revealed: 0,
@@ -69,14 +72,18 @@ class App extends React.Component {
       flags: 0,
       questions: 0
     },
-    notices: { // game notices
+    notices: { // Game notices
       bombNotice: false,
       victoryNotice: false,
       defeatNotice: false
     },
-    animations: {
+    animations: { // Animation data to prompt reflows
       squareScroll: false,
       seed: randomIntFromInterval(1,9999)
+    },
+    modal: { // Custom Settings && win/loss modal
+      isVisible: false, // Is the modal visible?
+      timer: false // Prevents multiple timers from starting in order to show a delayed modal on win/loss
     }
   }
 
@@ -213,7 +220,8 @@ class App extends React.Component {
       // Reset square and hide the bomb
       if (gameState.progress !== -1) {
         squares[squareKey].clicked = false;
-      } else {
+      } else if (gameState.progress === -1) {
+        // Handle defeat bomb explosion progression
         squares[squareKey].explosion.explodeTrigger = false;
         squares[squareKey].explosion.explodeFire = true;
         this.setState({squares});
@@ -221,6 +229,14 @@ class App extends React.Component {
           squares[squareKey].explosion.explodeFire = false;
           this.setState({squares});
         }, 1000)
+        const modal = {...this.state.modal}
+        if (!modal.isVisible) {
+          if (!modal.timer) {
+            modal.timer = true;
+            this.setState({modal});
+            setTimeout(() => this.toggleModal(), 5000);
+          }
+        }
       }
       // Remove disabling of buttons
       modes.bombMode = false;
@@ -527,6 +543,48 @@ class App extends React.Component {
     this.generatePositions(positionArray, squares, bombCount, optionSize, count)
   }
 
+  toggleModal = () => {
+    const modal = {...this.state.modal};
+    modal.isVisible = !modal.isVisible;
+    this.setState({modal});
+    return modal.isVisible;
+  }
+
+  renderModal = () => {
+    const modal = {...this.state.modal};
+    if (modal.isVisible) {
+      return (
+        <div>
+          <button onClick={this.toggleModal}>Customize Settings</button>
+          <ReactModal
+            isOpen={this.state.modal.isVisible}
+            onRequestClose={this.toggleModal} // Handles closing modal on ESC or clicking on overlay
+            contentLabel="Custom Settings Dialog" // Screen readers
+            shouldCloseOnOverlayClick={true} // Enable close on overlay click
+            shouldCloseOnEsc={true} // Enable close on clicking ESC
+            className="modal" // custom class name
+            overlayClassName="overlay" // custom overlay class name
+            closeTimeoutMS={500} // transition delay
+          >
+            <Form
+              toggleModal={this.toggleModal}
+              options={this.state.gameState.options}
+              saveOptions={this.saveOptions}
+              initSquares={this.initSquares}
+              setBombs={this.setBombs}
+              percentages={this.state.data.bombPercentage}
+              lives={this.state.data.numberOfLives}
+              gameState={this.state.gameState}
+            />
+          </ReactModal>
+        </div>
+      )
+    }
+    return (
+      <button onClick={this.toggleModal}>Customize Settings</button>
+    )
+  }
+
   render() {
     const columns = [];
     let columnKey;
@@ -551,15 +609,10 @@ class App extends React.Component {
     return (
       <div className="game-board">
         <Header />
-        <Form
-          options={this.state.gameState.options}
-          saveOptions={this.saveOptions}
-          initSquares={this.initSquares}
-          setBombs={this.setBombs}
-          percentages={this.state.data.bombPercentage}
-          lives={this.state.data.numberOfLives}
-        />
         <div className="game-body">
+          <div>
+            {this.renderModal()}
+          </div>
           <div className="squares">
             {columns}
           </div>

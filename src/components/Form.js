@@ -10,7 +10,8 @@ class Form extends React.Component {
     options: PropTypes.shape({
       size: PropTypes.number.isRequired,
       difficulty: PropTypes.number.isRequired
-    })
+    }),
+    gameState: PropTypes.object.isRequired
   }
 
   // Local validation state
@@ -23,7 +24,7 @@ class Form extends React.Component {
     errors: {}
   }
 
-  componentDidUpdate() {
+  componentDidMount() {
     // Set an initial local state. Only do this if size: {} is not set
     if (this.state.options.size === -1) {
       const options = {...this.state.options};
@@ -92,6 +93,8 @@ class Form extends React.Component {
     e.preventDefault();
     // 2. Validate fields
     if (this.handleValidation()){
+      // Close the modal on a submit
+        this.props.toggleModal();
       // Get values
       const size = this.state.options.size;
       const options = this.state.options;
@@ -121,6 +124,12 @@ class Form extends React.Component {
     options[e.target.name] = e.target.value;
     // 3. Save fields to local state
     this.setState({ options });
+  }
+
+  submitButtonText = () => {
+    const gameState = this.props.gameState;
+    // If the player won or lost, ask if they want to Play Another Game. If from customize settings, display Play Sweeper
+    return gameState.progress !== 0 ? "Play Another Game?" : "Play Sweeper";
   }
 
   render() {
@@ -166,8 +175,7 @@ class Form extends React.Component {
                 {Object.keys(lives).map(key => <option key={key} value={key}>{lives[key]}</option>)}
               </select>
             </div>
-
-            <button type="submit">Play Sweeper</button>
+            <button type="submit">{this.submitButtonText()}</button>
           </div>
         </form>
       </div>
