@@ -217,7 +217,7 @@ class Square extends React.Component {
     let squareScroll = modes.newGame && !this.props.animations.squareScroll ? true : false;
     return (
       <TransitionGroup component="div" className="squares" key={`${squareKey}-${this.props.animations.seed}`}>
-        <CSSTransition classNames="squares" in={squareScroll} appear={squareScroll} key={`${squareKey}-${this.props.animations.seed}`} onEnter={() => this.props.toggleScroll(false)} timeout={{enter: 1500}} >
+        <CSSTransition classNames="squares" in={squareScroll} appear={squareScroll} key={`${squareKey}-${this.props.animations.seed}`} onEnter={() => this.props.toggleScroll(false, 'squareScroll')} timeout={{enter: 1500}} >
           {this.generateButton()}
         </CSSTransition>
       </TransitionGroup>

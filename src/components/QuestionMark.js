@@ -7,20 +7,25 @@ import { faQuestionCircle as farQuestionCircle } from '@fortawesome/free-regular
 class QuestionMark extends React.Component {
   static propTypes = {
     onModeClick: PropTypes.func.isRequired,
-    questionMode: PropTypes.bool.isRequired
+    modes: PropTypes.object.isRequired
   }
 
   renderQuestionIcons = () => {
-    if (this.props.questionMode) {
+    const attribute = {};
+    // If a bomb is exploding or you have won/lost, disable the button
+      if (this.props.modes.bombMode || this.props.gameState.progress !== 0) {
+        attribute["disabled"] = "disabled";
+      }
+    if (this.props.modes.questionMode) {
       return (
-        <button className="question-button">
+        <button className="question-button" {...attribute} >
           <p>Mark As Unknown</p>
           <FontAwesomeIcon icon={ faQuestionCircle } />
         </button>
       )
     }
     return (
-      <button className="question-button">
+      <button className="question-button" {...attribute} >
         <p>Mark As Unknown</p>
         <FontAwesomeIcon icon={ farQuestionCircle } />
       </button>

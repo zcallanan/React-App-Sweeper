@@ -85,7 +85,8 @@ class App extends React.Component {
     },
     modal: { // Custom Settings && win/loss modal
       isVisible: false, // Is the modal visible?
-      timer: false // Prevents multiple timers from starting in order to show a delayed modal on win/loss
+      timer: false, // Prevents multiple timers from starting in order to show a delayed modal on win/loss
+      modalCleanup: false
     }
   }
 
@@ -141,11 +142,16 @@ class App extends React.Component {
     const stats = this.state.stats;
     const modes = {...this.state.modes};
     const data = {...this.state.data};
+    const modal = {...this.state.modal};
     const animations = {...this.state.animations}
     modes.newGame = true;
     this.toggleScroll(true, 'squareScroll');
-    // Reset seed
+    // Reset values on form submit
     animations.seed = randomIntFromInterval(1,9999);
+    animations.bombFade = false;
+    modal.timer = false;
+    modal.isVisible = false;
+    modal.modalCleanup = false;
     // 2. Add new value to state
     gameState.options.size = parseInt(obj.size);
     gameState.options.difficulty = parseInt(obj.difficulty);
@@ -155,7 +161,7 @@ class App extends React.Component {
     // Get initial number of lives
     stats.currentLives = parseInt(data.numberOfLives[gameState.options.lives])
     // 3. SetState
-    this.setState({ gameState, stats, modes, animations });
+    this.setState({ gameState, stats, modes, animations, modal });
     // 4. Save options to local storage
     localStorage.setItem("options", JSON.stringify(gameState.options));
   }
@@ -202,6 +208,8 @@ class App extends React.Component {
     } else {
       // Reset cleanup back to default
       squares[squareKey].explosion.explodeCleanup = false;
+      squares[squareKey].explosion.explodeTrigger = false;
+      squares = {...this.state.squares};
     }
   }
 
@@ -237,7 +245,12 @@ class App extends React.Component {
           if (!modal.timer) {
             modal.timer = true;
             this.setState({modal});
-            setTimeout(() => this.toggleModal(), 5000);
+            setTimeout(() => {
+              this.modalShow();
+              const modal = {...this.state.modal};
+              modal.modalCleanup = true;
+              this.setState({modal});
+            }, 5000);
           }
         }
       }
@@ -324,7 +337,12 @@ class App extends React.Component {
             if (!modal.timer) {
               modal.timer = true;
               this.setState({modal});
-              setTimeout(() => this.toggleModal(), 3500);
+              setTimeout(() => {
+                this.modalShow();
+                const modal = {...this.state.modal};
+                modal.modalCleanup = true;
+                this.setState({modal});
+              }, 3500);
             }
           }
           this.setState({gameState, notices, animations, modal});
@@ -555,14 +573,27 @@ class App extends React.Component {
     this.generatePositions(positionArray, squares, bombCount, optionSize, count)
   }
 
-  toggleModal = () => {
+  modalShow = () => {
     const modal = {...this.state.modal};
-    modal.isVisible = !modal.isVisible;
-    this.setState({modal});
-    return modal.isVisible;
+    if (!modal.isVisible) {
+      modal.isVisible = true
+      this.setState({modal});
+      return modal.isVisible;
+    }
+    return;
   }
 
-  modalMessage = () => {
+  modalClose = () => {
+    const modal = {...this.state.modal};
+    if (modal.isVisible) {
+      modal.isVisible = false
+      this.setState({modal});
+      return modal.isVisible;
+    }
+    return;
+  }
+
+  modalGameStateMessage = () => {
     const gameState = {...this.state.gameState};
     if (gameState.progress === 1) {
       // Win message
@@ -577,15 +608,25 @@ class App extends React.Component {
     }
   }
 
+  modalSettingsButtonText = () => {
+    const gameState = {...this.state.gameState};
+    const modal = {...this.state.modal}
+    if (gameState.progress !== 0 && modal.modalCleanup) {
+      return "Play Again?";
+    }
+    return "Customize Settings";
+
+  }
+
   renderModal = () => {
     const modal = {...this.state.modal};
     if (modal.isVisible) {
       return (
         <div>
-          <button onClick={this.toggleModal}>Customize Settings</button>
+          <button onClick={this.modalShow}>{this.modalSettingsButtonText()}</button>
           <ReactModal
             isOpen={this.state.modal.isVisible}
-            onRequestClose={this.toggleModal} // Handles closing modal on ESC or clicking on overlay
+            onRequestClose={this.modalClose} // Handles closing modal on ESC or clicking on overlay
             contentLabel="Custom Settings Dialog" // Screen readers
             shouldCloseOnOverlayClick={true} // Enable close on overlay click
             shouldCloseOnEsc={true} // Enable close on clicking ESC
@@ -593,9 +634,9 @@ class App extends React.Component {
             overlayClassName="overlay" // custom overlay class name
             closeTimeoutMS={500} // transition delay
           >
-            {this.modalMessage()}
+            {this.modalGameStateMessage()}
             <Form
-              toggleModal={this.toggleModal}
+              modalClose={this.modalClose}
               options={this.state.gameState.options}
               saveOptions={this.saveOptions}
               initSquares={this.initSquares}
@@ -609,7 +650,7 @@ class App extends React.Component {
       )
     }
     return (
-      <button onClick={this.toggleModal}>Customize Settings</button>
+      <button onClick={this.modalShow}>{this.modalSettingsButtonText()}</button>
     )
   }
 
@@ -655,8 +696,8 @@ class App extends React.Component {
 
         </div>
         <div className="modes">
-          <Flag onModeClick={this.onModeClick} flagMode={this.state.modes.flagMode}/>
-          <QuestionMark onModeClick={this.onModeClick} questionMode={this.state.modes.questionMode}/>
+          <Flag onModeClick={this.onModeClick} modes={this.state.modes} gameState={this.state.gameState}/>
+          <QuestionMark onModeClick={this.onModeClick} modes={this.state.modes} gameState={this.state.gameState}/>
         </div>
       </div>
     )
