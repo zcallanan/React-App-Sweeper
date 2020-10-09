@@ -7,20 +7,27 @@ import { faFlag as farFlag } from '@fortawesome/free-regular-svg-icons'
 class Flag extends React.Component {
   static propTypes = {
     onModeClick: PropTypes.func.isRequired,
-    flagMode: PropTypes.bool.isRequired
+    modes: PropTypes.object.isRequired
   }
 
   renderFlagIcons = () => {
-    if (this.props.flagMode) {
-      return (
-        <button className="flag-button">
-          <p>Flag Bomb</p>
-          <FontAwesomeIcon icon={ faFlag } />
-        </button>
-      )
+    const attribute = {};
+    // If a bomb is exploding or you have won/lost, disable the button
+    if (this.props.modes.bombMode || this.props.gameState.progress !== 0) {
+      attribute["disabled"] = "disabled";
+    }
+    if (this.props.modes.flagMode) {
+      if (this.props.modes.questionMode) {
+        return (
+          <button className="flag-button" {...attribute}>
+            <p>Flag Bomb</p>
+            <FontAwesomeIcon icon={ faFlag } />
+          </button>
+        )
+      }
     }
     return (
-      <button className="flag-button">
+      <button className="flag-button" {...attribute}>
         <p>Flag Bomb</p>
         <FontAwesomeIcon icon={ farFlag } />
       </button>

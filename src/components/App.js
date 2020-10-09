@@ -29,7 +29,8 @@ class App extends React.Component {
         2: "30%",
         3: "45%",
         4: "60%",
-        5: "75%"
+        5: "75%",
+        6: "5%"
       },
       numberOfLives: {
         0: "0",
@@ -79,11 +80,13 @@ class App extends React.Component {
     },
     animations: { // Animation data to prompt reflows
       squareScroll: false,
-      seed: randomIntFromInterval(1,9999)
+      seed: randomIntFromInterval(1,9999),
+      bombFade: false
     },
     modal: { // Custom Settings && win/loss modal
       isVisible: false, // Is the modal visible?
-      timer: false // Prevents multiple timers from starting in order to show a delayed modal on win/loss
+      timer: false, // Prevents multiple timers from starting in order to show a delayed modal on win/loss
+      modalCleanup: false
     }
   }
 
@@ -117,10 +120,10 @@ class App extends React.Component {
     this.setState({animations});
   }
 
-  // Prop function for stats to pass totalToReveal to global state
+  // Prop function for stats to pass to global state
   revealTarget = totalToReveal => {
     const stats = this.state.stats;
-    if (totalToReveal > 0 && stats.totalToReveal <= 0) {
+    if ((totalToReveal > 0 && stats.totalToReveal <= 0) || totalToReveal !== stats.totalToReveal) {
       stats.totalToReveal = totalToReveal;
       this.setState({stats});
     }
@@ -139,11 +142,16 @@ class App extends React.Component {
     const stats = this.state.stats;
     const modes = {...this.state.modes};
     const data = {...this.state.data};
+    const modal = {...this.state.modal};
     const animations = {...this.state.animations}
     modes.newGame = true;
     this.toggleScroll(true, 'squareScroll');
-    // Reset seed
+    // Reset values on form submit
     animations.seed = randomIntFromInterval(1,9999);
+    animations.bombFade = false;
+    modal.timer = false;
+    modal.isVisible = false;
+    modal.modalCleanup = false;
     // 2. Add new value to state
     gameState.options.size = parseInt(obj.size);
     gameState.options.difficulty = parseInt(obj.difficulty);
@@ -153,7 +161,7 @@ class App extends React.Component {
     // Get initial number of lives
     stats.currentLives = parseInt(data.numberOfLives[gameState.options.lives])
     // 3. SetState
-    this.setState({ gameState, stats, modes, animations });
+    this.setState({ gameState, stats, modes, animations, modal });
     // 4. Save options to local storage
     localStorage.setItem("options", JSON.stringify(gameState.options));
   }
@@ -200,6 +208,8 @@ class App extends React.Component {
     } else {
       // Reset cleanup back to default
       squares[squareKey].explosion.explodeCleanup = false;
+      squares[squareKey].explosion.explodeTrigger = false;
+      squares = {...this.state.squares};
     }
   }
 
@@ -218,7 +228,7 @@ class App extends React.Component {
       const squares = {...this.state.squares};
       const modes = {...this.state.modes};
       // Reset square and hide the bomb
-      if (gameState.progress !== -1) {
+      if (gameState.progress === 0) {
         squares[squareKey].clicked = false;
       } else if (gameState.progress === -1) {
         // Handle defeat bomb explosion progression
@@ -231,10 +241,16 @@ class App extends React.Component {
         }, 1000)
         const modal = {...this.state.modal}
         if (!modal.isVisible) {
+          // Handle displaying the play again modal upon defeat
           if (!modal.timer) {
             modal.timer = true;
             this.setState({modal});
-            setTimeout(() => this.toggleModal(), 5000);
+            setTimeout(() => {
+              this.modalShow();
+              const modal = {...this.state.modal};
+              modal.modalCleanup = true;
+              this.setState({modal});
+            }, 5000);
           }
         }
       }
@@ -308,16 +324,35 @@ class App extends React.Component {
           // Click on a square with an adjacent bomb, reveal its hint
           squares[squareKey].hint = true;
         }
-        // Win
-          // Send a notice that you revealed all squares
-          // Reveal all bomb positions
-          // You won message, Modal to play again?
-            // Should fully reset board, notices, and gameState.progress
-
+        // Handle Win
         if (stats.revealed === stats.totalToReveal) {
           gameState.progress = 1;
           notices.victoryNotice = true;
-          this.setState({gameState, notices});
+          const squares = { ...this.state.squares };
+          const animations = {...this.state.animations}
+          const modal = {...this.state.modal}
+          animations.bombFade = true;
+          if (!modal.isVisible) {
+          // Handle displaying the play again modal upon win
+            if (!modal.timer) {
+              modal.timer = true;
+              this.setState({modal});
+              setTimeout(() => {
+                this.modalShow();
+                const modal = {...this.state.modal};
+                modal.modalCleanup = true;
+                this.setState({modal});
+              }, 3500);
+            }
+          }
+          this.setState({gameState, notices, animations, modal});
+          Object.keys(squares).map(key => {
+            if (!squares[key].clicked) {
+              // Reveal the board
+              squares[key].clicked = true;
+            }
+            return squares;
+          })
         }
       } else {
         // Clicked on a bomb
@@ -327,17 +362,12 @@ class App extends React.Component {
         stats.currentLives--;
         modes.bombMode = true;
         if (!(stats.currentLives < 0)) {
-          // Defeat notice triggers instead in this case
+          // If currentLives is >= 0, show bomb notice
           notices.bombNotice = true;
         }
         squares[squareKey].explosion.explodeTrigger = true;
         this.setState({squares, notices, modes, stats})
-        // Loss
-          // Disable the board
-            // Fire a loss notice - You struck a bomb and you're out of lives
-            // Reveal all bombs
-            // Bombs animate and explode
-            // Modal pops up to play another game?
+        // Handle defeat
         if (stats.currentLives < 0) {
           // Flag gamestate as defeat
           gameState.progress = -1;
@@ -543,11 +573,49 @@ class App extends React.Component {
     this.generatePositions(positionArray, squares, bombCount, optionSize, count)
   }
 
-  toggleModal = () => {
+  modalShow = () => {
     const modal = {...this.state.modal};
-    modal.isVisible = !modal.isVisible;
-    this.setState({modal});
-    return modal.isVisible;
+    if (!modal.isVisible) {
+      modal.isVisible = true
+      this.setState({modal});
+      return modal.isVisible;
+    }
+    return;
+  }
+
+  modalClose = () => {
+    const modal = {...this.state.modal};
+    if (modal.isVisible) {
+      modal.isVisible = false
+      this.setState({modal});
+      return modal.isVisible;
+    }
+    return;
+  }
+
+  modalGameStateMessage = () => {
+    const gameState = {...this.state.gameState};
+    if (gameState.progress === 1) {
+      // Win message
+      return (
+        <h1>Congrats, You Won!</h1>
+      )
+    } else if ( gameState.progress === -1) {
+      // Defeat message
+      return (
+        <h1>You Lost!</h1>
+      );
+    }
+  }
+
+  modalSettingsButtonText = () => {
+    const gameState = {...this.state.gameState};
+    const modal = {...this.state.modal}
+    if (gameState.progress !== 0 && modal.modalCleanup) {
+      return "Play Again?";
+    }
+    return "Customize Settings";
+
   }
 
   renderModal = () => {
@@ -555,10 +623,10 @@ class App extends React.Component {
     if (modal.isVisible) {
       return (
         <div>
-          <button onClick={this.toggleModal}>Customize Settings</button>
+          <button onClick={this.modalShow}>{this.modalSettingsButtonText()}</button>
           <ReactModal
             isOpen={this.state.modal.isVisible}
-            onRequestClose={this.toggleModal} // Handles closing modal on ESC or clicking on overlay
+            onRequestClose={this.modalClose} // Handles closing modal on ESC or clicking on overlay
             contentLabel="Custom Settings Dialog" // Screen readers
             shouldCloseOnOverlayClick={true} // Enable close on overlay click
             shouldCloseOnEsc={true} // Enable close on clicking ESC
@@ -566,8 +634,9 @@ class App extends React.Component {
             overlayClassName="overlay" // custom overlay class name
             closeTimeoutMS={500} // transition delay
           >
+            {this.modalGameStateMessage()}
             <Form
-              toggleModal={this.toggleModal}
+              modalClose={this.modalClose}
               options={this.state.gameState.options}
               saveOptions={this.saveOptions}
               initSquares={this.initSquares}
@@ -581,7 +650,7 @@ class App extends React.Component {
       )
     }
     return (
-      <button onClick={this.toggleModal}>Customize Settings</button>
+      <button onClick={this.modalShow}>{this.modalSettingsButtonText()}</button>
     )
   }
 
@@ -627,8 +696,8 @@ class App extends React.Component {
 
         </div>
         <div className="modes">
-          <Flag onModeClick={this.onModeClick} flagMode={this.state.modes.flagMode}/>
-          <QuestionMark onModeClick={this.onModeClick} questionMode={this.state.modes.questionMode}/>
+          <Flag onModeClick={this.onModeClick} modes={this.state.modes} gameState={this.state.gameState}/>
+          <QuestionMark onModeClick={this.onModeClick} modes={this.state.modes} gameState={this.state.gameState}/>
         </div>
       </div>
     )

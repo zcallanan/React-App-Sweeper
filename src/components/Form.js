@@ -11,7 +11,8 @@ class Form extends React.Component {
       size: PropTypes.number.isRequired,
       difficulty: PropTypes.number.isRequired
     }),
-    gameState: PropTypes.object.isRequired
+    gameState: PropTypes.object.isRequired,
+    modalClose: PropTypes.func.isRequired
   }
 
   // Local validation state
@@ -43,7 +44,7 @@ class Form extends React.Component {
     let formIsValid = true;
 
     // Size of board
-    if (!options.size) {
+    if (!options.size.toString()) {
       formIsValid = false;
       errors.size = "Square number field cannot be empty";
     } else if(typeof options.size !== "undefined"){
@@ -60,7 +61,7 @@ class Form extends React.Component {
     }
 
     // Percentage
-    if (!options.difficulty) {
+    if (!options.difficulty.toString()) {
       formIsValid = false;
       errors.difficulty = "The percentage field cannot be empty";
     } else if(typeof options.difficulty !== "undefined"){
@@ -72,7 +73,8 @@ class Form extends React.Component {
     }
 
     // Lives
-    if (!options.lives) {
+    if (!options.lives.toString()) {
+      console.log(options.lives, "options.lives")
       formIsValid = false;
       errors.lives = "The lives field cannot be empty";
     } else if(typeof options.lives !== "undefined"){
@@ -94,7 +96,7 @@ class Form extends React.Component {
     // 2. Validate fields
     if (this.handleValidation()){
       // Close the modal on a submit
-        this.props.toggleModal();
+        this.props.modalClose();
       // Get values
       const size = this.state.options.size;
       const options = this.state.options;
@@ -129,7 +131,7 @@ class Form extends React.Component {
   submitButtonText = () => {
     const gameState = this.props.gameState;
     // If the player won or lost, ask if they want to Play Another Game. If from customize settings, display Play Sweeper
-    return gameState.progress !== 0 ? "Play Another Game?" : "Play Sweeper";
+    return gameState.progress !== 0 ? "Play Again?" : "Play Sweeper";
   }
 
   render() {
@@ -137,7 +139,7 @@ class Form extends React.Component {
     const lives = this.props.lives;
     return (
       <div className="settings">
-        <h2>Custom game board settings</h2>
+        <h2>Custom Settings</h2>
         <form key="optionsForm" onSubmit={this.handleSubmit}>
           <div className="form-fields">
             <div>
