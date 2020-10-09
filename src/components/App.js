@@ -29,8 +29,7 @@ class App extends React.Component {
         2: "30%",
         3: "45%",
         4: "60%",
-        5: "75%",
-        6: "5%"
+        5: "75%"
       },
       numberOfLives: {
         0: "0",
@@ -90,19 +89,23 @@ class App extends React.Component {
     }
   }
 
+  /* Init */
+
   componentDidMount() {
-    let gameState = { ...this.state.gameState };
-    gameState.progress = 0;
-    let modes = {...this.state.modes};
-    modes.newGame = true;
+    const gameState = { ...this.state.gameState };
+    const modes = {...this.state.modes};
     const stats = this.state.stats;
     const data = this.state.data;
+    // Game in progress
+    gameState.progress = 0;
+    // New Game
+    modes.newGame = true;
     // Read options from local storage
     const localStorageRef = localStorage.getItem("options");
     if (localStorageRef) {
       gameState.options = JSON.parse(localStorageRef);
     } else {
-      // No local storage
+      // No local storage, set initial default falues
       gameState.options.size = 10;
       gameState.options.difficulty = 2;
       gameState.options.lives = 2;
@@ -110,29 +113,8 @@ class App extends React.Component {
     // Get initial number of lives
     stats.currentLives = parseInt(data.numberOfLives[gameState.options.lives])
     this.setState({ gameState, stats, modes });
+    // Generate game board
     this.initSquares(gameState.options.size);
-  }
-
-  // Prop for squares to update squareScroll state
-  toggleScroll = (bool, anim) => {
-    const animations = {...this.state.animations};
-    animations[anim] = bool;
-    this.setState({animations});
-  }
-
-  // Prop function for stats to pass to global state
-  revealTarget = totalToReveal => {
-    const stats = this.state.stats;
-    if ((totalToReveal > 0 && stats.totalToReveal <= 0) || totalToReveal !== stats.totalToReveal) {
-      stats.totalToReveal = totalToReveal;
-      this.setState({stats});
-    }
-  }
-
-  triggerFire = squareKey => {
-    const squares = {...this.state.squares};
-    squares[squareKey].explosion.explodeFire = false;
-    this.setState({squares});
   }
 
   // Save Player's game board options
@@ -166,7 +148,125 @@ class App extends React.Component {
     localStorage.setItem("options", JSON.stringify(gameState.options));
   }
 
-  // Toggle state when mode buttons are clicked (flag, question mark)
+  // Generate initial squares state
+  initSquares = size => {
+    // 1. Copy state
+    let squares = {...this.state.squares};
+    // Cleanup a previous game
+    const stats = {...this.state.stats};
+    const notices = {...this.state.notices};
+    stats.revealed = 0;
+    stats.flags = 0;
+    stats.questions = 0;
+    notices.bombNotice = false;
+    notices.victoryNotice = false;
+    notices.defeatNotice = false;
+    this.setState({stats, notices});
+    // If size decreases, then square keys should be deleted before the board is regenerated
+    if (Object.keys(squares).length > 1) {
+      let row;
+      let column;
+      Object.keys(squares).map(square => {
+        row = parseInt(square.split("-")[0].match(/\d{1,3}/)[0]);
+        column = parseInt(square.split("-")[1].match(/(\d{1,3})/)[0]);
+        if (row > this.state.gameState.options.size - 1 || column > this.state.gameState.options.size - 1) {
+          // Check to see if squares has any rows or columns greater than the board size - 1
+          delete squares[square];
+        }
+        return squares;
+      })
+    }
+
+    // 2. Build squares object
+    for (let i = 0; i < size; i++) {
+      for (let k = 0; k < size; k++ ) {
+        squares[`r${i}-s${k}`] = {
+          bomb: false,
+          flagged: false,
+          questionMarked: false,
+          clicked: false,
+          hint: false,
+          neighbors: [],
+          adjacentBombCount: -1,
+          explosion: {
+            explodeTrigger: false,
+            explodeTimer: false,
+            explodeCleanup: false,
+            explodeFire: false
+          }
+        }
+      }
+    }
+    // 3. SetState
+    this.setState({ squares });
+    // 4. Determine what squares have bombs
+    setTimeout(() => this.setBombs(), 200);
+    setTimeout(() => { // When the board initially draws input is disabled. This timer enables the board
+      const modes = {...this.state.modes};
+      modes.drawing = false;
+      this.setState({modes});
+    }, 1500) // Timer synced with square draw anim transition of 1.5s
+  }
+
+  // Use user input to call bomb position fn and save positions to state
+  setBombs = () => {
+    let percentage;
+    let positionArray = []
+    // Copy game board dimension
+    const options = {...this.state.gameState.options};
+    const squares = {...this.state.squares};
+    const stats = {...this.state.stats}
+    // Get percentage of bombs
+    for (const [key, value] of Object.entries(this.state.data.bombPercentage)) {
+      if (parseInt(key) === options.difficulty) {
+        percentage = parseFloat(value) * .01;
+      }
+    }
+    // Calculate number of bombs
+    const bombCount = Math.floor((options.size ** 2) * percentage);
+    // Save bombCount to stats
+    stats.bombs = bombCount;
+    // Generate bomb positions
+    this.generatePositions(positionArray, squares, bombCount, options.size, 0);
+    // Save bomb positions
+    this.setState({squares, stats});
+  }
+
+  // Called by this.setBombs(), recursive function that determines whether a square has a bomb
+  generatePositions = (positionArray, squares, bombCount, optionSize, count) => {
+    if (count > bombCount - 1) {
+      // stop recursive call
+      return squares;
+    }
+    let tempPosition = `r${randomIntFromInterval(0, optionSize - 1)}-s${randomIntFromInterval(0, optionSize - 1)}`;
+    if (!positionArray.includes(tempPosition)) {
+      squares[tempPosition].bomb = true;
+      positionArray.push(tempPosition);
+      count++;
+    }
+    // If position was a dupe, count remains the same, otherwise a new bomb's position is generated
+    this.generatePositions(positionArray, squares, bombCount, optionSize, count)
+  }
+
+  /* Props */
+
+  // Prop for squares to update squareScroll state
+  toggleScroll = (bool, anim) => {
+    const animations = {...this.state.animations};
+    animations[anim] = bool;
+    this.setState({animations});
+  }
+
+  // Prop function for stats to pass to global state
+  revealTarget = totalToReveal => {
+    const stats = this.state.stats;
+    if ((totalToReveal > 0 && stats.totalToReveal <= 0) || totalToReveal !== stats.totalToReveal) {
+      stats.totalToReveal = totalToReveal;
+      this.setState({stats});
+    }
+  }
+
+  // Prop to toggle state when mode buttons are clicked (flag, question mark)
   onModeClick = e => {
     e.preventDefault();
     // 1. Get state of flag
@@ -183,7 +283,7 @@ class App extends React.Component {
     this.setState({ modes })
   }
 
-  // Called by square component when clicking on a bomb square
+  // Prop for Square component when clicking on a bomb square
   explode = squareKey => {
     let squares = {...this.state.squares};
     if (!squares[squareKey].explosion.explodeCleanup) {
@@ -260,7 +360,7 @@ class App extends React.Component {
     }, 1000); // triggers bomb explosion enter anim
   }
 
-  // Called by square component when clicking on a square
+  // Prop for Square component when clicking on a square
   onSquareClick = squareKey => {
     // 1. Copy state
     const squares = { ...this.state.squares };
@@ -276,7 +376,6 @@ class App extends React.Component {
       modes.newGame = false;
       this.setState({modes});
     }
-
     // 2. Update square
     if (flagMode) {
       // If marking a flag is active, then mark only that square and then save to state
@@ -392,91 +491,6 @@ class App extends React.Component {
     this.setState({ squares });
   }
 
-  // Generate initial squares state
-  initSquares = size => {
-    // 1. Copy state
-    let squares = {...this.state.squares};
-    // Cleanup a previous game
-    const stats = {...this.state.stats};
-    const notices = {...this.state.notices};
-    stats.revealed = 0;
-    stats.flags = 0;
-    stats.questions = 0;
-    notices.bombNotice = false;
-    notices.victoryNotice = false;
-    notices.defeatNotice = false;
-    this.setState({stats, notices});
-    // If size decreases, then square keys should be deleted before the board is regenerated
-    if (Object.keys(squares).length > 1) {
-      let row;
-      let column;
-      Object.keys(squares).map(square => {
-        row = parseInt(square.split("-")[0].match(/\d{1,3}/)[0]);
-        column = parseInt(square.split("-")[1].match(/(\d{1,3})/)[0]);
-        if (row > this.state.gameState.options.size - 1 || column > this.state.gameState.options.size - 1) {
-          // Check to see if squares has any rows or columns greater than the board size - 1
-          delete squares[square];
-        }
-        return squares;
-      })
-    }
-
-    // 2. Build squares object
-    for (let i = 0; i < size; i++) {
-      for (let k = 0; k < size; k++ ) {
-        squares[`r${i}-s${k}`] = {
-          bomb: false,
-          flagged: false,
-          questionMarked: false,
-          clicked: false,
-          hint: false,
-          neighbors: [],
-          adjacentBombCount: -1,
-          explosion: {
-            explodeTrigger: false,
-            explodeTimer: false,
-            explodeCleanup: false,
-            explodeFire: false
-          }
-        }
-      }
-    }
-    // 3. SetState
-    this.setState({ squares });
-    // 4. Determine what squares have bombs
-    setTimeout(() => this.setBombs(), 200);
-    setTimeout(() => { // When the board initially draws input is disabled. This timer enables the board
-      const modes = {...this.state.modes};
-      modes.drawing = false;
-      this.setState({modes});
-    }, 1500) // Timer synced with square draw anim transition of 1.5s
-  }
-
-  // Use user input to call bomb position fn and save positions to state
-  setBombs = () => {
-    let percentage;
-    let positionArray = []
-    // Copy game board dimension
-    const options = {...this.state.gameState.options};
-    const squares = {...this.state.squares};
-    const stats = {...this.state.stats}
-    // Get percentage of bombs
-    for (const [key, value] of Object.entries(this.state.data.bombPercentage)) {
-      if (parseInt(key) === options.difficulty) {
-        percentage = parseFloat(value) * .01;
-      }
-    }
-    // Calculate number of bombs
-    const bombCount = Math.floor((options.size ** 2) * percentage);
-    // Save bombCount to stats
-    stats.bombs = bombCount;
-    this.setState({stats});
-    // Generate bomb positions
-    this.generatePositions(positionArray, squares, bombCount, options.size, 0);
-    // Save bomb positions
-    this.setState({squares});
-  }
-
   // Called by this.onSquareClick() to determine whether a square's neighbors are bombs or have adjacent bombs
   checkNeighbors = (squareKey, squares, stats) => {
     let neighbors;
@@ -556,22 +570,7 @@ class App extends React.Component {
     return neighbors;
   }
 
-
-  // Called by this.setBombs(), recursive function that determines whether a square has a bomb
-  generatePositions = (positionArray, squares, bombCount, optionSize, count) => {
-    if (count > bombCount - 1) {
-      // stop recursive call
-      return squares;
-    }
-    let tempPosition = `r${randomIntFromInterval(0, optionSize - 1)}-s${randomIntFromInterval(0, optionSize - 1)}`;
-    if (!positionArray.includes(tempPosition)) {
-      squares[tempPosition].bomb = true;
-      positionArray.push(tempPosition);
-      count++;
-    }
-    // If position was a dupe, count remains the same, otherwise a new bomb's position is generated
-    this.generatePositions(positionArray, squares, bombCount, optionSize, count)
-  }
+  /* Modal fn's */
 
   modalShow = () => {
     const modal = {...this.state.modal};
