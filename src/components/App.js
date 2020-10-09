@@ -29,8 +29,7 @@ class App extends React.Component {
         2: "30%",
         3: "45%",
         4: "60%",
-        5: "75%",
-        6: "5%"
+        5: "75%"
       },
       numberOfLives: {
         0: "0",
