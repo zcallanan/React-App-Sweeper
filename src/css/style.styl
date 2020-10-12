@@ -1,20 +1,31 @@
 // Import all partials
 @require './_*.styl'
 
+.form-group
+  display flex
+  flex-wrap wrap
+
+.modes
+  display flex
+  flex-direction column
+  margin-top 16px
+
 .flag-mode
   cursor crosshair
 
 .questionmark-mode
   cursor help
 
+.buttons
+  width 100%
+
 .flag-button, .question-button
+  margin-top 8px
   display flex
   align-items center
   justify-content space-between
-  width 200px
   height 36px
   font-size 16px
-  cursor pointer
 
 .fa-w-16
   font-size 26px
@@ -23,12 +34,14 @@
   color rgba(20,30,40, .5)
 
 .game-board
+  width 100%
   display flex
   flex-direction column
 
 .game-body, .modes
+  width 100%
   display flex
-  justify-content center
+  justify-content space-between
 
 .form-fields
   display flex

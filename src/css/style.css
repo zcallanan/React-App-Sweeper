@@ -2,6 +2,7 @@ header {
   background-color: #fff;
   height: 55px;
   display: flex;
+  margin-bottom: 16px;
 }
 header span {
   display: flex;
@@ -20,7 +21,7 @@ header span span.sw {
   color: #fff;
 }
 header span span.eeper {
-  color: rgba(240,0,0,0.9);
+  color: #3c7dc8;
 }
 header span svg {
   position: absolute;
@@ -28,42 +29,15 @@ header span svg {
 }
 header span svg.header-icon {
   font-size: 46px;
-  color: rgba(240,0,0,0.85);
-}
-.modal {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  border: 1px solid #ccc;
-  background: #fff;
-  overflow: auto;
-  border-radius: 2px;
-  outline: none;
-  padding: 30px;
-}
-.overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0,0,0,0.65);
-}
-.ReactModal__Overlay {
-  opacity: 0;
-  transition: opacity 500ms ease-in-out;
-}
-.ReactModal__Overlay--after-open {
-  opacity: 1;
-}
-.ReactModal__Overlay--before-close {
-  opacity: 0;
+  color: #3c7dc8;
 }
 .notice-box {
-  width: 250px;
+  width: 100%;
+  text-align: center;
   height: 20px;
   overflow: hidden;
+  margin-top: 16px;
+  margin-bottom: 16px;
 }
 .notice {
   display: inline-block;
@@ -242,9 +216,15 @@ header span svg.header-icon {
 .win-appear-done {
   opacity: 0.3;
 }
-thead {
-  font-size: 26px;
+.stats-title {
   text-align: center;
+  margin-bottom: 8px;
+  padding-top: 8px;
+  border-top: 1px solid #dee2e6;
+}
+.stats-wrapper {
+  padding-bottom: 16px;
+  border-bottom: 1px solid #dee2e6;
 }
 .lives-enter {
   transform: translateY(100%);
@@ -328,27 +308,26 @@ thead {
   transition: 1.5s;
   -webkit-transition: 1.5s;
 }
-.total-to-reveal {
+.total-to-reveal-enter {
   transform: translateY(100%);
   -webkit-transform: translateY(100%);
 }
-.total-to-reveal.total-to-reveal-active {
+.total-to-reveal-enter.total-to-reveal-enter-active {
   transform: translateY(0);
   -webkit-transform: translateY(0);
-  transition: 15s;
-  -webkit-transition: 15s;
+  transition: 1.5s;
+  -webkit-transition: 1.5s;
 }
 .total-to-reveal-exit {
   transform: translateY(0);
   -webkit-transform: translateY(0);
   position: absolute;
-  left: 4px;
 }
 .total-to-reveal-exit.total-to-reveal-exit-active {
   transform: translateY(-100%);
   -webkit-transform: translateY(-100%);
-  transition: 15s;
-  -webkit-transition: 15s;
+  transition: 1.5s;
+  -webkit-transition: 1.5s;
 }
 span.lives,
 span.bombs,
@@ -370,7 +349,6 @@ span.total-to-reveal {
   position: relative;
   overflow: hidden;
   float: right;
-  top: -18px;
 }
 span.total-to-reveal span {
   display: inline-block;
@@ -378,15 +356,25 @@ span.total-to-reveal span {
 body {
   margin: 0;
 }
-h2 {
+h1,
+h2,
+h3 {
   margin: 0;
 }
 p {
   margin: 0;
 }
-ul {
-  list-style: none;
-  padding-left: 0;
+td:first-child {
+  width: 170px;
+}
+.form-group {
+  display: flex;
+  flex-wrap: wrap;
+}
+.modes {
+  display: flex;
+  flex-direction: column;
+  margin-top: 16px;
 }
 .flag-mode {
   cursor: crosshair;
@@ -394,15 +382,17 @@ ul {
 .questionmark-mode {
   cursor: help;
 }
+.buttons {
+  width: 100%;
+}
 .flag-button,
 .question-button {
+  margin-top: 8px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  width: 200px;
   height: 36px;
   font-size: 16px;
-  cursor: pointer;
 }
 .fa-w-16 {
   font-size: 26px;
@@ -412,13 +402,15 @@ ul {
   color: rgba(20,30,40,0.5);
 }
 .game-board {
+  width: 100%;
   display: flex;
   flex-direction: column;
 }
 .game-body,
 .modes {
+  width: 100%;
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
 }
 .form-fields {
   display: flex;

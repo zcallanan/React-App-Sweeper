@@ -18,14 +18,14 @@ class QuestionMark extends React.Component {
       }
     if (this.props.modes.questionMode) {
       return (
-        <button className="question-button" {...attribute} >
+        <button className="btn btn-outline-secondary question-button buttons" {...attribute} >
           <p>Mark As Unknown</p>
           <FontAwesomeIcon icon={ faQuestionCircle } />
         </button>
       )
     }
     return (
-      <button className="question-button" {...attribute} >
+      <button className="btn btn-outline-secondary question-button buttons" {...attribute} >
         <p>Mark As Unknown</p>
         <FontAwesomeIcon icon={ farQuestionCircle } />
       </button>
