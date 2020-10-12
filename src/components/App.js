@@ -1,4 +1,5 @@
 import React from 'react';
+import Modal from "react-bootstrap/Modal";
 import Form from './Form';
 import Column from './Column';
 import Flag from './Flag';
@@ -6,10 +7,9 @@ import Header from './Header';
 import QuestionMark from './QuestionMark';
 import Stats from './Stats';
 import Notice from './Notice';
-import ReactModal from 'react-modal';
 import { randomIntFromInterval } from '../helpers';
 
-ReactModal.setAppElement('#main')
+// ReactModal.setAppElement('#main')
 
 class App extends React.Component {
   // Initialize state
@@ -596,15 +596,12 @@ class App extends React.Component {
     const gameState = {...this.state.gameState};
     if (gameState.progress === 1) {
       // Win message
-      return (
-        <h1>Congrats, You Won!</h1>
-      )
+      return "Congrats, You Won!";
     } else if ( gameState.progress === -1) {
       // Defeat message
-      return (
-        <h1>You Lost!</h1>
-      );
+      return "You Lost!";
     }
+    return "Customize Settings";
   }
 
   modalSettingsButtonText = () => {
@@ -622,35 +619,31 @@ class App extends React.Component {
     if (modal.isVisible) {
       return (
         <div>
-          <button onClick={this.modalShow}>{this.modalSettingsButtonText()}</button>
-          <ReactModal
-            isOpen={this.state.modal.isVisible}
-            onRequestClose={this.modalClose} // Handles closing modal on ESC or clicking on overlay
-            contentLabel="Custom Settings Dialog" // Screen readers
-            shouldCloseOnOverlayClick={true} // Enable close on overlay click
-            shouldCloseOnEsc={true} // Enable close on clicking ESC
-            className="modal" // custom class name
-            overlayClassName="overlay" // custom overlay class name
-            closeTimeoutMS={500} // transition delay
+
+          <Modal
+            show={this.state.modal.isVisible}
+            onHide={this.modalClose} // Handles closing modal on ESC or clicking on overlay
           >
-            {this.modalGameStateMessage()}
-            <Form
-              modalClose={this.modalClose}
-              options={this.state.gameState.options}
-              saveOptions={this.saveOptions}
-              initSquares={this.initSquares}
-              setBombs={this.setBombs}
-              percentages={this.state.data.bombPercentage}
-              lives={this.state.data.numberOfLives}
-              gameState={this.state.gameState}
-            />
-          </ReactModal>
+            <Modal.Header>
+              <h3>{this.modalGameStateMessage()}</h3>
+            </Modal.Header>
+            <Modal.Body>
+              <Form
+                modalClose={this.modalClose}
+                options={this.state.gameState.options}
+                saveOptions={this.saveOptions}
+                initSquares={this.initSquares}
+                setBombs={this.setBombs}
+                percentages={this.state.data.bombPercentage}
+                lives={this.state.data.numberOfLives}
+                gameState={this.state.gameState}
+              />
+            </Modal.Body>
+          </Modal>
         </div>
       )
     }
-    return (
-      <button onClick={this.modalShow}>{this.modalSettingsButtonText()}</button>
-    )
+    return;
   }
 
   render() {
@@ -675,30 +668,37 @@ class App extends React.Component {
     }
 
     return (
-      <div className="game-board">
+      <div>
         <Header />
-        <div className="game-body">
+        <div className="game-board container">
+
           <div>
             {this.renderModal()}
           </div>
-          <div className="squares">
-            {columns}
-          </div>
-          <div>
-            <Notice notices={this.state.notices} />
-            <Stats
-              stats={this.state.stats}
-              options={this.state.gameState.options}
-              revealTarget={this.revealTarget}
-            />
-          </div>
+          <div className="game-body row">
+            <div className="col-3">
+              <button className="btn btn-secondary buttons" onClick={this.modalShow}>{this.modalSettingsButtonText()}</button>
+              <Notice notices={this.state.notices} />
+              <Stats
+                stats={this.state.stats}
+                options={this.state.gameState.options}
+                revealTarget={this.revealTarget}
+              />
+              <div className="modes">
+                <Flag onModeClick={this.onModeClick} modes={this.state.modes} gameState={this.state.gameState}/>
+                <QuestionMark onModeClick={this.onModeClick} modes={this.state.modes} gameState={this.state.gameState}/>
+              </div>
+            </div>
+            <div className="col-9">
 
-        </div>
-        <div className="modes">
-          <Flag onModeClick={this.onModeClick} modes={this.state.modes} gameState={this.state.gameState}/>
-          <QuestionMark onModeClick={this.onModeClick} modes={this.state.modes} gameState={this.state.gameState}/>
+              <div className="squares">
+                {columns}
+              </div>
+            </div>
+          </div>
         </div>
       </div>
+
     )
   }
 }

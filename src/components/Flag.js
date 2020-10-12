@@ -17,17 +17,15 @@ class Flag extends React.Component {
       attribute["disabled"] = "disabled";
     }
     if (this.props.modes.flagMode) {
-      if (this.props.modes.questionMode) {
-        return (
-          <button className="flag-button" {...attribute}>
+      return (
+          <button className="btn btn-outline-secondary flag-button buttons" {...attribute}>
             <p>Flag Bomb</p>
             <FontAwesomeIcon icon={ faFlag } />
           </button>
         )
-      }
     }
     return (
-      <button className="flag-button" {...attribute}>
+      <button className="btn btn-outline-secondary flag-button buttons" {...attribute}>
         <p>Flag Bomb</p>
         <FontAwesomeIcon icon={ farFlag } />
       </button>

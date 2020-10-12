@@ -139,11 +139,10 @@ class Form extends React.Component {
     const lives = this.props.lives;
     return (
       <div className="settings">
-        <h2>Custom Settings</h2>
         <form key="optionsForm" onSubmit={this.handleSubmit}>
           <div className="form-fields">
-            <div>
-              <label htmlFor="size">Squares along a side:</label>
+            <div className="form-group">
+              <label htmlFor="size" className="label"><strong>Squares along a side:</strong></label>
               <input
                 value={this.state.options.size}
                 onChange={this.handleChange}
@@ -151,33 +150,36 @@ class Form extends React.Component {
                 key="size"
                 type="text"
                 id="size"
+                className="form-control"
               />
             </div>
-            <div>
-              <label htmlFor="difficulty">Percentage of bombs:</label>
+            <div className="form-group">
+              <label htmlFor="difficulty"><strong>Percentage of bombs:</strong></label>
               <select
                 value={this.state.options.difficulty}
                 onChange={this.handleChange}
                 name="difficulty"
                 key="difficulty"
                 id="difficulty"
+                className="form-control"
               >
                 {Object.keys(percentages).map(key => <option key={key} value={key}>{percentages[key]}</option>)}
               </select>
             </div>
-            <div>
-              <label htmlFor="lives">Number of Lives:</label>
+            <div className="form-group">
+              <label htmlFor="lives"><strong>Number of Lives:</strong></label>
               <select
                 value={this.state.options.lives}
                 onChange={this.handleChange}
                 name="lives"
                 key="lives"
                 id="lives"
+                className="form-control"
               >
                 {Object.keys(lives).map(key => <option key={key} value={key}>{lives[key]}</option>)}
               </select>
             </div>
-            <button type="submit">{this.submitButtonText()}</button>
+            <button className="btn btn-outline-secondary" type="submit">{this.submitButtonText()}</button>
           </div>
         </form>
       </div>
