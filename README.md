@@ -1,5 +1,7 @@
 My take on the classic Minesweeper, built in React. 
 
+![sweeper](https://github.com/zcallanan/sweeper/raw/master/public/sweeper.png)
+
 Custom Settings
 - Change the number of squares along a side of the game board
 - Make the game more forgiving by adjusting the number of lives you have
