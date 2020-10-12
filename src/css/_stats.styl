@@ -52,25 +52,25 @@
     transition 1.5s
     -webkit-transition 1.5s
 
-.total-to-reveal
+.total-to-reveal-enter
   transform translateY(100%)
   -webkit-transform translateY(100%)
-  &.total-to-reveal-active
+  &.total-to-reveal-enter-active
     transform translateY(0)
     -webkit-transform translateY(0)
-    transition 15s
-    -webkit-transition 15s
+    transition 1.5s
+    -webkit-transition 1.5s
 
 .total-to-reveal-exit
   transform translateY(0)
   -webkit-transform translateY(0)
   position absolute
-  left 4px;
+  left -10px
   &.total-to-reveal-exit-active
     transform translateY(-100%)
     -webkit-transform translateY(-100%)
-    transition 15s
-    -webkit-transition 15s
+    transition 1.5s
+    -webkit-transition 1.5s
 
 span.lives, span.bombs, span.revealed, span.flags, span.questions
   position relative
@@ -83,7 +83,6 @@ span.total-to-reveal
   position relative
   overflow hidden
   float right
-  top -23px
-  left 6px
+
   span
     display inline-block

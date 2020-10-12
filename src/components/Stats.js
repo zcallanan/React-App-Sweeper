@@ -119,7 +119,7 @@ class Stats extends React.Component {
           <td>/</td>
           <td>
             <TransitionGroup component="span" className="total-to-reveal">
-                <CSSTransition classNames="total-to-reveal" key={totalToReveal} timeout={{enter: 15000, exit: 15000}} >
+                <CSSTransition classNames="total-to-reveal" key={totalToReveal} timeout={{enter: 1500, exit: 1500}} >
                   <span>{totalToReveal}</span>
                 </CSSTransition>
               </TransitionGroup>
