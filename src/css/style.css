@@ -322,7 +322,6 @@ header span svg.header-icon {
   transform: translateY(0);
   -webkit-transform: translateY(0);
   position: absolute;
-  left: -10px;
 }
 .total-to-reveal-exit.total-to-reveal-exit-active {
   transform: translateY(-100%);
