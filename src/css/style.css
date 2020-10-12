@@ -2,6 +2,7 @@ header {
   background-color: #fff;
   height: 55px;
   display: flex;
+  margin-bottom: 16px;
 }
 header span {
   display: flex;
@@ -20,7 +21,7 @@ header span span.sw {
   color: #fff;
 }
 header span span.eeper {
-  color: rgba(240,0,0,0.9);
+  color: #3c7dc8;
 }
 header span svg {
   position: absolute;
@@ -28,7 +29,7 @@ header span svg {
 }
 header span svg.header-icon {
   font-size: 46px;
-  color: rgba(240,0,0,0.85);
+  color: #3c7dc8;
 }
 .modal {
   position: fixed;
@@ -61,9 +62,12 @@ header span svg.header-icon {
   opacity: 0;
 }
 .notice-box {
-  width: 250px;
+  width: 100%;
+  text-align: center;
   height: 20px;
   overflow: hidden;
+  margin-top: 16px;
+  margin-bottom: 16px;
 }
 .notice {
   display: inline-block;
@@ -244,8 +248,9 @@ header span svg.header-icon {
 }
 .stats-title {
   text-align: center;
-  margin-bottom: 16px;
-  border-bottom: 1px solid #dee2e6;
+  margin-bottom: 8px;
+  padding-top: 8px;
+  border-top: 1px solid #dee2e6;
 }
 .stats-wrapper {
   padding-bottom: 16px;
@@ -375,7 +380,8 @@ span.total-to-reveal {
   position: relative;
   overflow: hidden;
   float: right;
-  top: -18px;
+  top: -23px;
+  left: 6px;
 }
 span.total-to-reveal span {
   display: inline-block;
@@ -391,9 +397,8 @@ h3 {
 p {
   margin: 0;
 }
-ul {
-  list-style: none;
-  padding-left: 0;
+td:first-child {
+  width: 75%;
 }
 .form-group {
   display: flex;

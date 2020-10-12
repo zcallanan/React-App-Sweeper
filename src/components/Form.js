@@ -179,7 +179,7 @@ class Form extends React.Component {
                 {Object.keys(lives).map(key => <option key={key} value={key}>{lives[key]}</option>)}
               </select>
             </div>
-            <button className="btn btn-outline-secondary" type="submit">{this.submitButtonText()}</button>
+            <button className="btn btn-secondary" type="submit">{this.submitButtonText()}</button>
           </div>
         </form>
       </div>
