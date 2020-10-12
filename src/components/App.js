@@ -9,8 +9,6 @@ import Stats from './Stats';
 import Notice from './Notice';
 import { randomIntFromInterval } from '../helpers';
 
-// ReactModal.setAppElement('#main')
-
 class App extends React.Component {
   // Initialize state
   state = {
