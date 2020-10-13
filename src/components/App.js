@@ -99,7 +99,7 @@ class App extends React.Component {
     // New Game
     modes.newGame = true;
     // Read options from local storage
-    const localStorageRef = localStorage.getItem("options");
+    const localStorageRef = localStorage.getItem("sweeper-options");
     if (localStorageRef) {
       gameState.options = JSON.parse(localStorageRef);
     } else {
@@ -143,7 +143,7 @@ class App extends React.Component {
     // 3. SetState
     this.setState({ gameState, stats, modes, animations, modal });
     // 4. Save options to local storage
-    localStorage.setItem("options", JSON.stringify(gameState.options));
+    localStorage.setItem("sweeper-options", JSON.stringify(gameState.options));
   }
 
   // Generate initial squares state
