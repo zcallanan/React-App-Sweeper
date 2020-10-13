@@ -1,33 +1,40 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { TransitionGroup, CSSTransition } from 'react-transition-group';
 
-class Stats extends React.Component {
-  static propTypes = {
-    stats: PropTypes.shape({
-      currentLives: PropTypes.number.isRequired,
-      bombs: PropTypes.number.isRequired,
-      flags: PropTypes.number.isRequired,
-      questions: PropTypes.number.isRequired
-    }),
-    options: PropTypes.object.isRequired,
-    revealTarget: PropTypes.func.isRequired
-  }
+interface Props {
+  stats: statsType,
+  options: optionType,
+  revealTarget: (totalToReveal: number) => void
+}
 
-  state = {
-    localStats: {
-      size: -1,
-      bombs: -1,
-      totalToReveal: -1
+interface State {
+  localStats: localStatsType
+}
+
+type localStatsType = {
+  size: number,
+  bombs: number,
+  totalToReveal: number
+}
+
+class Stats extends React.Component<Props, State> {
+  constructor(props: any) {
+    super(props);
+    this.state = {
+      localStats: {
+        size: -1,
+        bombs: -1,
+        totalToReveal: -1
+      }
     }
   }
 
   componentDidUpdate() {
-    const stats = this.props.stats;
-    const bombs = stats.bombs;
-    const localStats = {...this.state.localStats};
-    const options = this.props.options;
-    const totalToReveal = (options.size ** 2) - bombs;
+    const stats: statsType = this.props.stats;
+    const bombs: number = stats.bombs;
+    const localStats: localStatsType = {...this.state.localStats};
+    const options: optionType = this.props.options;
+    const totalToReveal: number = (options.size ** 2) - bombs;
     if (bombs > 0 && options.size > 0 && localStats.totalToReveal < 0) {
       localStats.totalToReveal = (options.size ** 2) - bombs;
       if (localStats.totalToReveal > 0) {
@@ -81,7 +88,7 @@ class Stats extends React.Component {
   }
 
   renderBombCount = () => {
-    const stats = this.props.stats;
+    const stats: statsType = this.props.stats;
     const bombs = stats.bombs;
     if (bombs >= 0) {
       return (
@@ -100,7 +107,7 @@ class Stats extends React.Component {
   }
 
   renderRevealed = () => {
-    const stats = this.props.stats;
+    const stats: statsType = this.props.stats;
     const revealed = stats.revealed;
     const localStats = {...this.state.localStats}
     const totalToReveal = localStats.totalToReveal;
@@ -130,7 +137,7 @@ class Stats extends React.Component {
   }
 
   renderFlagCount = () => {
-    const stats = this.props.stats;
+    const stats: statsType = this.props.stats;
     const flags = stats.flags;
     let flagText = "Bombs Flagged:";
     if (flags === 1) {
@@ -153,7 +160,7 @@ class Stats extends React.Component {
   }
 
   renderQuestionsCount = () => {
-    const stats = this.props.stats;
+    const stats: statsType = this.props.stats;
     const questions = stats.questions;
     if (questions >= 0) {
       return (

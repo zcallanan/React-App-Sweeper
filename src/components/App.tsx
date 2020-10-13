@@ -9,91 +9,107 @@ import Stats from './Stats';
 import Notice from './Notice';
 import { randomIntFromInterval } from '../helpers';
 
-class App extends React.Component {
-  // Initialize state
-  state = {
-    gameState : {
-      progress: 0, // -1 defeat, 0 mid-game, 1 victory
-      options: { // User input settings, loaded from localStorage if available
-        size: 0,
-        difficulty: 0,
-        lives: 0
-      }
-    },
-    data: { // Hard coded data
-      bombPercentage: {
-        0: "10%",
-        1: "20%",
-        2: "30%",
-        3: "45%",
-        4: "60%",
-        5: "75%"
-      },
-      numberOfLives: {
-        0: "0",
-        1: "1",
-        2: "2",
-        3: "5",
-        4: "9",
-        5: "99"
-      }
-    },
-    squares: { // Game board framework
-      "r0-s0": {
-        bomb: false,
-        flagged: false,
-        questionMarked: false,
-        clicked: false,
-        hint: false,
-        neighbors: [],
-        adjacentBombCount: -1,
-        explosion: {
-          explodeTrigger: false,
-          explodeTimer: false,
-          explodeCleanup: false,
-          explodeFire: false
+interface Props {
+}
+
+interface State {
+  gameState: gameStateType,
+  data: dataType,
+  squares: squaresType,
+  modes: modesType,
+  stats: statsType,
+  notices: noticesType,
+  animations: animationsType,
+  modal: modalType
+}
+
+class App extends React.Component<Props, State> {
+  constructor(props: any) {
+    super(props);
+    this.state = {
+      gameState : {
+        progress: 0, // -1 defeat, 0 mid-game, 1 victory
+        options: { // User input settings, loaded from localStorage if available
+          size: 0,
+          difficulty: 0,
+          lives: 0
         }
+      },
+      data: { // Hard coded data
+        bombPercentage: {
+          0: "10%",
+          1: "20%",
+          2: "30%",
+          3: "45%",
+          4: "60%",
+          5: "75%"
+        },
+        numberOfLives: {
+          0: "0",
+          1: "1",
+          2: "2",
+          3: "5",
+          4: "9",
+          5: "99"
+        }
+      },
+      squares: { // Game board framework
+        "r0-s0": {
+          bomb: false,
+          flagged: false,
+          questionMarked: false,
+          clicked: false,
+          hint: false,
+          neighbors: [],
+          adjacentBombCount: -1,
+          explosion: {
+            explodeTrigger: false,
+            explodeTimer: false,
+            explodeCleanup: false,
+            explodeFire: false
+          }
+        }
+      },
+      modes: {
+        newGame: false, // Denotes the start of a new game before a square is selected
+        bombMode: false, // Struck a bomb, locks input
+        flagMode: false, // Place a flag on a square
+        questionMode: false, // Place a question mark on a square
+        drawing: true // On square init the initial board draws. After 1.5 seconds this is marked false
+      },
+      stats: { // Game stats
+        currentLives: -1,
+        bombs: -1,
+        revealed: 0,
+        totalToReveal: 0,
+        flags: 0,
+        questions: 0
+      },
+      notices: { // Game notices
+        bombNotice: false,
+        victoryNotice: false,
+        defeatNotice: false
+      },
+      animations: { // Animation data to prompt reflows
+        squareScroll: false,
+        seed: randomIntFromInterval(1,9999),
+        bombFade: false
+      },
+      modal: { // Custom Settings && win/loss modal
+        isVisible: false, // Is the modal visible?
+        timer: false, // Prevents multiple timers from starting in order to show a delayed modal on win/loss
+        modalCleanup: false
       }
-    },
-    modes: {
-      newGame: false, // Denotes the start of a new game before a square is selected
-      bombMode: false, // Struck a bomb, locks input
-      flagMode: false, // Place a flag on a square
-      questionMode: false, // Place a question mark on a square
-      drawing: true // On square init the initial board draws. After 1.5 seconds this is marked false
-    },
-    stats: { // Game stats
-      currentLives: -1,
-      bombs: -1,
-      revealed: 0,
-      totalToReveal: 0,
-      flags: 0,
-      questions: 0
-    },
-    notices: { // Game notices
-      bombNotice: false,
-      victoryNotice: false,
-      defeatNotice: false
-    },
-    animations: { // Animation data to prompt reflows
-      squareScroll: false,
-      seed: randomIntFromInterval(1,9999),
-      bombFade: false
-    },
-    modal: { // Custom Settings && win/loss modal
-      isVisible: false, // Is the modal visible?
-      timer: false, // Prevents multiple timers from starting in order to show a delayed modal on win/loss
-      modalCleanup: false
     }
   }
 
   /* Init */
 
   componentDidMount() {
-    const gameState = { ...this.state.gameState };
-    const modes = {...this.state.modes};
-    const stats = this.state.stats;
-    const data = this.state.data;
+    const gameState: gameStateType = { ...this.state.gameState };
+    const modes: modesType = {...this.state.modes};
+    const stats: statsType = {...this.state.stats};
+    const data: dataType = {...this.state.data};
     // Game in progress
     gameState.progress = 0;
     // New Game
@@ -116,14 +132,14 @@ class App extends React.Component {
   }
 
   // Save Player's game board options
-  saveOptions = obj => {
+  saveOptions = (obj: optionObj) => {
     // 1. Copy state
-    const gameState = this.state.gameState;
-    const stats = this.state.stats;
-    const modes = {...this.state.modes};
-    const data = {...this.state.data};
-    const modal = {...this.state.modal};
-    const animations = {...this.state.animations}
+    const gameState: gameStateType = this.state.gameState;
+    const stats: statsType = this.state.stats;
+    const modes: modesType = {...this.state.modes};
+    const data: dataType = {...this.state.data};
+    const modal: modalType = {...this.state.modal};
+    const animations: animationsType = {...this.state.animations};
     modes.newGame = true;
     this.toggleScroll(true, 'squareScroll');
     // Reset values on form submit
@@ -147,12 +163,12 @@ class App extends React.Component {
   }
 
   // Generate initial squares state
-  initSquares = size => {
+  initSquares = (size: number) => {
     // 1. Copy state
-    let squares = {...this.state.squares};
+    let squares: squaresType = {...this.state.squares};
     // Cleanup a previous game
-    const stats = {...this.state.stats};
-    const notices = {...this.state.notices};
+    const stats: statsType = {...this.state.stats};
+    const notices: noticesType = {...this.state.notices};
     stats.revealed = 0;
     stats.flags = 0;
     stats.questions = 0;
@@ -162,11 +178,11 @@ class App extends React.Component {
     this.setState({stats, notices});
     // If size decreases, then square keys should be deleted before the board is regenerated
     if (Object.keys(squares).length > 1) {
-      let row;
-      let column;
-      Object.keys(squares).map(square => {
-        row = parseInt(square.split("-")[0].match(/\d{1,3}/)[0]);
-        column = parseInt(square.split("-")[1].match(/(\d{1,3})/)[0]);
+      let row: number = 0;
+      let column: number = 0;
+      Object.keys(squares).map((square: string) => {
+        row = parseInt(square!.split("-")[0].match(/\d{1,3}/)[0]);
+        column = parseInt(square!.split("-")[1].match(/(\d{1,3})/)[0]);
         if (row > this.state.gameState.options.size - 1 || column > this.state.gameState.options.size - 1) {
           // Check to see if squares has any rows or columns greater than the board size - 1
           delete squares[square];
@@ -174,6 +190,7 @@ class App extends React.Component {
         return squares;
       })
     }
+
 
     // 2. Build squares object
     for (let i = 0; i < size; i++) {
@@ -208,12 +225,12 @@ class App extends React.Component {
 
   // Use user input to call bomb position fn and save positions to state
   setBombs = () => {
-    let percentage;
-    let positionArray = []
+    let percentage: number;
+    let positionArray: Array<string> = []
     // Copy game board dimension
-    const options = {...this.state.gameState.options};
-    const squares = {...this.state.squares};
-    const stats = {...this.state.stats}
+    const options: optionType = {...this.state.gameState.options};
+    const squares: squaresType = {...this.state.squares};
+    const stats: statsType = {...this.state.stats}
     // Get percentage of bombs
     for (const [key, value] of Object.entries(this.state.data.bombPercentage)) {
       if (parseInt(key) === options.difficulty) {
@@ -236,7 +253,7 @@ class App extends React.Component {
       // stop recursive call
       return squares;
     }
-    let tempPosition = `r${randomIntFromInterval(0, optionSize - 1)}-s${randomIntFromInterval(0, optionSize - 1)}`;
+    let tempPosition: string = `r${randomIntFromInterval(0, optionSize - 1)}-s${randomIntFromInterval(0, optionSize - 1)}`;
     if (!positionArray.includes(tempPosition)) {
       squares[tempPosition].bomb = true;
       positionArray.push(tempPosition);
@@ -250,14 +267,14 @@ class App extends React.Component {
 
   // Prop for squares to update squareScroll state
   toggleScroll = (bool, anim) => {
-    const animations = {...this.state.animations};
+    const animations: animationsType = {...this.state.animations};
     animations[anim] = bool;
     this.setState({animations});
   }
 
   // Prop function for stats to pass to global state
   revealTarget = totalToReveal => {
-    const stats = this.state.stats;
+    const stats: statsType = {...this.state.stats};
     if ((totalToReveal > 0 && stats.totalToReveal <= 0) || totalToReveal !== stats.totalToReveal) {
       stats.totalToReveal = totalToReveal;
       this.setState({stats});
@@ -268,7 +285,7 @@ class App extends React.Component {
   onModeClick = e => {
     e.preventDefault();
     // 1. Get state of flag
-    let modes = this.state.modes;
+    const modes: modesType = {...this.state.modes};
     // 2. Change flag setting
     modes[e.target.name] = !modes[e.target.name];
     // 3. If mode X toggles to true, then make sure mode Y is false
@@ -283,7 +300,7 @@ class App extends React.Component {
 
   // Prop for Square component when clicking on a bomb square
   explode = squareKey => {
-    let squares = {...this.state.squares};
+    let squares: squaresType = {...this.state.squares};
     if (!squares[squareKey].explosion.explodeCleanup) {
       // Prevent further animations if it's time to cleanup
       squares[squareKey].explosion.explodeTrigger = false;
@@ -313,8 +330,8 @@ class App extends React.Component {
 
   // Cleanup bombMode, resetting bomb square, reset bombNotice, and remove disabled from clickable squares
   explodeCleanup = squareKey => {
-    const squares = {...this.state.squares};
-    const gameState = {...this.state.gameState};
+    const squares: squaresType = {...this.state.squares};
+    const gameState: gameStateType = {...this.state.gameState};
     squares[squareKey].explosion.explodeTrigger = false;
     squares[squareKey].explosion.explodeTimer = false;
     squares[squareKey].explosion.explodeCleanup = true;
@@ -361,15 +378,15 @@ class App extends React.Component {
   // Prop for Square component when clicking on a square
   onSquareClick = squareKey => {
     // 1. Copy state
-    const squares = { ...this.state.squares };
-    let stats = { ...this.state.stats };
-    const gameState = {...this.state.gameState};
-    const notices = {...this.state.notices};
-    const modes = {...this.state.modes};
-    const bomb = squares[squareKey].bomb;
-    const adjacentBombCount = squares[squareKey].adjacentBombCount;
-    const flagMode = modes.flagMode;
-    const questionMode = modes.questionMode;
+    const squares: squaresType = { ...this.state.squares };
+    let stats: statsType = { ...this.state.stats };
+    const gameState: gameStateType = {...this.state.gameState};
+    const notices: noticesType = {...this.state.notices};
+    const modes: modesType = {...this.state.modes};
+    const bomb: boolean = squares[squareKey].bomb;
+    const adjacentBombCount: number = squares[squareKey].adjacentBombCount;
+    const flagMode: boolean = modes.flagMode;
+    const questionMode: boolean = modes.questionMode;
     if (modes.newGame) {
       modes.newGame = false;
       this.setState({modes});
@@ -453,9 +470,9 @@ class App extends React.Component {
         }
       } else {
         // Clicked on a bomb
-        const notices = {...this.state.notices};
-        const modes = {...this.state.modes};
-        const stats = {...this.state.stats};
+        const notices: noticesType = {...this.state.notices};
+        const modes: modesType = {...this.state.modes};
+        const stats: statsType = {...this.state.stats};
         stats.currentLives--;
         modes.bombMode = true;
         if (!(stats.currentLives < 0)) {
@@ -491,7 +508,7 @@ class App extends React.Component {
 
   // Called by this.onSquareClick() to determine whether a square's neighbors are bombs or have adjacent bombs
   checkNeighbors = (squareKey, squares, stats) => {
-    let neighbors;
+    let neighbors: Array<string>;
     if ((squares[squareKey].neighbors === 'undefined' || squares[squareKey].neighbors.length === 0) || squares[squareKey].adjacentBombCount === -1 ) {
       // If squareKey has no neighbors or its adjacent bombs have not been counted, then call countAdjacentBombs
       neighbors = this.countAdjacentBombs(squareKey);
@@ -571,7 +588,7 @@ class App extends React.Component {
   /* Modal fn's */
 
   modalShow = () => {
-    const modal = {...this.state.modal};
+    const modal: modalType = {...this.state.modal};
     if (!modal.isVisible) {
       modal.isVisible = true
       this.setState({modal});
@@ -581,7 +598,7 @@ class App extends React.Component {
   }
 
   modalClose = () => {
-    const modal = {...this.state.modal};
+    const modal: modalType = {...this.state.modal};
     if (modal.isVisible) {
       modal.isVisible = false
       this.setState({modal});
@@ -591,7 +608,7 @@ class App extends React.Component {
   }
 
   modalGameStateMessage = () => {
-    const gameState = {...this.state.gameState};
+    const gameState: gameStateType = {...this.state.gameState};
     if (gameState.progress === 1) {
       // Win message
       return "Congrats, You Won!";
@@ -603,8 +620,8 @@ class App extends React.Component {
   }
 
   modalSettingsButtonText = () => {
-    const gameState = {...this.state.gameState};
-    const modal = {...this.state.modal}
+    const gameState: gameStateType = {...this.state.gameState};
+    const modal: modalType = {...this.state.modal}
     if (gameState.progress !== 0 && modal.modalCleanup) {
       return "Play Again?";
     }
@@ -613,7 +630,7 @@ class App extends React.Component {
   }
 
   renderModal = () => {
-    const modal = {...this.state.modal};
+    const modal: modalType = {...this.state.modal};
     if (modal.isVisible) {
       return (
         <div>
@@ -631,9 +648,7 @@ class App extends React.Component {
                 options={this.state.gameState.options}
                 saveOptions={this.saveOptions}
                 initSquares={this.initSquares}
-                setBombs={this.setBombs}
-                percentages={this.state.data.bombPercentage}
-                lives={this.state.data.numberOfLives}
+                data={this.state.data}
                 gameState={this.state.gameState}
               />
             </Modal.Body>

@@ -1,20 +1,26 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { TransitionGroup, CSSTransition } from 'react-transition-group';
 
-class Notice extends React.Component {
+interface Props {
+  notices: noticesType
+}
 
-  static propTypes = {
-    notices: PropTypes.shape({
-      bombNotice: PropTypes.bool.isRequired,
-      victoryNotice: PropTypes.bool.isRequired,
-      defeatNotice: PropTypes.bool.isRequired
-    })
-  }
+interface State {
+}
+
+type noticeT = {
+  key: string,
+  message: string
+}
+
+class Notice extends React.Component<Props, State> {
 
   handleNotice = () => {
     const { bombNotice, victoryNotice, defeatNotice} = this.props.notices;
-    let notice = {};
+    let notice: noticeT = {
+      key: null,
+      message: null
+    };
     if (bombNotice) {
       // Notice content
       notice = {
@@ -32,7 +38,7 @@ class Notice extends React.Component {
         message: "You ran out of lives!"
       }
     }
-    if (Object.keys(notice).length > 0) {
+    if (notice.key === null) {
       // If there's content to display, render it
       return (
         <CSSTransition classNames="notices" key={notice.key} timeout={{enter: 2500, exit: 2500}} >

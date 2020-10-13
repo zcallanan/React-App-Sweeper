@@ -1,32 +1,33 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { TransitionGroup, CSSTransition } from 'react-transition-group';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faFlag, faQuestionCircle, faBomb, faFireAlt } from '@fortawesome/free-solid-svg-icons'
 import { faFlag as farFlag, faQuestionCircle as farQuestionCircle } from '@fortawesome/free-regular-svg-icons'
 
-class Square extends React.Component {
-  static propTypes = {
-    squareData: PropTypes.shape({
-      adjacentBombCount: PropTypes.number.isRequired,
-      bomb: PropTypes.bool.isRequired,
-      clicked: PropTypes.bool.isRequired,
-      hint: PropTypes.bool.isRequired,
-      flagged: PropTypes.bool.isRequired,
-      questionMarked: PropTypes.bool.isRequired
-    }),
-    onSquareClick: PropTypes.func.isRequired,
-    modes: PropTypes.object.isRequired,
-    squareKey: PropTypes.string.isRequired
-  }
+interface Props {
+  animations: animationsType,
+  gameState: gameStateType,
+  modes: modesType,
+  squareData: squaresType,
+  squareKey: string,
+  explode: (squareKey: string) => void,
+  onSquareClick: (squareKey: string) => void,
+  toggleScroll: (bool: boolean, anim: string) => void,
+  explosion: explosionType
+}
+
+interface State {
+}
+
+class Square extends React.Component<Props, State> {
 
   cssTransition = () => {
-    const gameState = this.props.gameState;
-    const bombFade = this.props.animations.bombFade;
-    const squareData = this.props.squareData;
-    const squareKey = this.props.squareKey;
-    const explodeTrigger = squareData.explosion.explodeTrigger;
-    const fire = squareData.explosion.explodeFire;
+    const gameState: gameStateType = this.props.gameState;
+    const bombFade: boolean = this.props.animations.bombFade;
+    const squareKey: string = this.props.squareKey;
+    const explosion: explosionType = this.props.explosion;
+    const explodeTrigger: boolean = explosion.explodeTrigger;
+    const fire: boolean = explosion.explodeFire;
     if (explodeTrigger && !fire) {
       return (
         <CSSTransition classNames="bomba" key={squareKey} in={explodeTrigger} appear={explodeTrigger} onEnter={() => this.props.explode(squareKey)} timeout={{enter: 1000, exit: 1000}} >
