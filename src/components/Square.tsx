@@ -12,7 +12,8 @@ interface Props {
   squareKey: string,
   explode: (squareKey: string) => void,
   onSquareClick: (squareKey: string) => void,
-  toggleScroll: (bool: boolean, anim: string) => void
+  toggleScroll: (bool: boolean, anim: string) => void,
+  explosion: explosionType
 }
 
 interface State {
@@ -23,10 +24,10 @@ class Square extends React.Component<Props, State> {
   cssTransition = () => {
     const gameState: gameStateType = this.props.gameState;
     const bombFade: boolean = this.props.animations.bombFade;
-    const squareData: squaresType = this.props.squareData;
     const squareKey: string = this.props.squareKey;
-    const explodeTrigger: boolean = squareData.explosion.explodeTrigger;
-    const fire: boolean = squareData.explosion.explodeFire;
+    const explosion: explosionType = this.props.explosion;
+    const explodeTrigger: boolean = explosion.explodeTrigger;
+    const fire: boolean = explosion.explodeFire;
     if (explodeTrigger && !fire) {
       return (
         <CSSTransition classNames="bomba" key={squareKey} in={explodeTrigger} appear={explodeTrigger} onEnter={() => this.props.explode(squareKey)} timeout={{enter: 1000, exit: 1000}} >

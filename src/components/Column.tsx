@@ -19,17 +19,20 @@ interface State {
 class Column extends React.Component<Props, State> {
   render() {
     const column: Array<JSX.Element> = [];
+    let squareKey = "";
     for (let i = 0; i < this.props.size; i++) {
+      squareKey = `r${i}-${this.props.columnKey}`;
       column.push(<Square
-        key={`r${i}-${this.props.columnKey}`}
-        squareKey={`r${i}-${this.props.columnKey}`}
+        key={squareKey}
+        squareKey={squareKey}
         modes={this.props.modes}
         animations={this.props.animations}
-        squareData={this.props.squares[`r${i}-${this.props.columnKey}`]}
+        squareData={this.props.squares[squareKey]}
         onSquareClick={this.props.onSquareClick}
         toggleScroll={this.props.toggleScroll}
         explode={this.props.explode}
         gameState={this.props.gameState}
+        explosion={this.props.squares[squareKey].explosion}
       />)
     }
 

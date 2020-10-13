@@ -4,6 +4,13 @@ declare namespace JSX {
   }
 }
 
+type explosionType = {
+  explodeTrigger: boolean,
+  explodeTimer: boolean,
+  explodeCleanup: boolean,
+  explodeFire: boolean
+}
+
 type optionObj = {
   size: string,
   difficulty: string,
@@ -70,11 +77,6 @@ type squaresType = {
     hint: boolean,
     neighbors: Array<string>,
     adjacentBombCount: number,
-    explosion: {
-      explodeTrigger: boolean,
-      explodeTimer: boolean,
-      explodeCleanup: boolean,
-      explodeFire: boolean
-    }
+    explosion: explosionType
   }
 }
