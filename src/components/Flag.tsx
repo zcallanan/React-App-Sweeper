@@ -1,14 +1,19 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faFlag } from '@fortawesome/free-solid-svg-icons'
 import { faFlag as farFlag } from '@fortawesome/free-regular-svg-icons'
 
-class Flag extends React.Component {
-  static propTypes = {
-    onModeClick: PropTypes.func.isRequired,
-    modes: PropTypes.object.isRequired
-  }
+interface Props {
+  modes: modesType,
+  gameState: gameStateType,
+  onModeClick(e: React.FormEvent<HTMLInputElement>): void
+}
+
+interface State {
+
+}
+
+class Flag extends React.Component<Props, State> {
 
   renderFlagIcons = () => {
     const attribute = {};
@@ -34,7 +39,7 @@ class Flag extends React.Component {
 
   render() {
     return (
-      <form name="flagMode" onSubmit={this.props.onModeClick}>
+      <form name="flagMode" onSubmit={() => this.props.onModeClick}>
         {this.renderFlagIcons()}
       </form>
     )

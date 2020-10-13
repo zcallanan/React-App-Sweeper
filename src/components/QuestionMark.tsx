@@ -1,15 +1,18 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faQuestionCircle } from '@fortawesome/free-solid-svg-icons'
 import { faQuestionCircle as farQuestionCircle } from '@fortawesome/free-regular-svg-icons'
 
-class QuestionMark extends React.Component {
-  static propTypes = {
-    onModeClick: PropTypes.func.isRequired,
-    modes: PropTypes.object.isRequired
-  }
+interface Props {
+  modes: modesType,
+  gameState: gameStateType,
+  onModeClick(e: React.FormEvent<HTMLInputElement>): void
+}
 
+interface State {
+}
+
+class QuestionMark extends React.Component<Props, State> {
   renderQuestionIcons = () => {
     const attribute = {};
     // If a bomb is exploding or you have won/lost, disable the button
@@ -35,7 +38,7 @@ class QuestionMark extends React.Component {
   render() {
     return (
       <div>
-        <form name="questionMode" onSubmit={this.props.onModeClick}>
+        <form name="questionMode" onSubmit={() => this.props.onModeClick}>
           {this.renderQuestionIcons()}
         </form>
       </div>

@@ -1,6 +1,7 @@
 {
   "name": "sweeper",
   "version": "0.1.0",
+  "typings": "main.d.ts",
   "private": true,
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^1.2.30",
@@ -18,7 +19,8 @@
     "react-dom": "^16.13.1",
     "react-scripts": "3.4.3",
     "react-transition-group": "^4.4.1",
-    "stylus": "^0.54.8"
+    "stylus": "^0.54.8",
+    "typescript": "^4.0.3"
   },
   "scripts": {
     "start": "react-scripts start",
