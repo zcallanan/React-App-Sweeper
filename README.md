@@ -1,4 +1,4 @@
-My take on the classic Minesweeper, built in React. 
+My take on the classic Minesweeper, built in TypeScript and React. 
 
 ![sweeper](https://github.com/zcallanan/sweeper/raw/master/public/sweeper.png)
 
