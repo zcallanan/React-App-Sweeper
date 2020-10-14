@@ -6,7 +6,7 @@ import { faFlag as farFlag } from '@fortawesome/free-regular-svg-icons'
 interface Props {
   modes: modesType,
   gameState: gameStateType,
-  onModeClick(e: React.FormEvent<HTMLInputElement>): void
+  onModeClick(e: React.FormEvent<HTMLFormElement>): void
 }
 
 interface State {
@@ -14,9 +14,8 @@ interface State {
 }
 
 class Flag extends React.Component<Props, State> {
-
-  renderFlagIcons = () => {
-    const attribute = {};
+  protected renderFlagIcons = (): JSX.Element => {
+    const attribute: object = {};
     // If a bomb is exploding or you have won/lost, disable the button
     if (this.props.modes.bombMode || this.props.gameState.progress !== 0) {
       attribute["disabled"] = "disabled";
@@ -39,7 +38,7 @@ class Flag extends React.Component<Props, State> {
 
   render() {
     return (
-      <form name="flagMode" onSubmit={() => this.props.onModeClick}>
+      <form name="flagMode" onSubmit={this.props.onModeClick}>
         {this.renderFlagIcons()}
       </form>
     )

@@ -19,7 +19,7 @@ interface State {
 class Column extends React.Component<Props, State> {
   render() {
     const column: Array<JSX.Element> = [];
-    let squareKey = "";
+    let squareKey: string = "";
     for (let i = 0; i < this.props.size; i++) {
       squareKey = `r${i}-${this.props.columnKey}`;
       column.push(<Square

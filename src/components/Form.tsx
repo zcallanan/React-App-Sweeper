@@ -49,7 +49,7 @@ class Form extends React.Component<Props, State> {
   }
 
   // Field Validation
-  handleValidation = () => {
+  protected handleValidation = (): boolean => {
     // Copy local state objects
     const options: optionObj = { ...this.state.options };
     const errors: errorType = { ...this.state.errors };
@@ -104,7 +104,7 @@ class Form extends React.Component<Props, State> {
     return formIsValid;
   }
 
-  handleSubmit = e => {
+  protected handleSubmit = (e: React.FormEvent<HTMLFormElement>): void => {
     // 1. Intercept click
     e.preventDefault();
     // 2. Validate fields
@@ -133,16 +133,25 @@ class Form extends React.Component<Props, State> {
     }
   }
 
-  handleChange = e => {
+  protected handleChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
     // 1. Copy local field state
     const options = this.state.options;
     // 2. Get the changed value from the input
-    options[e.target.name] = e.target.value;
+    options[(e.target as HTMLInputElement).name] = (e.target as HTMLInputElement).value;
     // 3. Save fields to local state
     this.setState({ options });
   }
 
-  submitButtonText = () => {
+  protected handleChangeSelect = (e: React.ChangeEvent<HTMLSelectElement>): void  => {
+    // 1. Copy local field state
+    const options = this.state.options;
+    // 2. Get the changed value from the input
+    options[(e.target as HTMLSelectElement).name] = (e.target as HTMLSelectElement).value;
+    // 3. Save fields to local state
+    this.setState({ options });
+  }
+
+  protected submitButtonText = (): string => {
     const gameState = this.props.gameState;
     // If the player won or lost, ask if they want to Play Another Game. If from customize settings, display Play Sweeper
     return gameState.progress !== 0 ? "Play Again?" : "Play Sweeper";
@@ -172,7 +181,7 @@ class Form extends React.Component<Props, State> {
               <label htmlFor="difficulty"><strong>Percentage of bombs:</strong></label>
               <select
                 value={this.state.options.difficulty}
-                onChange={this.handleChange}
+                onChange={this.handleChangeSelect}
                 name="difficulty"
                 key="difficulty"
                 id="difficulty"
@@ -185,7 +194,7 @@ class Form extends React.Component<Props, State> {
               <label htmlFor="lives"><strong>Number of Lives:</strong></label>
               <select
                 value={this.state.options.lives}
-                onChange={this.handleChange}
+                onChange={this.handleChangeSelect}
                 name="lives"
                 key="lives"
                 id="lives"
