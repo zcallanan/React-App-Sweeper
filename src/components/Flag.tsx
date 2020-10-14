@@ -14,9 +14,8 @@ interface State {
 }
 
 class Flag extends React.Component<Props, State> {
-
-  renderFlagIcons = () => {
-    const attribute = {};
+  protected renderFlagIcons = (): JSX.Element => {
+    const attribute: object = {};
     // If a bomb is exploding or you have won/lost, disable the button
     if (this.props.modes.bombMode || this.props.gameState.progress !== 0) {
       attribute["disabled"] = "disabled";

@@ -15,7 +15,7 @@ type noticeT = {
 
 class Notice extends React.Component<Props, State> {
 
-  handleNotice = () => {
+  protected handleNotice = (): JSX.Element => {
     const { bombNotice, victoryNotice, defeatNotice} = this.props.notices;
     let notice: noticeT = {
       key: null,

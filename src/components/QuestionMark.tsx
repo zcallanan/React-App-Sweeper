@@ -13,7 +13,7 @@ interface State {
 }
 
 class QuestionMark extends React.Component<Props, State> {
-  renderQuestionIcons = () => {
+  protected renderQuestionIcons = (): JSX.Element => {
     const attribute = {};
     // If a bomb is exploding or you have won/lost, disable the button
       if (this.props.modes.bombMode || this.props.gameState.progress !== 0) {

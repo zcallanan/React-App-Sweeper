@@ -273,7 +273,7 @@ class App extends React.Component<Props, State> {
   }
 
   // Prop function for stats to pass to global state
-  protected revealTarget = (totalToReveal: number) => {
+  protected revealTarget = (totalToReveal: number): void => {
     const stats: statsType = {...this.state.stats};
     if ((totalToReveal > 0 && stats.totalToReveal <= 0) || totalToReveal !== stats.totalToReveal) {
       stats.totalToReveal = totalToReveal;
@@ -282,7 +282,7 @@ class App extends React.Component<Props, State> {
   }
 
   // Prop to toggle state when mode buttons are clicked (flag, question mark)
-  protected onModeClick = (e: React.FormEvent<HTMLFormElement>) => {
+  protected onModeClick = (e: React.FormEvent<HTMLFormElement>): void => {
     e.preventDefault();
     console.log('what?')
     // 1. Get state of flag
@@ -508,7 +508,7 @@ class App extends React.Component<Props, State> {
   }
 
   // Called by this.onSquareClick() to determine whether a square's neighbors are bombs or have adjacent bombs
-  protected checkNeighbors = (squareKey, squares, stats) => {
+  protected checkNeighbors = (squareKey, squares, stats): statsType => {
     let neighbors: Array<string>;
     if ((squares[squareKey].neighbors === 'undefined' || squares[squareKey].neighbors.length === 0) || squares[squareKey].adjacentBombCount === -1 ) {
       // If squareKey has no neighbors or its adjacent bombs have not been counted, then call countAdjacentBombs
@@ -535,7 +535,7 @@ class App extends React.Component<Props, State> {
   }
 
   // Called by this.checkNeighbors() to determine who is a neighbor of a square and tally that square's adjacent bomb count
-  countAdjacentBombs = squareKey => {
+  protected countAdjacentBombs = (squareKey: string): Array<string> => {
     const size = this.state.gameState.options.size;
     const row = parseInt(squareKey.split("-")[0].match(/\d{1,3}/)[0]);
     const column = parseInt(squareKey.split("-")[1].match(/(\d{1,3})/)[0]);
@@ -598,7 +598,7 @@ class App extends React.Component<Props, State> {
     return;
   }
 
-  protected modalClose = () => {
+  protected modalClose = (): boolean => {
     const modal: modalType = {...this.state.modal};
     if (modal.isVisible) {
       modal.isVisible = false
@@ -608,7 +608,7 @@ class App extends React.Component<Props, State> {
     return;
   }
 
-  protected modalGameStateMessage = () => {
+  protected modalGameStateMessage = (): string => {
     const gameState: gameStateType = {...this.state.gameState};
     if (gameState.progress === 1) {
       // Win message
@@ -620,7 +620,7 @@ class App extends React.Component<Props, State> {
     return "Customize Settings";
   }
 
-  protected modalSettingsButtonText = () => {
+  protected modalSettingsButtonText = (): string => {
     const gameState: gameStateType = {...this.state.gameState};
     const modal: modalType = {...this.state.modal}
     if (gameState.progress !== 0 && modal.modalCleanup) {
@@ -630,7 +630,7 @@ class App extends React.Component<Props, State> {
 
   }
 
-  protected renderModal = () => {
+  protected renderModal = (): JSX.Element => {
     const modal: modalType = {...this.state.modal};
     if (modal.isVisible) {
       return (
