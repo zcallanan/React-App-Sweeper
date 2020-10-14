@@ -132,7 +132,7 @@ class App extends React.Component<Props, State> {
   }
 
   // Save Player's game board options
-  saveOptions = (obj: optionObj) => {
+  protected saveOptions = (obj: optionObj): void => {
     // 1. Copy state
     const gameState: gameStateType = this.state.gameState;
     const stats: statsType = this.state.stats;
@@ -163,7 +163,7 @@ class App extends React.Component<Props, State> {
   }
 
   // Generate initial squares state
-  initSquares = (size: number) => {
+  protected initSquares = (size: number): void => {
     // 1. Copy state
     let squares: squaresType = {...this.state.squares};
     // Cleanup a previous game
@@ -224,7 +224,7 @@ class App extends React.Component<Props, State> {
   }
 
   // Use user input to call bomb position fn and save positions to state
-  setBombs = () => {
+  protected setBombs = (): void => {
     let percentage: number;
     let positionArray: Array<string> = []
     // Copy game board dimension
@@ -248,7 +248,7 @@ class App extends React.Component<Props, State> {
   }
 
   // Called by this.setBombs(), recursive function that determines whether a square has a bomb
-  generatePositions = (positionArray, squares, bombCount, optionSize, count) => {
+  protected generatePositions = (positionArray: Array<string>, squares: squaresType, bombCount: number, optionSize: number, count: number): squaresType => {
     if (count > bombCount - 1) {
       // stop recursive call
       return squares;
@@ -266,14 +266,14 @@ class App extends React.Component<Props, State> {
   /* Props */
 
   // Prop for squares to update squareScroll state
-  toggleScroll = (bool, anim) => {
+  protected toggleScroll = (bool: boolean, anim: string): void => {
     const animations: animationsType = {...this.state.animations};
     animations[anim] = bool;
     this.setState({animations});
   }
 
   // Prop function for stats to pass to global state
-  revealTarget = totalToReveal => {
+  protected revealTarget = (totalToReveal: number) => {
     const stats: statsType = {...this.state.stats};
     if ((totalToReveal > 0 && stats.totalToReveal <= 0) || totalToReveal !== stats.totalToReveal) {
       stats.totalToReveal = totalToReveal;
@@ -282,16 +282,17 @@ class App extends React.Component<Props, State> {
   }
 
   // Prop to toggle state when mode buttons are clicked (flag, question mark)
-  onModeClick = e => {
+  protected onModeClick = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    console.log('what?')
     // 1. Get state of flag
     const modes: modesType = {...this.state.modes};
     // 2. Change flag setting
-    modes[e.target.name] = !modes[e.target.name];
+    modes[(e.target as HTMLFormElement).name] = !modes[(e.target as HTMLFormElement).name];
     // 3. If mode X toggles to true, then make sure mode Y is false
-    if ("flagMode" === e.target.name && modes[e.target.name]) {
+    if ("flagMode" === (e.target as HTMLFormElement).name && modes[(e.target as HTMLFormElement).name]) {
       modes.questionMode = false;
-    } else if ("questionMode" === e.target.name && modes[e.target.name]){
+    } else if ("questionMode" === (e.target as HTMLFormElement).name && modes[(e.target as HTMLFormElement).name]){
       modes.flagMode = false;
     }
     // 4. Save change
@@ -299,7 +300,7 @@ class App extends React.Component<Props, State> {
   }
 
   // Prop for Square component when clicking on a bomb square
-  explode = squareKey => {
+  protected explode = (squareKey: string): void => {
     let squares: squaresType = {...this.state.squares};
     if (!squares[squareKey].explosion.explodeCleanup) {
       // Prevent further animations if it's time to cleanup
@@ -329,7 +330,7 @@ class App extends React.Component<Props, State> {
   }
 
   // Cleanup bombMode, resetting bomb square, reset bombNotice, and remove disabled from clickable squares
-  explodeCleanup = squareKey => {
+  protected explodeCleanup = (squareKey: string): void => {
     const squares: squaresType = {...this.state.squares};
     const gameState: gameStateType = {...this.state.gameState};
     squares[squareKey].explosion.explodeTrigger = false;
@@ -376,7 +377,7 @@ class App extends React.Component<Props, State> {
   }
 
   // Prop for Square component when clicking on a square
-  onSquareClick = squareKey => {
+  protected onSquareClick = (squareKey: string): void => {
     // 1. Copy state
     const squares: squaresType = { ...this.state.squares };
     let stats: statsType = { ...this.state.stats };
@@ -507,7 +508,7 @@ class App extends React.Component<Props, State> {
   }
 
   // Called by this.onSquareClick() to determine whether a square's neighbors are bombs or have adjacent bombs
-  checkNeighbors = (squareKey, squares, stats) => {
+  protected checkNeighbors = (squareKey, squares, stats) => {
     let neighbors: Array<string>;
     if ((squares[squareKey].neighbors === 'undefined' || squares[squareKey].neighbors.length === 0) || squares[squareKey].adjacentBombCount === -1 ) {
       // If squareKey has no neighbors or its adjacent bombs have not been counted, then call countAdjacentBombs
@@ -587,7 +588,7 @@ class App extends React.Component<Props, State> {
 
   /* Modal fn's */
 
-  modalShow = () => {
+  protected modalShow = () => {
     const modal: modalType = {...this.state.modal};
     if (!modal.isVisible) {
       modal.isVisible = true
@@ -597,7 +598,7 @@ class App extends React.Component<Props, State> {
     return;
   }
 
-  modalClose = () => {
+  protected modalClose = () => {
     const modal: modalType = {...this.state.modal};
     if (modal.isVisible) {
       modal.isVisible = false
@@ -607,7 +608,7 @@ class App extends React.Component<Props, State> {
     return;
   }
 
-  modalGameStateMessage = () => {
+  protected modalGameStateMessage = () => {
     const gameState: gameStateType = {...this.state.gameState};
     if (gameState.progress === 1) {
       // Win message
@@ -619,7 +620,7 @@ class App extends React.Component<Props, State> {
     return "Customize Settings";
   }
 
-  modalSettingsButtonText = () => {
+  protected modalSettingsButtonText = () => {
     const gameState: gameStateType = {...this.state.gameState};
     const modal: modalType = {...this.state.modal}
     if (gameState.progress !== 0 && modal.modalCleanup) {
@@ -629,7 +630,7 @@ class App extends React.Component<Props, State> {
 
   }
 
-  renderModal = () => {
+  protected renderModal = () => {
     const modal: modalType = {...this.state.modal};
     if (modal.isVisible) {
       return (

@@ -21,7 +21,7 @@ interface State {
 
 class Square extends React.Component<Props, State> {
 
-  cssTransition = () => {
+  protected cssTransition = (): JSX.Element => {
     const gameState: gameStateType = this.props.gameState;
     const bombFade: boolean = this.props.animations.bombFade;
     const squareKey: string = this.props.squareKey;
@@ -50,7 +50,7 @@ class Square extends React.Component<Props, State> {
     }
   }
 
-  renderIcons = () => {
+  protected renderIcons = (): JSX.Element => {
     const squareData = this.props.squareData;
     const gameState = this.props.gameState;
     const bomb = squareData.bomb;
@@ -88,7 +88,7 @@ class Square extends React.Component<Props, State> {
 
   }
 
-  disableButtons = attribute => {
+  protected disableButtons = (attribute: object): object => {
     const modes = this.props.modes;
     if (modes.bombMode || modes.drawing) {
       attribute["disabled"] = "disabled";
@@ -96,7 +96,7 @@ class Square extends React.Component<Props, State> {
     return attribute;
   }
 
-  insertElement = element => {
+  protected insertElement = (element: boolean): JSX.Element => {
     if (element) {
       const adjacentBombCount = this.props.squareData.adjacentBombCount;
       return (
@@ -105,7 +105,7 @@ class Square extends React.Component<Props, State> {
     }
   }
 
-  buttonMarkup = (className, attribute, element) => {
+  protected buttonMarkup = (className: string, attribute: object, element: boolean): JSX.Element => {
     const squareKey = this.props.squareKey;
 
     return (
@@ -119,7 +119,7 @@ class Square extends React.Component<Props, State> {
   }
 
   // Handles button modes
-  generateButton = () => {
+  protected generateButton = (): JSX.Element => {
     const squareData = this.props.squareData;
     const modes = this.props.modes;
     const clicked = squareData.clicked;

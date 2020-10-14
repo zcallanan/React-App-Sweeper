@@ -63,7 +63,7 @@ class Stats extends React.Component<Props, State> {
     this.props.revealTarget(localStats.totalToReveal);
   }
 
-  renderLives = () => {
+  protected renderLives = (): JSX.Element => {
     const stats = this.props.stats;
     const currentLives = stats.currentLives;
     let life = "Lives:";
@@ -87,7 +87,7 @@ class Stats extends React.Component<Props, State> {
     }
   }
 
-  renderBombCount = () => {
+  protected renderBombCount = (): JSX.Element => {
     const stats: statsType = this.props.stats;
     const bombs = stats.bombs;
     if (bombs >= 0) {
@@ -106,7 +106,7 @@ class Stats extends React.Component<Props, State> {
     }
   }
 
-  renderRevealed = () => {
+  protected renderRevealed = (): JSX.Element => {
     const stats: statsType = this.props.stats;
     const revealed = stats.revealed;
     const localStats = {...this.state.localStats}
@@ -136,7 +136,7 @@ class Stats extends React.Component<Props, State> {
     }
   }
 
-  renderFlagCount = () => {
+  protected renderFlagCount = (): JSX.Element => {
     const stats: statsType = this.props.stats;
     const flags = stats.flags;
     let flagText = "Bombs Flagged:";
@@ -159,7 +159,7 @@ class Stats extends React.Component<Props, State> {
     }
   }
 
-  renderQuestionsCount = () => {
+  protected renderQuestionsCount = (): JSX.Element => {
     const stats: statsType = this.props.stats;
     const questions = stats.questions;
     if (questions >= 0) {

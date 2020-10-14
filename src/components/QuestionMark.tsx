@@ -6,7 +6,7 @@ import { faQuestionCircle as farQuestionCircle } from '@fortawesome/free-regular
 interface Props {
   modes: modesType,
   gameState: gameStateType,
-  onModeClick(e: React.FormEvent<HTMLInputElement>): void
+  onModeClick(e: React.FormEvent<HTMLFormElement>): void
 }
 
 interface State {
@@ -38,7 +38,7 @@ class QuestionMark extends React.Component<Props, State> {
   render() {
     return (
       <div>
-        <form name="questionMode" onSubmit={() => this.props.onModeClick}>
+        <form name="questionMode" onSubmit={this.props.onModeClick}>
           {this.renderQuestionIcons()}
         </form>
       </div>
