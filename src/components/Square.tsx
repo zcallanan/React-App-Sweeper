@@ -13,28 +13,72 @@ interface Props {
   explode: (squareKey: string) => void,
   onSquareClick: (squareKey: string) => void,
   toggleScroll: (bool: boolean, anim: string) => void,
-  explosion: explosionType
+  explosion: explosionType,
 }
 
 interface State {
+  localAnimState: localAnimType
+}
+
+type localAnimType = {
+  bombAnimIsPlaying: boolean,
+  fireAnimIsPlaying: boolean
 }
 
 class Square extends React.Component<Props, State> {
+  constructor(props: any) {
+    super(props);
+    this.state = {
+      localAnimState: {
+        bombAnimIsPlaying: false,
+        fireAnimIsPlaying: false
+      }
+    }
+  }
+
+  componentDidUpdate() {
+    const modes: modesType = this.props.modes;
+    const explosion: explosionType = this.props.explosion;
+    const explodeTrigger: boolean = explosion.explodeTrigger;
+    const fire: boolean = explosion.explodeFire;
+    const localAnimState: localAnimType = {...this.state.localAnimState};
+    // Reset square if it's a new game
+    if (modes.newGame && localAnimState.fireAnimIsPlaying) {
+      localAnimState.fireAnimIsPlaying = false;
+      this.setState({localAnimState});
+    } else if (modes.newGame && localAnimState.bombAnimIsPlaying) {
+      localAnimState.bombAnimIsPlaying = false;
+      this.setState({localAnimState});
+    }
+    // Prevent animation renders if an animation is already playing
+    if (explodeTrigger && !fire && !localAnimState.bombAnimIsPlaying) {
+      localAnimState.bombAnimIsPlaying = true;
+      localAnimState.fireAnimIsPlaying = false;
+      this.setState({localAnimState});
+    } else if (!explodeTrigger && fire && !localAnimState.fireAnimIsPlaying) {
+      localAnimState.bombAnimIsPlaying = false;
+      localAnimState.fireAnimIsPlaying = true;
+      this.setState({localAnimState});
+    }
+  }
 
   protected cssTransition = (): JSX.Element => {
     const gameState: gameStateType = this.props.gameState;
+    const localAnimState: localAnimType = {...this.state.localAnimState};
     const bombFade: boolean = this.props.animations.bombFade;
     const squareKey: string = this.props.squareKey;
     const explosion: explosionType = this.props.explosion;
     const explodeTrigger: boolean = explosion.explodeTrigger;
     const fire: boolean = explosion.explodeFire;
-    if (explodeTrigger && !fire) {
+    if (explodeTrigger && !fire && !localAnimState.bombAnimIsPlaying) {
+      console.log('bomb explode')
       return (
         <CSSTransition classNames="bomba" key={squareKey} in={explodeTrigger} appear={explodeTrigger} onEnter={() => this.props.explode(squareKey)} timeout={{enter: 1000, exit: 1000}} >
           <FontAwesomeIcon key={squareKey} icon={ faBomb } />
         </CSSTransition>
       )
-    } else if (!explodeTrigger && fire) {
+    } else if (!explodeTrigger && fire && !localAnimState.fireAnimIsPlaying) {
+      console.log('fire explode', squareKey)
       return (
         <CSSTransition className="fire-enter" classNames="fire" mountOnEnter key={squareKey} in={fire} appear={fire} timeout={{enter: 10000, exit: 20000}} >
           <FontAwesomeIcon key={squareKey} icon={ faFireAlt } />
@@ -51,7 +95,7 @@ class Square extends React.Component<Props, State> {
   }
 
   protected renderIcons = (): JSX.Element => {
-    const squareData = this.props.squareData;
+    const squareData: squaresType  = this.props.squareData;
     const gameState = this.props.gameState;
     const bomb = squareData.bomb;
     const clicked = squareData.clicked;
