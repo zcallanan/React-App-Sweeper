@@ -10,7 +10,7 @@ interface Props {
   size: number,
   explode: (squareKey: string) => void,
   onSquareClick: (squareKey: string) => void,
-  toggleScroll: (bool: boolean, anim: string) => void
+  toggleScroll: (bool: boolean, anim: string) => void,
 }
 
 interface State {

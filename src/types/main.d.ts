@@ -69,14 +69,16 @@ type modesType = {
 }
 
 type squaresType = {
-  [key: string]: {
-    bomb: boolean
-    flagged: boolean,
-    questionMarked: boolean,
-    clicked: boolean,
-    hint: boolean,
-    neighbors: Array<string>,
-    adjacentBombCount: number,
-    explosion: explosionType
-  }
+  [key: string]: squareDataType
+}
+
+type squareDataType = {
+  bomb: boolean
+  flagged: boolean,
+  questionMarked: boolean,
+  clicked: boolean,
+  hint: boolean,
+  neighbors: Array<string>,
+  adjacentBombCount: number,
+  explosion: explosionType
 }

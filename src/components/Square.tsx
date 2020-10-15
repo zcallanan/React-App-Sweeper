@@ -8,33 +8,77 @@ interface Props {
   animations: animationsType,
   gameState: gameStateType,
   modes: modesType,
-  squareData: squaresType,
+  squareData: squareDataType,
   squareKey: string,
   explode: (squareKey: string) => void,
   onSquareClick: (squareKey: string) => void,
   toggleScroll: (bool: boolean, anim: string) => void,
-  explosion: explosionType
+  explosion: explosionType,
 }
 
 interface State {
+  localAnimState: localAnimType
+}
+
+type localAnimType = {
+  bombAnimIsPlaying: boolean,
+  fireAnimIsPlaying: boolean
 }
 
 class Square extends React.Component<Props, State> {
+  constructor(props: any) {
+    super(props);
+    this.state = {
+      localAnimState: {
+        bombAnimIsPlaying: false,
+        fireAnimIsPlaying: false
+      }
+    }
+  }
+
+  componentDidUpdate() {
+    const modes: modesType = this.props.modes;
+    const explosion: explosionType = this.props.explosion;
+    const explodeTrigger: boolean = explosion.explodeTrigger;
+    const fire: boolean = explosion.explodeFire;
+    const localAnimState: localAnimType = {...this.state.localAnimState};
+    // Reset square if it's a new game
+    if (modes.newGame && localAnimState.fireAnimIsPlaying) {
+      localAnimState.fireAnimIsPlaying = false;
+      this.setState({localAnimState});
+    } else if (modes.newGame && localAnimState.bombAnimIsPlaying) {
+      localAnimState.bombAnimIsPlaying = false;
+      this.setState({localAnimState});
+    }
+    // Prevent animation renders if an animation is already playing
+    if (explodeTrigger && !fire && !localAnimState.bombAnimIsPlaying) {
+      localAnimState.bombAnimIsPlaying = true;
+      localAnimState.fireAnimIsPlaying = false;
+      this.setState({localAnimState});
+    } else if (!explodeTrigger && fire && !localAnimState.fireAnimIsPlaying) {
+      localAnimState.bombAnimIsPlaying = false;
+      localAnimState.fireAnimIsPlaying = true;
+      this.setState({localAnimState});
+    }
+  }
 
   protected cssTransition = (): JSX.Element => {
     const gameState: gameStateType = this.props.gameState;
+    const localAnimState: localAnimType = {...this.state.localAnimState};
     const bombFade: boolean = this.props.animations.bombFade;
     const squareKey: string = this.props.squareKey;
     const explosion: explosionType = this.props.explosion;
     const explodeTrigger: boolean = explosion.explodeTrigger;
     const fire: boolean = explosion.explodeFire;
-    if (explodeTrigger && !fire) {
+    if (explodeTrigger && !fire && !localAnimState.bombAnimIsPlaying) {
+      console.log('bomb explode')
       return (
         <CSSTransition classNames="bomba" key={squareKey} in={explodeTrigger} appear={explodeTrigger} onEnter={() => this.props.explode(squareKey)} timeout={{enter: 1000, exit: 1000}} >
           <FontAwesomeIcon key={squareKey} icon={ faBomb } />
         </CSSTransition>
       )
-    } else if (!explodeTrigger && fire) {
+    } else if (!explodeTrigger && fire && !localAnimState.fireAnimIsPlaying) {
+      console.log('fire explode', squareKey)
       return (
         <CSSTransition className="fire-enter" classNames="fire" mountOnEnter key={squareKey} in={fire} appear={fire} timeout={{enter: 10000, exit: 20000}} >
           <FontAwesomeIcon key={squareKey} icon={ faFireAlt } />
@@ -51,12 +95,12 @@ class Square extends React.Component<Props, State> {
   }
 
   protected renderIcons = (): JSX.Element => {
-    const squareData = this.props.squareData;
-    const gameState = this.props.gameState;
-    const bomb = squareData.bomb;
-    const clicked = squareData.clicked;
-    const flaggedBool = squareData.flagged;
-    const questionmarkBool = squareData.questionMarked
+    const squareData: squareDataType  = this.props.squareData;
+    const gameState: gameStateType = this.props.gameState;
+    const bomb: boolean = squareData.bomb;
+    const clicked: boolean = squareData.clicked;
+    const flaggedBool: boolean = squareData.flagged;
+    const questionmarkBool: boolean = squareData.questionMarked
     if (bomb && clicked) {
       // If it's a bomb and clicked, show the bomb
       return (
@@ -89,7 +133,7 @@ class Square extends React.Component<Props, State> {
   }
 
   protected disableButtons = (attribute: object): object => {
-    const modes = this.props.modes;
+    const modes: modesType = this.props.modes;
     if (modes.bombMode || modes.drawing) {
       attribute["disabled"] = "disabled";
     }
@@ -98,7 +142,7 @@ class Square extends React.Component<Props, State> {
 
   protected insertElement = (element: boolean): JSX.Element => {
     if (element) {
-      const adjacentBombCount = this.props.squareData.adjacentBombCount;
+      const adjacentBombCount: number = this.props.squareData.adjacentBombCount;
       return (
         <p className={`bomb-count neighbors-${adjacentBombCount}`}>{adjacentBombCount}</p>
       )
@@ -106,7 +150,7 @@ class Square extends React.Component<Props, State> {
   }
 
   protected buttonMarkup = (className: string, attribute: object, element: boolean): JSX.Element => {
-    const squareKey = this.props.squareKey;
+    const squareKey: string = this.props.squareKey;
 
     return (
       <button className={className} {...attribute} onClick={() => { this.props.onSquareClick(squareKey)}}>
@@ -120,16 +164,16 @@ class Square extends React.Component<Props, State> {
 
   // Handles button modes
   protected generateButton = (): JSX.Element => {
-    const squareData = this.props.squareData;
-    const modes = this.props.modes;
-    const clicked = squareData.clicked;
-    const hint = squareData.hint;
-    const flaggedBool = squareData.flagged;
-    const questionmarkBool = squareData.questionMarked;
-    const drawingBool = modes.drawing;
-    let className;
-    let attribute = {};
-    let element = false;
+    const squareData: squareDataType = this.props.squareData;
+    const modes: modesType = this.props.modes;
+    const clicked: boolean = squareData.clicked;
+    const hint: boolean = squareData.hint;
+    const flaggedBool: boolean = squareData.flagged;
+    const questionmarkBool: boolean = squareData.questionMarked;
+    const drawingBool: boolean = modes.drawing;
+    let className: string = "";
+    let attribute: object = {};
+    let element: boolean = false;
 
     if (clicked) {
       // Disable the button if it's been clicked
