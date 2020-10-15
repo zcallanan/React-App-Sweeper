@@ -284,7 +284,6 @@ class App extends React.Component<Props, State> {
   // Prop to toggle state when mode buttons are clicked (flag, question mark)
   protected onModeClick = (e: React.FormEvent<HTMLFormElement>): void => {
     e.preventDefault();
-    console.log('what?')
     // 1. Get state of flag
     const modes: modesType = {...this.state.modes};
     // 2. Change flag setting
