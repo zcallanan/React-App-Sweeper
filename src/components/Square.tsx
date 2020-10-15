@@ -71,14 +71,12 @@ class Square extends React.Component<Props, State> {
     const explodeTrigger: boolean = explosion.explodeTrigger;
     const fire: boolean = explosion.explodeFire;
     if (explodeTrigger && !fire && !localAnimState.bombAnimIsPlaying) {
-      console.log('bomb explode')
       return (
         <CSSTransition classNames="bomba" key={squareKey} in={explodeTrigger} appear={explodeTrigger} onEnter={() => this.props.explode(squareKey)} timeout={{enter: 1000, exit: 1000}} >
           <FontAwesomeIcon key={squareKey} icon={ faBomb } />
         </CSSTransition>
       )
     } else if (!explodeTrigger && fire && !localAnimState.fireAnimIsPlaying) {
-      console.log('fire explode', squareKey)
       return (
         <CSSTransition className="fire-enter" classNames="fire" mountOnEnter key={squareKey} in={fire} appear={fire} timeout={{enter: 10000, exit: 20000}} >
           <FontAwesomeIcon key={squareKey} icon={ faFireAlt } />

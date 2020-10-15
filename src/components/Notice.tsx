@@ -38,7 +38,7 @@ class Notice extends React.Component<Props, State> {
         message: "You ran out of lives!"
       }
     }
-    if (notice.key === null) {
+    if (notice.key !== null) {
       // If there's content to display, render it
       return (
         <CSSTransition classNames="notices" key={notice.key} timeout={{enter: 2500, exit: 2500}} >
