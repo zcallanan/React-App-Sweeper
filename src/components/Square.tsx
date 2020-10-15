@@ -8,7 +8,7 @@ interface Props {
   animations: animationsType,
   gameState: gameStateType,
   modes: modesType,
-  squareData: squaresType,
+  squareData: squareDataType,
   squareKey: string,
   explode: (squareKey: string) => void,
   onSquareClick: (squareKey: string) => void,
@@ -95,12 +95,12 @@ class Square extends React.Component<Props, State> {
   }
 
   protected renderIcons = (): JSX.Element => {
-    const squareData: squaresType  = this.props.squareData;
-    const gameState = this.props.gameState;
-    const bomb = squareData.bomb;
-    const clicked = squareData.clicked;
-    const flaggedBool = squareData.flagged;
-    const questionmarkBool = squareData.questionMarked
+    const squareData: squareDataType  = this.props.squareData;
+    const gameState: gameStateType = this.props.gameState;
+    const bomb: boolean = squareData.bomb;
+    const clicked: boolean = squareData.clicked;
+    const flaggedBool: boolean = squareData.flagged;
+    const questionmarkBool: boolean = squareData.questionMarked
     if (bomb && clicked) {
       // If it's a bomb and clicked, show the bomb
       return (
@@ -133,7 +133,7 @@ class Square extends React.Component<Props, State> {
   }
 
   protected disableButtons = (attribute: object): object => {
-    const modes = this.props.modes;
+    const modes: modesType = this.props.modes;
     if (modes.bombMode || modes.drawing) {
       attribute["disabled"] = "disabled";
     }
@@ -142,7 +142,7 @@ class Square extends React.Component<Props, State> {
 
   protected insertElement = (element: boolean): JSX.Element => {
     if (element) {
-      const adjacentBombCount = this.props.squareData.adjacentBombCount;
+      const adjacentBombCount: number = this.props.squareData.adjacentBombCount;
       return (
         <p className={`bomb-count neighbors-${adjacentBombCount}`}>{adjacentBombCount}</p>
       )
@@ -150,7 +150,7 @@ class Square extends React.Component<Props, State> {
   }
 
   protected buttonMarkup = (className: string, attribute: object, element: boolean): JSX.Element => {
-    const squareKey = this.props.squareKey;
+    const squareKey: string = this.props.squareKey;
 
     return (
       <button className={className} {...attribute} onClick={() => { this.props.onSquareClick(squareKey)}}>
@@ -164,16 +164,16 @@ class Square extends React.Component<Props, State> {
 
   // Handles button modes
   protected generateButton = (): JSX.Element => {
-    const squareData = this.props.squareData;
-    const modes = this.props.modes;
-    const clicked = squareData.clicked;
-    const hint = squareData.hint;
-    const flaggedBool = squareData.flagged;
-    const questionmarkBool = squareData.questionMarked;
-    const drawingBool = modes.drawing;
-    let className;
-    let attribute = {};
-    let element = false;
+    const squareData: squareDataType = this.props.squareData;
+    const modes: modesType = this.props.modes;
+    const clicked: boolean = squareData.clicked;
+    const hint: boolean = squareData.hint;
+    const flaggedBool: boolean = squareData.flagged;
+    const questionmarkBool: boolean = squareData.questionMarked;
+    const drawingBool: boolean = modes.drawing;
+    let className: string = "";
+    let attribute: object = {};
+    let element: boolean = false;
 
     if (clicked) {
       // Disable the button if it's been clicked
