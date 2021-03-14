@@ -10,14 +10,15 @@ interface Props {
   onModeClick(e: React.FormEvent<HTMLFormElement>): void;
 }
 
-class QuestionMark extends React.Component<Props> {
-  protected renderQuestionIcons = (): JSX.Element => {
+const QuestionMark = ({modes, gameState, onModeClick}: Props): JSX.Element => {
+  const renderQuestionIcons = (): JSX.Element => {
     const attribute = {};
     // If a bomb is exploding or you have won/lost, disable the button
-    if (this.props.modes.bombMode || this.props.gameState.progress !== 0) {
+    if (modes.bombMode || gameState.progress !== 0) {
       attribute["disabled"] = "disabled";
     }
-    if (this.props.modes.questionMode) {
+    if (modes.questionMode) {
+      // Question mode button was clicked
       return (
         <button
           className="btn btn-outline-secondary question-button buttons"
@@ -28,6 +29,7 @@ class QuestionMark extends React.Component<Props> {
         </button>
       );
     }
+    // Question mode button is not clicked
     return (
       <button
         className="btn btn-outline-secondary question-button buttons"
@@ -39,15 +41,13 @@ class QuestionMark extends React.Component<Props> {
     );
   };
 
-  render() {
-    return (
-      <div>
-        <form name="questionMode" onSubmit={this.props.onModeClick}>
-          {this.renderQuestionIcons()}
-        </form>
-      </div>
-    );
-  }
-}
+  return (
+    <div>
+      <form name="questionMode" onSubmit={onModeClick}>
+        {renderQuestionIcons()}
+      </form>
+    </div>
+  );
+};
 
 export default QuestionMark;
