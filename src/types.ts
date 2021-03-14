@@ -1,8 +1,6 @@
-// export declare namespace JSX {
-//   interface IntrinsicElements {
-//     [elemName: string]: any;
-//   }
-// }
+export type DictNumber = {
+  [key: string]: number;
+};
 
 export type ExplosionType = {
   explodeTrigger: boolean;
