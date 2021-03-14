@@ -82,9 +82,3 @@ export type SquareDataType = {
   adjacentBombCount: number;
   explosion: ExplosionType;
 };
-
-export type OtherStatsType = {
-  size: number;
-  bombs: number;
-  totalToReveal: number;
-};
