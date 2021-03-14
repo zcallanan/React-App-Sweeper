@@ -11,9 +11,9 @@ type NoticeT = {
   message: string;
 };
 
-class Notice extends React.Component<Props> {
-  protected handleNotice = (): JSX.Element => {
-    const { bombNotice, victoryNotice, defeatNotice } = this.props.notices;
+const Notice = ({notices}: Props): JSX.Element => {
+  const handleNotice = (): JSX.Element => {
+    const { bombNotice, victoryNotice, defeatNotice } = notices;
     let notice: NoticeT = {
       key: null,
       message: null,
@@ -51,15 +51,14 @@ class Notice extends React.Component<Props> {
     }
     return;
   };
-  render() {
-    return (
-      <div className="notice-box">
-        <TransitionGroup component="span" className="notices">
-          {this.handleNotice()}
-        </TransitionGroup>
-      </div>
-    );
-  }
+
+  return (
+    <div className="notice-box">
+      <TransitionGroup component="span" className="notices">
+        {handleNotice()}
+      </TransitionGroup>
+    </div>
+  );
 }
 
 export default Notice;
