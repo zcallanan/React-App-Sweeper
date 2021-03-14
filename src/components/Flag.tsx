@@ -10,14 +10,15 @@ interface Props {
   onModeClick(e: React.FormEvent<HTMLFormElement>): void;
 }
 
-class Flag extends React.Component<Props> {
-  protected renderFlagIcons = (): JSX.Element => {
+const Flag = ({modes, gameState, onModeClick}: Props): JSX.Element => {
+  const renderFlagIcons = (): JSX.Element => {
     const attribute: object = {};
     // If a bomb is exploding or you have won/lost, disable the button
-    if (this.props.modes.bombMode || this.props.gameState.progress !== 0) {
+    if (modes.bombMode || gameState.progress !== 0) {
       attribute["disabled"] = "disabled";
     }
-    if (this.props.modes.flagMode) {
+    // Flagmode button was clicked
+    if (modes.flagMode) {
       return (
         <button
           className="btn btn-outline-secondary flag-button buttons"
@@ -28,6 +29,7 @@ class Flag extends React.Component<Props> {
         </button>
       );
     }
+    // Flagmode button not clicked
     return (
       <button
         className="btn btn-outline-secondary flag-button buttons"
@@ -39,13 +41,11 @@ class Flag extends React.Component<Props> {
     );
   };
 
-  render() {
-    return (
-      <form name="flagMode" onSubmit={this.props.onModeClick}>
-        {this.renderFlagIcons()}
-      </form>
-    );
-  }
+  return (
+    <form name="flagMode" onSubmit={onModeClick}>
+      {renderFlagIcons()}
+    </form>
+  );
 }
 
 export default Flag;
