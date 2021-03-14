@@ -2,6 +2,10 @@ export type DictNumber = {
   [key: string]: number;
 };
 
+export type DictBool = {
+  [key:string]: boolean
+}
+
 export type ExplosionType = {
   explodeTrigger: boolean;
   explodeTimer: boolean;

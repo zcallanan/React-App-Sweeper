@@ -1,4 +1,4 @@
-import React, { useReducer, useEffect } from "react";
+import React from "react";
 import { TransitionGroup, CSSTransition } from "react-transition-group";
 import { StatsType, OptionType, DictNumber } from "../types";
 
@@ -57,12 +57,12 @@ const Stats = ({ stats, options, revealTarget }: Props): JSX.Element => {
   };
 
   // Manage state
-  const [statsState, statsDispatch] = useReducer(
+  const [statsState, statsDispatch] = React.useReducer(
     statsReducer,
     initialVals,
   );
 
-  useEffect(() => {
+  React.useEffect(() => {
     const bombsProps: number = stats.bombs;
     const bombsState: number = statsState.bombs;
     const totalToRevealState: number = statsState.totalToReveal;

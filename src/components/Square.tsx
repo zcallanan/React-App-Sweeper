@@ -17,6 +17,7 @@ import {
   ModesType,
   SquareDataType,
   ExplosionType,
+  DictBool,
 } from "../types";
 
 interface Props {
@@ -31,74 +32,126 @@ interface Props {
   explosion: ExplosionType;
 }
 
-interface State {
-  localAnimState: LocalAnimType;
-}
-
-type LocalAnimType = {
+type SquareProps = {
   bombAnimIsPlaying: boolean;
   fireAnimIsPlaying: boolean;
 };
 
-class Square extends React.Component<Props, State> {
-  constructor(props: any) {
-    super(props);
-    this.state = {
-      localAnimState: {
-        bombAnimIsPlaying: false,
-        fireAnimIsPlaying: false,
-      },
-    };
+type SquareAction = { type: "AllValues"; payload: SquareProps }
+  | { type: "SetBombAnim"; payload: DictBool }
+  | { type: "SetFireAnim"; payload: DictBool };
+
+const Square = ({
+  animations,
+  gameState,
+  modes,
+  squareData,
+  squareKey,
+  explode,
+  onSquareClick,
+  toggleScroll,
+  explosion
+}): JSX.Element => {
+  // Reducer
+  const squareReducer = (state: typeof initialVals, action: SquareAction) => {
+    switch (action.type) {
+      case "AllValues":
+        return {
+          bombAnimIsPlaying: action.payload.bombAnimIsPlaying,
+          fireAnimIsPlaying: action.payload.fireAnimIsPlaying,
+        };
+      case "SetBombAnim":
+      return {
+        ...state,
+        size: action.payload.bombAnimIsPlaying,
+      };
+      case "SetFireAnim":
+      return {
+        ...state,
+        bombs: action.payload.fireAnimIsPlaying,
+      };
+      default:
+        throw new Error();
+    }
+  };
+
+  const initialVals: SquareProps = {
+    bombAnimIsPlaying: false,
+    fireAnimIsPlaying: false,
   }
 
-  componentDidUpdate() {
-    const modes: ModesType = this.props.modes;
-    const explosion: ExplosionType = this.props.explosion;
+  // Manage state
+  const [squareState, squareDispatch] = React.useReducer(
+    squareReducer,
+    initialVals,
+  );
+
+  React.useEffect(() => {
+    // From State
+    const bombState: boolean = squareState.bombAnimIsPlaying;
+    const fireState: boolean = squareState.fireAnimIsPlaying;
+    // From Props
     const explodeTrigger: boolean = explosion.explodeTrigger;
     const fire: boolean = explosion.explodeFire;
-    const localAnimState: LocalAnimType = { ...this.state.localAnimState };
     // Reset square if it's a new game
-    if (modes.newGame && localAnimState.fireAnimIsPlaying) {
-      localAnimState.fireAnimIsPlaying = false;
-      this.setState({ localAnimState });
-    } else if (modes.newGame && localAnimState.bombAnimIsPlaying) {
-      localAnimState.bombAnimIsPlaying = false;
-      this.setState({ localAnimState });
+    if (modes.newGame && fireState) {
+      squareDispatch({
+        type: "SetFireAnim",
+        payload: {
+          fireAnimIsPlaying: false,
+        },
+      });
+    } else if (modes.newGame && bombState) {
+      squareDispatch({
+        type: "SetBombAnim",
+        payload: {
+          bombAnimIsPlaying: false,
+        },
+      });
     }
     // Prevent animation renders if an animation is already playing
-    if (explodeTrigger && !fire && !localAnimState.bombAnimIsPlaying) {
-      localAnimState.bombAnimIsPlaying = true;
-      localAnimState.fireAnimIsPlaying = false;
-      this.setState({ localAnimState });
-    } else if (!explodeTrigger && fire && !localAnimState.fireAnimIsPlaying) {
-      localAnimState.bombAnimIsPlaying = false;
-      localAnimState.fireAnimIsPlaying = true;
-      this.setState({ localAnimState });
+    if (explodeTrigger && !fire && !bombState) {
+      squareDispatch({
+        type: "AllValues",
+        payload: {
+          bombAnimIsPlaying: true,
+          fireAnimIsPlaying: false,
+        },
+      });
+    } else if (!explodeTrigger && fire && !fireState) {
+      squareDispatch({
+        type: "AllValues",
+        payload: {
+          bombAnimIsPlaying: false,
+          fireAnimIsPlaying: true,
+        },
+      });
     }
-  }
+  });
 
-  protected cssTransition = (): JSX.Element => {
-    const gameState: GameStateType = this.props.gameState;
-    const localAnimState: LocalAnimType = { ...this.state.localAnimState };
-    const bombFade: boolean = this.props.animations.bombFade;
-    const squareKey: string = this.props.squareKey;
-    const explosion: ExplosionType = this.props.explosion;
+  const cssTransition = (): JSX.Element => {
+    // From State
+    const bombState: boolean = squareState.bombAnimIsPlaying;
+    const fireState: boolean = squareState.fireAnimIsPlaying;
+    // From Props
+    const bombFade: boolean = animations.bombFade;
     const explodeTrigger: boolean = explosion.explodeTrigger;
     const fire: boolean = explosion.explodeFire;
-    if (explodeTrigger && !fire && !localAnimState.bombAnimIsPlaying) {
+
+    if (explodeTrigger && !fire && !bombState) {
       return (
         <CSSTransition
           classNames="bomba"
           key={squareKey}
           in={explodeTrigger}
           appear={explodeTrigger}
-          onEnter={() => this.props.explode(squareKey)}
+          onEnter={() => explode(squareKey)}
           timeout={{ enter: 1000, exit: 1000 }}
         >
           <FontAwesomeIcon key={squareKey} icon={faBomb} />
         </CSSTransition>
       );
-    } else if (!explodeTrigger && fire && !localAnimState.fireAnimIsPlaying) {
+    } else if (!explodeTrigger && fire && !fireState) {
       return (
         <CSSTransition
           className="fire-enter"
@@ -129,18 +182,18 @@ class Square extends React.Component<Props, State> {
     }
   };
 
-  protected renderIcons = (): JSX.Element => {
-    const squareData: SquareDataType = this.props.squareData;
-    const gameState: GameStateType = this.props.gameState;
+  const renderIcons = (): JSX.Element => {
+    // From Props
     const bomb: boolean = squareData.bomb;
     const clicked: boolean = squareData.clicked;
     const flaggedBool: boolean = squareData.flagged;
     const questionmarkBool: boolean = squareData.questionMarked;
+
     if (bomb && clicked) {
       // If it's a bomb and clicked, show the bomb
       return (
         <TransitionGroup component="span" className="bomba">
-          {this.cssTransition()}
+          {cssTransition()}
         </TransitionGroup>
       );
     } else if (flaggedBool && !clicked) {
@@ -169,17 +222,16 @@ class Square extends React.Component<Props, State> {
     }
   };
 
-  protected disableButtons = (attribute: object): object => {
-    const modes: ModesType = this.props.modes;
+  const disableButtons = (attribute: object): object => {
     if (modes.bombMode || modes.drawing) {
       attribute["disabled"] = "disabled";
     }
     return attribute;
   };
 
-  protected insertElement = (element: boolean): JSX.Element => {
+  const insertElement = (element: boolean): JSX.Element => {
     if (element) {
-      const adjacentBombCount: number = this.props.squareData.adjacentBombCount;
+      const adjacentBombCount: number = squareData.adjacentBombCount;
       return (
         <p className={`bomb-count neighbors-${adjacentBombCount}`}>
           {adjacentBombCount}
@@ -188,38 +240,37 @@ class Square extends React.Component<Props, State> {
     }
   };
 
-  protected buttonMarkup = (
+  const buttonMarkup = (
     className: string,
     attribute: object,
     element: boolean
   ): JSX.Element => {
-    const squareKey: string = this.props.squareKey;
 
     return (
       <button
         className={className}
         {...attribute}
         onClick={() => {
-          this.props.onSquareClick(squareKey);
+          onSquareClick(squareKey);
         }}
       >
         <span>
-          {this.insertElement(element)}
-          {this.renderIcons()}
+          {insertElement(element)}
+          {renderIcons()}
         </span>
       </button>
     );
   };
 
   // Handles button modes
-  protected generateButton = (): JSX.Element => {
-    const squareData: SquareDataType = this.props.squareData;
-    const modes: ModesType = this.props.modes;
+  const generateButton = (): JSX.Element => {
+    // From Props
     const clicked: boolean = squareData.clicked;
     const hint: boolean = squareData.hint;
     const flaggedBool: boolean = squareData.flagged;
     const questionmarkBool: boolean = squareData.questionMarked;
     const drawingBool: boolean = modes.drawing;
+
     let className: string = "";
     let attribute: object = {};
     let element: boolean = false;
@@ -228,7 +279,7 @@ class Square extends React.Component<Props, State> {
       // Disable the button if it's been clicked
       className = "square";
       attribute["disabled"] = "disabled";
-      return this.buttonMarkup(className, attribute, element);
+      return buttonMarkup(className, attribute, element);
     } else if (modes.flagMode) {
       // Toggle placement of flags
       if (questionmarkBool) {
@@ -245,7 +296,7 @@ class Square extends React.Component<Props, State> {
           element = true;
           className = "square flag-mode hint";
         }
-        return this.buttonMarkup(className, attribute, element);
+        return buttonMarkup(className, attribute, element);
       } else {
         className = "square flag-mode";
       }
@@ -265,7 +316,7 @@ class Square extends React.Component<Props, State> {
           element = true;
           className = "square questionmark-mode hint";
         }
-        return this.buttonMarkup(className, attribute, element);
+        return buttonMarkup(className, attribute, element);
       } else {
         className = "square questionmark-mode";
       }
@@ -285,10 +336,10 @@ class Square extends React.Component<Props, State> {
         element = true;
         className = !modes.bombMode ? "square hint" : "square hint bomb-mode";
       }
-      attribute = this.disableButtons(attribute);
-      return this.buttonMarkup(className, attribute, element);
+      attribute = disableButtons(attribute);
+      return buttonMarkup(className, attribute, element);
     } else {
-      attribute = this.disableButtons(attribute);
+      attribute = disableButtons(attribute);
       if (flaggedBool) {
         // if a square is clickable or a bomb is active, display the flag on the square
         className = !modes.bombMode
@@ -303,7 +354,7 @@ class Square extends React.Component<Props, State> {
         if (drawingBool) {
           // If the board is drawing, disable the buttons
           className = "drawing default";
-          attribute = this.disableButtons(attribute);
+          attribute = disableButtons(attribute);
         } else {
           // Default functional button
           className = !modes.bombMode
@@ -312,33 +363,31 @@ class Square extends React.Component<Props, State> {
         }
       }
     }
-    return this.buttonMarkup(className, attribute, element);
+    return buttonMarkup(className, attribute, element);
   };
 
-  render() {
-    const squareKey = this.props.squareKey;
-    const modes = this.props.modes;
-    let squareScroll =
-      modes.newGame && !this.props.animations.squareScroll ? true : false;
-    return (
-      <TransitionGroup
-        component="div"
-        className="squares"
-        key={`${squareKey}-${this.props.animations.seed}`}
+  let squareScroll = modes.newGame && !animations.squareScroll
+    ? true
+    : false;
+
+  return (
+    <TransitionGroup
+      component="div"
+      className="squares"
+      key={`${squareKey}-${animations.seed}`}
+    >
+      <CSSTransition
+        classNames="squares"
+        in={squareScroll}
+        appear={squareScroll}
+        key={`${squareKey}-${animations.seed}`}
+        onEnter={() => toggleScroll(false, "squareScroll")}
+        timeout={{ enter: 1500 }}
       >
-        <CSSTransition
-          classNames="squares"
-          in={squareScroll}
-          appear={squareScroll}
-          key={`${squareKey}-${this.props.animations.seed}`}
-          onEnter={() => this.props.toggleScroll(false, "squareScroll")}
-          timeout={{ enter: 1500 }}
-        >
-          {this.generateButton()}
-        </CSSTransition>
-      </TransitionGroup>
-    );
-  }
+        {generateButton()}
+      </CSSTransition>
+    </TransitionGroup>
+  );
 }
 
 export default Square;
