@@ -1,55 +1,56 @@
-import React from 'react';
-import { TransitionGroup, CSSTransition } from 'react-transition-group';
+import React from "react";
+import { TransitionGroup, CSSTransition } from "react-transition-group";
+import { NoticesType } from "../types";
 
 interface Props {
-  notices: noticesType
+  notices: NoticesType;
 }
 
-interface State {
-}
+type NoticeT = {
+  key: string;
+  message: string;
+};
 
-type noticeT = {
-  key: string,
-  message: string
-}
-
-class Notice extends React.Component<Props, State> {
-
+class Notice extends React.Component<Props> {
   protected handleNotice = (): JSX.Element => {
-    const { bombNotice, victoryNotice, defeatNotice} = this.props.notices;
-    let notice: noticeT = {
+    const { bombNotice, victoryNotice, defeatNotice } = this.props.notices;
+    let notice: NoticeT = {
       key: null,
-      message: null
+      message: null,
     };
     if (bombNotice) {
       // Notice content
       notice = {
         key: "bomb",
-        message: "You struck a bomb and lost a life!"
-      }
+        message: "You struck a bomb and lost a life!",
+      };
     } else if (victoryNotice) {
       notice = {
         key: "victory",
-        message: "You revealed the final square!"
-      }
+        message: "You revealed the final square!",
+      };
     } else if (defeatNotice) {
       notice = {
         key: "defeat",
-        message: "You ran out of lives!"
-      }
+        message: "You ran out of lives!",
+      };
     }
     if (notice.key !== null) {
       // If there's content to display, render it
       return (
-        <CSSTransition classNames="notices" key={notice.key} timeout={{enter: 2500, exit: 2500}} >
+        <CSSTransition
+          classNames="notices"
+          key={notice.key}
+          timeout={{ enter: 2500, exit: 2500 }}
+        >
           <span key={notice.key} className="notice">
             <strong>{notice.message}</strong>
           </span>
         </CSSTransition>
-      )
+      );
     }
     return;
-  }
+  };
   render() {
     return (
       <div className="notice-box">
@@ -57,9 +58,8 @@ class Notice extends React.Component<Props, State> {
           {this.handleNotice()}
         </TransitionGroup>
       </div>
-    )
+    );
   }
-
 }
 
 export default Notice;

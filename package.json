@@ -1,7 +1,6 @@
 {
   "name": "sweeper",
   "version": "0.1.0",
-  "typings": "main.d.ts",
   "private": true,
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^1.2.30",
