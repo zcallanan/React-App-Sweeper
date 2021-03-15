@@ -18,9 +18,9 @@ export type GameState = {
 };
 
 export type SizeDifficultyLives = {
-  size: number | string;
-  difficulty: number | string;
-  lives: number | string;
+  size: number;
+  difficulty: number;
+  lives: number;
 };
 
 // Hardcoded custom game data
@@ -91,3 +91,38 @@ export type AnimationsType = {
   seed: number;
   bombFade: boolean;
 };
+
+// Payloads
+export type FormPayload = {
+  size: number,
+  difficulty: number,
+  lives: number,
+  errorString: string,
+};
+
+export type SquarePayload = {
+  bombAnimIsPlaying: boolean;
+  fireAnimIsPlaying: boolean;
+};
+
+export type StatsPayload = {
+  size: number;
+  bombs: number;
+  totalToReveal: number;
+};
+
+// Actions
+export type FormAction = { type: "InitValues"; payload: SizeDifficultyLives }
+  | { type: "SetSize"; payload: DictNumber }
+  | { type: "SetDifficulty"; payload: DictNumber }
+  | { type: "SetLives"; payload: DictNumber }
+  | { type: "SetError"; payload: DictString };
+
+export type SquareAction = { type: "AllValues"; payload: SquarePayload }
+  | { type: "SetBombAnim"; payload: DictBool }
+  | { type: "SetFireAnim"; payload: DictBool };
+
+export type StatsAction = { type: "InitValues"; payload: StatsPayload }
+  | { type: "SetSize"; payload: DictNumber }
+  | { type: "SetBombs"; payload: DictNumber }
+  | { type: "SetTotalToReveal"; payload: DictNumber };

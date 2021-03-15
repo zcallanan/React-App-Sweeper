@@ -11,13 +11,13 @@ import {
   faFlag as farFlag,
   faQuestionCircle as farQuestionCircle,
 } from "@fortawesome/free-regular-svg-icons";
+import { squareReducer, squareInit } from "../reducers";
 import {
   GameState,
   AnimationsType,
   ModesType,
   SquareDataType,
   ExplosionType,
-  DictBool,
 } from "../types";
 
 interface Props {
@@ -32,15 +32,6 @@ interface Props {
   explosion: ExplosionType;
 }
 
-type SquareProps = {
-  bombAnimIsPlaying: boolean;
-  fireAnimIsPlaying: boolean;
-};
-
-type SquareAction = { type: "AllValues"; payload: SquareProps }
-  | { type: "SetBombAnim"; payload: DictBool }
-  | { type: "SetFireAnim"; payload: DictBool };
-
 const Square = ({
   animations,
   gameState,
@@ -51,39 +42,11 @@ const Square = ({
   onSquareClick,
   toggleScroll,
   explosion
-}): JSX.Element => {
-  // Reducer
-  const squareReducer = (state: typeof initialVals, action: SquareAction) => {
-    switch (action.type) {
-      case "AllValues":
-        return {
-          bombAnimIsPlaying: action.payload.bombAnimIsPlaying,
-          fireAnimIsPlaying: action.payload.fireAnimIsPlaying,
-        };
-      case "SetBombAnim":
-      return {
-        ...state,
-        size: action.payload.bombAnimIsPlaying,
-      };
-      case "SetFireAnim":
-      return {
-        ...state,
-        bombs: action.payload.fireAnimIsPlaying,
-      };
-      default:
-        throw new Error();
-    }
-  };
-
-  const initialVals: SquareProps = {
-    bombAnimIsPlaying: false,
-    fireAnimIsPlaying: false,
-  };
-
+}: Props): JSX.Element => {
   // Manage state
   const [squareState, squareDispatch] = React.useReducer(
     squareReducer,
-    initialVals,
+    squareInit,
   );
 
   React.useEffect(() => {

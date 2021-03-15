@@ -1,6 +1,7 @@
 import React from "react";
 import { TransitionGroup, CSSTransition } from "react-transition-group";
-import { StatsType, SizeDifficultyLives, DictNumber } from "../types";
+import { statsReducer, statsInit } from "../reducers";
+import { StatsType, SizeDifficultyLives } from "../types";
 
 interface Props {
   stats: StatsType;
@@ -8,58 +9,11 @@ interface Props {
   revealTarget: (totalToReveal: number) => void;
 }
 
-type StatsProps = {
-  size: number;
-  bombs: number;
-  totalToReveal: number;
-};
-
-type StatsAction = { type: "InitValues"; payload: StatsProps }
-  | { type: "SetSize"; payload: DictNumber }
-  | { type: "SetBombs"; payload: DictNumber }
-  | { type: "SetTotalToReveal"; payload: DictNumber };
-
 const Stats = ({ stats, options, revealTarget }: Props): JSX.Element => {
-  // Reducer
-  const statsReducer = (state: typeof initialVals, action: StatsAction) => {
-    switch (action.type) {
-      case "InitValues":
-        return {
-          size: action.payload.size,
-          bombs: action.payload.bombs,
-          totalToReveal: action.payload.totalToReveal,
-        };
-      case "SetSize":
-      return {
-        ...state,
-        size: action.payload.size,
-      };
-      case "SetBombs":
-      return {
-        ...state,
-        bombs: action.payload.bombs,
-      };
-      case "SetTotalToReveal":
-      return {
-        ...state,
-        totalToReveal: action.payload.totalToReveal,
-      };
-      default:
-        throw new Error();
-    }
-  };
-
-  // Initial values
-  const initialVals: StatsProps = {
-    size: -1,
-    bombs: -1,
-    totalToReveal: -1,
-  };
-
   // Manage state
   const [statsState, statsDispatch] = React.useReducer(
     statsReducer,
-    initialVals,
+    statsInit,
   );
 
   React.useEffect(() => {
