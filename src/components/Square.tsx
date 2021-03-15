@@ -78,7 +78,7 @@ const Square = ({
   const initialVals: SquareProps = {
     bombAnimIsPlaying: false,
     fireAnimIsPlaying: false,
-  }
+  };
 
   // Manage state
   const [squareState, squareDispatch] = React.useReducer(
@@ -127,7 +127,13 @@ const Square = ({
         },
       });
     }
-  });
+  }, [
+    explosion.explodeFire,
+    explosion.explodeTrigger,
+    modes.newGame,
+    squareState.bombAnimIsPlaying,
+    squareState.fireAnimIsPlaying,
+  ]);
 
   const cssTransition = (): JSX.Element => {
     // From State

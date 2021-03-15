@@ -63,12 +63,16 @@ const Stats = ({ stats, options, revealTarget }: Props): JSX.Element => {
   );
 
   React.useEffect(() => {
-    const bombsProps: number = stats.bombs;
+    // From State
+    const sizeState: number = statsState.size;
     const bombsState: number = statsState.bombs;
     const totalToRevealState: number = statsState.totalToReveal;
+    // From Props
     const sizeProps: number = options.size;
-    const sizeState: number = statsState.size;
+    const bombsProps: number = stats.bombs;
+
     const currentTotalToReveal: number = sizeProps ** 2 - bombsProps;
+
     if (bombsProps > 0 && sizeProps > 0 && totalToRevealState < 0) {
       // Save initial values to state
       statsDispatch({
