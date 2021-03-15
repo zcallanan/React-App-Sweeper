@@ -1,17 +1,17 @@
 import React from "react";
-import { GameStateType, DataType, OptionType, OptionObj } from "../types";
+import { GameState, CustomGameValues, SizeDifficultyLives } from "../types";
 
 interface Props {
-  gameState: GameStateType;
-  data: DataType;
-  options: OptionType; // Prop is an int
+  gameState: GameState;
+  data: CustomGameValues;
+  options: SizeDifficultyLives; // Prop is an int
   modalClose: () => void;
   initSquares: (size: number) => void;
-  saveOptions: (obj: OptionObj) => void;
+  saveOptions: (obj: SizeDifficultyLives) => void;
 }
 
 interface State {
-  options: OptionObj; // Locally stored as a string from the form
+  options: SizeDifficultyLives; // Locally stored as a string from the form
   errors: ErrorType;
 }
 
@@ -41,7 +41,7 @@ class Form extends React.Component<Props, State> {
   componentDidMount() {
     // Set an initial local state. Only do this if size: {} is not set
     if (this.state.options.size === "") {
-      const options: OptionObj = { ...this.state.options };
+      const options: SizeDifficultyLives = { ...this.state.options };
       options.size = this.props.options.size.toString();
       options.difficulty = this.props.options.difficulty.toString();
       options.lives = this.props.options.lives.toString();
@@ -52,11 +52,20 @@ class Form extends React.Component<Props, State> {
   // Field Validation
   protected handleValidation = (): boolean => {
     // Copy local state objects
-    const options: OptionObj = { ...this.state.options };
+    const options: SizeDifficultyLives = { ...this.state.options };
     const errors: ErrorType = { ...this.state.errors };
-    const size: number = parseInt(options.size);
-    const difficulty: number = parseInt(options.difficulty);
-    const lives: number = parseInt(options.lives);
+    let size: number;
+    let difficulty: number;
+    let lives: number;
+    if (typeof options.size === "string") {
+      size = Number(options.size);
+    }
+    if (typeof options.difficulty === "string") {
+      difficulty = Number(options.difficulty);
+    }
+    if (typeof options.lives === "string") {
+      lives = Number(options.lives);
+    }
     let formIsValid = true;
 
     // Size of board
@@ -112,8 +121,11 @@ class Form extends React.Component<Props, State> {
       // Close the modal on a submit
       this.props.modalClose();
       // Get values
-      const size: number = parseInt(this.state.options.size);
-      const options: OptionObj = { ...this.state.options };
+      let size: number;
+      if (typeof this.state.options.size === "string") {
+        size = Number(this.state.options.size);
+      }
+      const options: SizeDifficultyLives = { ...this.state.options };
       // Pass values to global state
       this.props.saveOptions(options);
       // Determine positioning of bombs
@@ -164,7 +176,7 @@ class Form extends React.Component<Props, State> {
   };
 
   render() {
-    const data: DataType = this.props.data;
+    const data: CustomGameValues = this.props.data;
     const percentages: object = data.bombPercentage;
     const lives: object = data.numberOfLives;
     return (

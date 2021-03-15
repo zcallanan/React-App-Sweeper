@@ -2,11 +2,11 @@ import React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFlag } from "@fortawesome/free-solid-svg-icons";
 import { faFlag as farFlag } from "@fortawesome/free-regular-svg-icons";
-import { GameStateType, ModesType } from "../types";
+import { GameState, ModesType } from "../types";
 
 interface Props {
   modes: ModesType;
-  gameState: GameStateType;
+  gameState: GameState;
   onModeClick(e: React.FormEvent<HTMLFormElement>): void;
 }
 

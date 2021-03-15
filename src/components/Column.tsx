@@ -1,11 +1,11 @@
 import React from "react";
 import Square from "./Square";
-import { GameStateType, AnimationsType, ModesType } from "../types";
+import { GameState, AnimationsType, ModesType } from "../types";
 
 interface Props {
   columnKey: string;
   animations: AnimationsType;
-  gameState: GameStateType;
+  gameState: GameState;
   modes: ModesType;
   squares: object;
   size: number;

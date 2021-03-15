@@ -1,52 +1,42 @@
+// Dicts
 export type DictNumber = {
   [key: string]: number;
 };
 
 export type DictBool = {
-  [key:string]: boolean
-}
-
-export type ExplosionType = {
-  explodeTrigger: boolean;
-  explodeTimer: boolean;
-  explodeCleanup: boolean;
-  explodeFire: boolean;
+  [key:string]: boolean;
 };
 
-export type OptionObj = {
-  size: string;
-  difficulty: string;
-  lives: string;
+export type DictString = {
+  [key: string]: string;
 };
 
-export type AnimationsType = {
-  squareScroll: boolean;
-  seed: number;
-  bombFade: boolean;
+// GameState data
+export type GameState = {
+  progress: number;
+  options: SizeDifficultyLives;
 };
 
+export type SizeDifficultyLives = {
+  size: number | string;
+  difficulty: number | string;
+  lives: number | string;
+};
+
+// Hardcoded custom game data
+export type CustomGameValues = {
+  bombPercentage: DictString;
+  numberOfLives: DictString;
+};
+
+// Modal state data
 export type ModalType = {
   isVisible: boolean;
   timer: boolean;
   modalCleanup: boolean;
 };
 
-export type DataType = {
-  bombPercentage: { [key: number]: string };
-  numberOfLives: { [key: number]: string };
-};
-
-export type OptionType = {
-  size: number;
-  difficulty: number;
-  lives: number;
-};
-
-export type GameStateType = {
-  progress: number;
-  options: OptionType;
-};
-
+// Game stats state data
 export type StatsType = {
   currentLives: number;
   bombs: number;
@@ -56,12 +46,14 @@ export type StatsType = {
   questions: number;
 };
 
-export type NoticesType = {
+// Game notices state data
+export type Notices = {
   bombNotice: boolean;
   victoryNotice: boolean;
   defeatNotice: boolean;
 };
 
+// Game modes state data
 export type ModesType = {
   newGame: boolean;
   bombMode: boolean;
@@ -70,6 +62,7 @@ export type ModesType = {
   drawing: boolean;
 };
 
+// Square state data
 export type SquaresType = {
   [key: string]: SquareDataType;
 };
@@ -83,4 +76,18 @@ export type SquareDataType = {
   neighbors: string[];
   adjacentBombCount: number;
   explosion: ExplosionType;
+};
+
+export type ExplosionType = {
+  explodeTrigger: boolean;
+  explodeTimer: boolean;
+  explodeCleanup: boolean;
+  explodeFire: boolean;
+};
+
+// Square animations data
+export type AnimationsType = {
+  squareScroll: boolean;
+  seed: number;
+  bombFade: boolean;
 };

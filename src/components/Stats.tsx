@@ -1,10 +1,10 @@
 import React from "react";
 import { TransitionGroup, CSSTransition } from "react-transition-group";
-import { StatsType, OptionType, DictNumber } from "../types";
+import { StatsType, SizeDifficultyLives, DictNumber } from "../types";
 
 interface Props {
   stats: StatsType;
-  options: OptionType;
+  options: SizeDifficultyLives;
   revealTarget: (totalToReveal: number) => void;
 }
 
@@ -68,7 +68,10 @@ const Stats = ({ stats, options, revealTarget }: Props): JSX.Element => {
     const bombsState: number = statsState.bombs;
     const totalToRevealState: number = statsState.totalToReveal;
     // From Props
-    const sizeProps: number = options.size;
+    let sizeProps: number;
+    if (typeof options.size === "number") {
+      sizeProps = options.size;
+    }
     const bombsProps: number = stats.bombs;
 
     const currentTotalToReveal: number = sizeProps ** 2 - bombsProps;

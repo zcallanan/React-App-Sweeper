@@ -12,7 +12,7 @@ import {
   faQuestionCircle as farQuestionCircle,
 } from "@fortawesome/free-regular-svg-icons";
 import {
-  GameStateType,
+  GameState,
   AnimationsType,
   ModesType,
   SquareDataType,
@@ -22,7 +22,7 @@ import {
 
 interface Props {
   animations: AnimationsType;
-  gameState: GameStateType;
+  gameState: GameState;
   modes: ModesType;
   squareData: SquareDataType;
   squareKey: string;

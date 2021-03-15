@@ -1,12 +1,12 @@
 import React from "react";
 import { TransitionGroup, CSSTransition } from "react-transition-group";
-import { NoticesType } from "../types";
+import { Notices } from "../types";
 
 interface Props {
-  notices: NoticesType;
+  notices: Notices;
 }
 
-type NoticeT = {
+type KeyMessage = {
   key: string;
   message: string;
 };
@@ -14,7 +14,7 @@ type NoticeT = {
 const Notice = ({notices}: Props): JSX.Element => {
   const handleNotice = (): JSX.Element => {
     const { bombNotice, victoryNotice, defeatNotice } = notices;
-    let notice: NoticeT = {
+    let notice: KeyMessage = {
       key: null,
       message: null,
     };
