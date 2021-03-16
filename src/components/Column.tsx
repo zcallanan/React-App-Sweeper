@@ -1,23 +1,12 @@
 import React from "react";
 import Square from "./Square";
-import { GameState, AnimationsType, ModesType } from "../types";
+import { ColumnProps } from "../types";
 
-interface Props {
-  columnKey: string;
-  animations: AnimationsType;
-  gameState: GameState;
-  modes: ModesType;
-  squares: object;
-  size: number;
-  explode: (squareKey: string) => void;
-  onSquareClick: (squareKey: string) => void;
-  toggleScroll: (bool: boolean, anim: string) => void;
-}
-
-class Column extends React.Component<Props> {
+class Column extends React.Component<ColumnProps> {
   render() {
-    const column: JSX.Element[] = [];
+    const column: Array<JSX.Element> = [];
     let squareKey: string = "";
+
     for (let i = 0; i < this.props.size; i++) {
       squareKey = `r${i}-${this.props.columnKey}`;
       column.push(
@@ -35,7 +24,6 @@ class Column extends React.Component<Props> {
         />
       );
     }
-
     return <div className="board-column">{column}</div>;
   }
 }

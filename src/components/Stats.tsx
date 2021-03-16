@@ -1,15 +1,9 @@
 import React from "react";
 import { TransitionGroup, CSSTransition } from "react-transition-group";
 import { statsReducer, statsInit } from "../reducers";
-import { StatsType, SizeDifficultyLives } from "../types";
+import { StatsProps } from "../types";
 
-interface Props {
-  stats: StatsType;
-  options: SizeDifficultyLives;
-  revealTarget: (totalToReveal: number) => void;
-}
-
-const Stats = ({ stats, options, revealTarget }: Props): JSX.Element => {
+const Stats = ({ stats, options, revealTarget }: StatsProps): JSX.Element => {
   // Manage state
   const [statsState, statsDispatch] = React.useReducer(
     statsReducer,
@@ -33,7 +27,7 @@ const Stats = ({ stats, options, revealTarget }: Props): JSX.Element => {
     if (bombsProps > 0 && sizeProps > 0 && totalToRevealState < 0) {
       // Save initial values to state
       statsDispatch({
-        type: "InitValues",
+        type: "STATS_INIT_VALUES",
         payload: {
           bombs: bombsProps,
           size: sizeProps,
@@ -50,7 +44,7 @@ const Stats = ({ stats, options, revealTarget }: Props): JSX.Element => {
       && bombsProps !== bombsState
     ) {
       statsDispatch({
-        type: "SetTotalToReveal",
+        type: "STATS_SET_TOTALTOREVEAL",
         payload: {
           totalToReveal: currentTotalToReveal,
         },
@@ -62,7 +56,7 @@ const Stats = ({ stats, options, revealTarget }: Props): JSX.Element => {
     ) {
       // Size changed, save it
       statsDispatch({
-        type: "SetSize",
+        type: "STATS_SET_SIZE",
         payload: {
           size: sizeProps,
         },
@@ -71,7 +65,7 @@ const Stats = ({ stats, options, revealTarget }: Props): JSX.Element => {
     if ((bombsState < 0 || bombsState !== bombsProps) && bombsProps > 0) {
       // Bombs changed, save it
       statsDispatch({
-        type: "SetBombs",
+        type: "STATS_SET_BOMBS",
         payload: {
           bombs: bombsProps,
         },
@@ -115,8 +109,7 @@ const Stats = ({ stats, options, revealTarget }: Props): JSX.Element => {
   };
 
   const renderBombCount = (): React.ReactNode => {
-    const statsProps: StatsType = stats;
-    const bombs = statsProps.bombs;
+    const bombs = stats.bombs;
     if (bombs >= 0) {
       return (
         <tr key="bombs">
@@ -138,8 +131,7 @@ const Stats = ({ stats, options, revealTarget }: Props): JSX.Element => {
   };
 
   const renderRevealed = (): React.ReactNode => {
-    const statsProps: StatsType = stats;
-    const revealed = statsProps.revealed;
+    const revealed = stats.revealed;
     const totalToReveal = statsState.totalToReveal;
 
     if (revealed >= 0 && totalToReveal >= 0) {
@@ -175,8 +167,7 @@ const Stats = ({ stats, options, revealTarget }: Props): JSX.Element => {
   };
 
   const renderFlagCount = (): React.ReactNode => {
-    const statsProps: StatsType = stats;
-    const flags = statsProps.flags;
+    const flags = stats.flags;
     let flagText = "Bombs Flagged:";
     if (flags === 1) {
       flagText = "Bomb Flagged:";
@@ -202,8 +193,7 @@ const Stats = ({ stats, options, revealTarget }: Props): JSX.Element => {
   };
 
   const renderQuestionsCount = (): React.ReactNode => {
-    const statsProps: StatsType = stats;
-    const questions = statsProps.questions;
+    const questions = stats.questions;
     if (questions >= 0) {
       return (
         <tr key="questions">

@@ -12,25 +12,7 @@ import {
   faQuestionCircle as farQuestionCircle,
 } from "@fortawesome/free-regular-svg-icons";
 import { squareReducer, squareInit } from "../reducers";
-import {
-  GameState,
-  AnimationsType,
-  ModesType,
-  SquareDataType,
-  ExplosionType,
-} from "../types";
-
-interface Props {
-  animations: AnimationsType;
-  gameState: GameState;
-  modes: ModesType;
-  squareData: SquareDataType;
-  squareKey: string;
-  explode: (squareKey: string) => void;
-  onSquareClick: (squareKey: string) => void;
-  toggleScroll: (bool: boolean, anim: string) => void;
-  explosion: ExplosionType;
-}
+import { SquareProps } from "../types";
 
 const Square = ({
   animations,
@@ -42,7 +24,7 @@ const Square = ({
   onSquareClick,
   toggleScroll,
   explosion
-}: Props): JSX.Element => {
+}: SquareProps): JSX.Element => {
   // Manage state
   const [squareState, squareDispatch] = React.useReducer(
     squareReducer,
@@ -59,14 +41,14 @@ const Square = ({
     // Reset square if it's a new game
     if (modes.newGame && fireState) {
       squareDispatch({
-        type: "SetFireAnim",
+        type: "SQUARE_SET_FIRE_ANIM",
         payload: {
           fireAnimIsPlaying: false,
         },
       });
     } else if (modes.newGame && bombState) {
       squareDispatch({
-        type: "SetBombAnim",
+        type: "SQUARE_SET_BOMB_ANIM",
         payload: {
           bombAnimIsPlaying: false,
         },
@@ -75,7 +57,7 @@ const Square = ({
     // Prevent animation renders if an animation is already playing
     if (explodeTrigger && !fire && !bombState) {
       squareDispatch({
-        type: "AllValues",
+        type: "SQUARE_ALL_VALUES",
         payload: {
           bombAnimIsPlaying: true,
           fireAnimIsPlaying: false,
@@ -83,7 +65,7 @@ const Square = ({
       });
     } else if (!explodeTrigger && fire && !fireState) {
       squareDispatch({
-        type: "AllValues",
+        type: "SQUARE_ALL_VALUES",
         payload: {
           bombAnimIsPlaying: false,
           fireAnimIsPlaying: true,

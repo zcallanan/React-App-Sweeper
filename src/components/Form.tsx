@@ -1,20 +1,6 @@
 import React from "react";
 import { formReducer, formInit } from "../reducers";
-import {
-  GameState,
-  CustomGameValues,
-  SizeDifficultyLives,
-  DictString
-} from "../types";
-
-interface Props {
-  gameState: GameState;
-  data: CustomGameValues;
-  options: SizeDifficultyLives;
-  modalClose: () => void;
-  initSquares: (size: number) => void;
-  saveOptions: (obj: SizeDifficultyLives) => void;
-}
+import { DictString, FormProps } from "../types";
 
 const Form = ({
   gameState,
@@ -23,7 +9,7 @@ const Form = ({
   modalClose,
   initSquares,
   saveOptions,
-}: Props): JSX.Element => {
+}: FormProps): JSX.Element => {
   // Manage state
   const [formState, formDispatch] = React.useReducer(
     formReducer,
@@ -36,7 +22,7 @@ const Form = ({
     const livesState = formState.lives;
     if (sizeState < 0 && difficultyState < 0 && livesState < 0 ) {
       formDispatch({
-        type: "InitValues",
+        type: "FORM_INIT_VALUES",
         payload: {
           size: options.size,
           difficulty: options.difficulty,
@@ -94,7 +80,7 @@ const Form = ({
     }
 
     formDispatch({
-      type: "SetError",
+      type: "FORM_SET_ERROR",
       payload: { errorString },
     });
     return formIsValid;
@@ -129,7 +115,7 @@ const Form = ({
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
     if ((e.target as HTMLInputElement).name === 'size') {
       formDispatch({
-        type: "SetSize",
+        type: "FORM_SET_SIZE",
         payload: {
           size: Number((e.target as HTMLInputElement).value),
         },
@@ -142,14 +128,14 @@ const Form = ({
   ): void => {
     if ((e.target as HTMLSelectElement).name === 'difficulty') {
       formDispatch({
-        type: "SetDifficulty",
+        type: "FORM_SET_DIFFICULTY",
         payload: {
           difficulty: Number((e.target as HTMLSelectElement).value),
         },
       });
     } else if ((e.target as HTMLSelectElement).name === 'lives') {
       formDispatch({
-        type: "SetLives",
+        type: "FORM_SET_LIVES",
         payload: {
           lives: Number((e.target as HTMLSelectElement).value),
         },

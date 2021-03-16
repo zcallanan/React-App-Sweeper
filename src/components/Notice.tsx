@@ -1,20 +1,11 @@
 import React from "react";
 import { TransitionGroup, CSSTransition } from "react-transition-group";
-import { Notices } from "../types";
+import { NoticesProps, DictString } from "../types";
 
-interface Props {
-  notices: Notices;
-}
-
-type KeyMessage = {
-  key: string;
-  message: string;
-};
-
-const Notice = ({notices}: Props): JSX.Element => {
+const Notice = ({notices}: NoticesProps): JSX.Element => {
   const handleNotice = (): JSX.Element => {
     const { bombNotice, victoryNotice, defeatNotice } = notices;
-    let notice: KeyMessage = {
+    let notice: DictString = {
       key: null,
       message: null,
     };
