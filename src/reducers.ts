@@ -230,11 +230,11 @@ export const appReducer = (state: typeof appInit, action: AppAction) => {
     return {
       ...state,
       gameState: {
-        progress: action.payload.gameState.progress,
+        progress: action.payload.progress,
         options: {
-          size: action.payload.gameState.options.size,
-          difficulty: action.payload.gameState.options.difficulty,
-          lives: action.payload.gameState.options.lives,
+          size: action.payload.options.size,
+          difficulty: action.payload.options.difficulty,
+          lives: action.payload.options.lives,
         },
       }
     };
@@ -243,7 +243,7 @@ export const appReducer = (state: typeof appInit, action: AppAction) => {
       ...state,
       gameState: {
         ...state.gameState,
-        progress: action.payload.gameState.progress,
+        progress: action.payload.progress,
       }
     };
     case "MODES_NEWGAME":
@@ -251,7 +251,7 @@ export const appReducer = (state: typeof appInit, action: AppAction) => {
       ...state,
       modes: {
         ...state.modes,
-        newGame: action.payload.modes.newGame,
+        newGame: action.payload.newGame,
       }
     };
     case "MODES_GAMEBOARD_DRAWING":
@@ -259,7 +259,7 @@ export const appReducer = (state: typeof appInit, action: AppAction) => {
       ...state,
       modes: {
         ...state.modes,
-        drawing: action.payload.modes.drawing,
+        drawing: action.payload.drawing,
       }
     };
     case "GAMESTATS_CLEANUP":
@@ -267,9 +267,9 @@ export const appReducer = (state: typeof appInit, action: AppAction) => {
       ...state,
       gameStats: {
         ...state.gameStats,
-        revealed: action.payload.gameStats.revealed,
-        flags: action.payload.gameStats.flags,
-        questions: action.payload.gameStats.questions,
+        revealed: action.payload.revealed,
+        flags: action.payload.flags,
+        questions: action.payload.questions,
       }
     }
     case "GAMESTATS_STARTING_LIVES":
@@ -277,7 +277,15 @@ export const appReducer = (state: typeof appInit, action: AppAction) => {
       ...state,
       gameStats: {
         ...state.gameStats,
-        currentLives: action.payload.gameStats.currentLives,
+        currentLives: action.payload.currentLives,
+      }
+    };
+    case "GAMESTATS_SET_BOMB_COUNT":
+    return {
+      ...state,
+      gameStats: {
+        ...state.gameStats,
+        bombs: action.payload.bombs,
       }
     };
     case "GAMESTATS_UPDATE_TOTALTOREVEAL":
@@ -285,7 +293,7 @@ export const appReducer = (state: typeof appInit, action: AppAction) => {
       ...state,
       gameStats: {
         ...state.gameStats,
-        totalToReveal: action.payload.gameStats.totalToReveal,
+        totalToReveal: action.payload.totalToReveal,
       }
     };
     case "FORM_RESET":
@@ -293,8 +301,8 @@ export const appReducer = (state: typeof appInit, action: AppAction) => {
       ...state,
       animations: {
         ...state.animations,
-        bombFade: action.payload.animations.bombFade,
-        seed: action.payload.animations.seed,
+        bombFade: action.payload.bombFade,
+        seed: action.payload.seed,
       }
     };
     case "FORM_TOGGLE_SQUARESCROLL":
@@ -302,7 +310,7 @@ export const appReducer = (state: typeof appInit, action: AppAction) => {
       ...state,
       animations: {
         ...state.animations,
-        squareScroll: action.payload.animations.squareScroll,
+        squareScroll: action.payload.squareScroll,
       }
     };
     case "MODAL_CLOSE":
@@ -310,9 +318,9 @@ export const appReducer = (state: typeof appInit, action: AppAction) => {
       ...state,
       modal: {
         ...state.modal,
-        isVisible: action.payload.modal.isVisible,
-        timer: action.payload.modal.timer,
-        modalCleanup: action.payload.modal.modalCleanup,
+        isVisible: action.payload.isVisible,
+        timer: action.payload.timer,
+        modalCleanup: action.payload.modalCleanup,
       }
     };
     case "NOTICES_CLEANUP":
@@ -320,9 +328,9 @@ export const appReducer = (state: typeof appInit, action: AppAction) => {
       ...state,
       notices: {
         ...state.notices,
-        bombNotice: action.payload.notices.bombNotice,
-        victoryNotice: action.payload.notices.victoryNotice,
-        defeatNotice: action.payload.notices.defeatNotice,
+        bombNotice: action.payload.bombNotice,
+        victoryNotice: action.payload.victoryNotice,
+        defeatNotice: action.payload.defeatNotice,
       }
     };
     case "SQUARES_ADD":
@@ -330,7 +338,7 @@ export const appReducer = (state: typeof appInit, action: AppAction) => {
       ...state,
       squares: {
         ...state.squares,
-        [action.key]: action.payload.squareValue,
+        [action.key]: action.payload,
       }
     };
     case "SQUARES_DELETE":
@@ -339,6 +347,17 @@ export const appReducer = (state: typeof appInit, action: AppAction) => {
     };
     delete stateCopy.squares[action.key];
     return stateCopy;
+    case "SQUARES_BOMB":
+    return {
+      ...state,
+      squares: {
+        ...state.squares,
+        [action.key]: {
+          ...state.squares[action.key],
+          bomb: action.payload.bomb,
+        }
+      }
+    };
     default:
       throw new Error();
   }

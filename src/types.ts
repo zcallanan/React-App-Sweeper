@@ -104,131 +104,48 @@ export type AnimationsType = {
   bombFade: boolean;
 };
 
-/* *****************************
-  App Payload Types (Reducers)
-***************************** */
+/* ************************************
+  App Action Payload Types (Reducers)
+************************************ */
 
-// GAMESTATE Payloads
-type GameStateAllPd = {
-  gameState: GameState;
-}
-
-type GameStateProgPd = {
-  gameState: ProgressProp;
-}
-
-// GameState Properties
-
-type ProgressProp = {
+type Progress = {
   progress: number;
 };
 
-/*
-  GAMESTATS Payloads
-*/
-
-type GameStatsLivesPd = {
-  gameStats: LivesProp;
-};
-
-type GStatsCleanupPd = {
-  gameStats: GStatsCleanupProps;
-};
-
-type GStatsUpdateTotalToRevealPd = {
-  gameStats: GStatsUpdateTotalToRevealProp;
-};
-
-// GAMESTATS Properties
-
-type LivesProp = {
+type CurrentLives = {
   currentLives: number;
 };
 
-type GStatsCleanupProps = {
+type GStatsCleanup = {
   revealed: number;
   flags: number;
   questions: number;
 };
 
-type GStatsUpdateTotalToRevealProp = {
+type TotalToReveal = {
   totalToReveal: number;
 };
 
-/*
-  MODES Payloads
-*/
+type BombCount = {
+  bombs: number;
+};
 
-type ModesLivesPd = {
-  modes: NewGameProp;
-}
-
-type ModesDrawingPd = {
-  modes: DrawingProp;
-}
-
-// MODES Properties
-
-type NewGameProp = {
+type NewGame = {
   newGame: boolean;
 }
 
-type DrawingProp = {
+type Drawing = {
   drawing: boolean;
 }
 
-/*
-  ANIMATIONS Payloads
-*/
-
-type FormResetPd = {
-  animations: FormResetProps;
-};
-
-type FormToggleSqScrollPd = {
-  animations: FormToggleSqScrollProp;
-};
-
-// ANIMATIONS Properties
-
-type FormResetProps = {
+type FormReset = {
   seed: number;
   bombFade: boolean;
 };
 
-type FormToggleSqScrollProp = {
-  squareScroll: boolean;
+type Bomb = {
+  bomb: boolean;
 };
-
-/*
-  MODALS Payloads
-*/
-
-type ModalClosePd = {
-  modal: ModalType;
-};
-
-// MODALS Properties
-
-
-/*
-  NOTICES Payloads
-*/
-
-type NoticesCleanupPd = {
-  notices: Notices
-};
-
-// NOTICES Properties
-
-/*
-  SQUARES Payloads
-*/
-
-type SquaresAddPd = {
-  squareValue: SquareDataType
-};
-
 
 /* ***********************************
   Component Payload Types (Reducers)
@@ -263,19 +180,22 @@ export type StatsPd = {
   Action Types (Reducers)
 ************************ */
 
-export type AppAction = { type: "GAMESTATE_INIT"; payload: GameStateAllPd }
-  | { type: "GAMESTATE_SET_PROGRESS"; payload: GameStateProgPd }
-  | { type: "MODES_NEWGAME"; payload: ModesLivesPd }
-  | { type: "MODES_GAMEBOARD_DRAWING"; payload: ModesDrawingPd }
-  | { type: "GAMESTATS_STARTING_LIVES"; payload: GameStatsLivesPd }
-  | { type: "GAMESTATS_CLEANUP"; payload: GStatsCleanupPd }
-  | { type: "GAMESTATS_UPDATE_TOTALTOREVEAL"; payload: GStatsUpdateTotalToRevealPd }
-  | { type: "FORM_RESET"; payload: FormResetPd }
-  | { type: "FORM_TOGGLE_SQUARESCROLL"; payload: FormToggleSqScrollPd }
-  | { type: "MODAL_CLOSE"; payload: ModalClosePd }
-  | { type: "NOTICES_CLEANUP"; payload: NoticesCleanupPd }
-  | { type: "SQUARES_ADD"; key: string; payload: SquaresAddPd }
+export type AppAction = { type: "GAMESTATE_INIT"; payload: GameState }
+  | { type: "GAMESTATE_SET_PROGRESS"; payload: Progress }
+  | { type: "MODES_NEWGAME"; payload: NewGame }
+  | { type: "MODES_GAMEBOARD_DRAWING"; payload: Drawing }
+  | { type: "GAMESTATS_STARTING_LIVES"; payload: CurrentLives }
+  | { type: "GAMESTATS_SET_BOMB_COUNT"; payload: BombCount  }
+  | { type: "GAMESTATS_CLEANUP"; payload: GStatsCleanup }
+  | { type: "GAMESTATS_UPDATE_TOTALTOREVEAL"; payload: TotalToReveal }
+  | { type: "FORM_RESET"; payload: FormReset }
+  | { type: "FORM_TOGGLE_SQUARESCROLL"; payload: DictBool }
+  | { type: "MODAL_CLOSE"; payload: ModalType }
+  | { type: "NOTICES_CLEANUP"; payload: Notices }
+  | { type: "SQUARES_ADD"; key: string; payload: SquareDataType }
   | { type: "SQUARES_DELETE"; key: string; }
+  | { type: "SQUARES_BOMB"; key: string; payload: Bomb }
+
 
 export type FormAction = { type: "FORM_INIT_VALUES"; payload: SizeDifficultyLives }
   | { type: "FORM_SET_SIZE"; payload: DictNumber }

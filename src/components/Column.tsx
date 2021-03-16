@@ -4,7 +4,7 @@ import { ColumnProps } from "../types";
 
 class Column extends React.Component<ColumnProps> {
   render() {
-    const column: Array<JSX.Element> = [];
+    const column: JSX.Element[] = [];
     let squareKey: string = "";
 
     for (let i = 0; i < this.props.size; i++) {

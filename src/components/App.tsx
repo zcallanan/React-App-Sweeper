@@ -50,31 +50,25 @@ const App = (): JSX.Element => {
     appDispatch({
       type: "GAMESTATE_INIT",
       payload: {
-        gameState: {
-          progress,
-          options: {
-            size,
-            difficulty,
-            lives
-          },
-        }
+        progress,
+        options: {
+          size,
+          difficulty,
+          lives
+        },
       },
     });
     // Get initial number of lives
     appDispatch({
       type: "GAMESTATS_STARTING_LIVES",
       payload: {
-        gameStats: {
-          currentLives: Number(dataInit.numberOfLives[lives]),
-        }
+        currentLives: Number(dataInit.numberOfLives[lives]),
       }
     });
     appDispatch({
       type: "MODES_NEWGAME",
       payload: {
-        modes: {
-          newGame: true,
-        }
+        newGame: true,
       },
     });
     initSquares(size);
@@ -87,49 +81,39 @@ const App = (): JSX.Element => {
     appDispatch({
       type: "GAMESTATE_INIT",
       payload: {
-        gameState: {
-          progress: 0,
-          options: {
-            size: obj.size,
-            difficulty: obj.difficulty,
-            lives: obj.lives,
-          },
-        }
+        progress: 0,
+        options: {
+          size: obj.size,
+          difficulty: obj.difficulty,
+          lives: obj.lives,
+        },
       },
     });
     appDispatch({
       type: "GAMESTATS_STARTING_LIVES",
       payload: {
-        gameStats: {
-          currentLives: Number(dataInit.numberOfLives[obj.lives]),
-        }
+        currentLives: Number(dataInit.numberOfLives[obj.lives]),
       }
     });
     appDispatch({
       type: "MODES_NEWGAME",
       payload: {
-        modes: {
-          newGame: true,
-        }
+        newGame: true,
       },
     });
     appDispatch({
       type: "FORM_RESET",
       payload: {
-        animations: {
-          seed: randomIntFromInterval(1, 9999),
-          bombFade: false,
-        }
+        seed: randomIntFromInterval(1, 9999),
+        bombFade: false,
       },
     });
     appDispatch({
       type: "MODAL_CLOSE",
       payload: {
-        modal: {
-          isVisible: false,
-          timer: false,
-          modalCleanup: false,
-        }
+        isVisible: false,
+        timer: false,
+        modalCleanup: false,
       },
     });
     // Save user selection to local storage
@@ -145,21 +129,17 @@ const App = (): JSX.Element => {
     appDispatch({
       type: "GAMESTATS_CLEANUP",
       payload: {
-        gameStats: {
-          revealed = 0,
-          flags = 0,
-          questions = 0,
-        }
+        revealed = 0,
+        flags = 0,
+        questions = 0,
       }
     });
     appDispatch({
       type: "NOTICES_CLEANUP",
       payload: {
-        notices: {
-          bombNotice = false,
-          victoryNotice = false,
-          defeatNotice = false,
-        }
+        bombNotice = false,
+        victoryNotice = false,
+        defeatNotice = false,
       }
     });
     // If size decreases, then square keys should be deleted before the board is regenerated
@@ -190,21 +170,19 @@ const App = (): JSX.Element => {
           type: "SQUARES_ADD",
           key: `r${i}-s${k}`,
           payload: {
-            squareValue: {
-              bomb: false,
-              flagged: false,
-              questionMarked: false,
-              clicked: false,
-              hint: false,
-              neighbors: [],
-              adjacentBombCount: -1,
-              explosion: {
-                explodeTrigger: false,
-                explodeTimer: false,
-                explodeCleanup: false,
-                explodeFire: false,
-              },
-            }
+            bomb: false,
+            flagged: false,
+            questionMarked: false,
+            clicked: false,
+            hint: false,
+            neighbors: [],
+            adjacentBombCount: -1,
+            explosion: {
+              explodeTrigger: false,
+              explodeTimer: false,
+              explodeCleanup: false,
+              explodeFire: false,
+            },
           },
         });
       }
@@ -216,9 +194,7 @@ const App = (): JSX.Element => {
       appDispatch({
         type: "MODES_GAMEBOARD_DRAWING",
         payload: {
-          modes: {
-            drawing: false,
-          }
+          drawing: false,
         },
       });
     }, 1500); // Timer ~synced with square draw anim transition of 1.5s
@@ -229,54 +205,70 @@ const App = (): JSX.Element => {
     let percentage: number;
     let positionArray: string[] = [];
     // Copy game board dimension
-    const options: SizeDifficultyLives = { ...this.state.gameState.options };
-    let size: number;
-      size = options.size;
-    const squares: SquaresType = { ...this.state.squares };
-    const stats: GameStats = { ...this.state.stats };
+    const options: SizeDifficultyLives = appState.gameState.options;
+    // const size: number = options.size;
+    // const squares: SquaresType = appState.squares;
+    const gameStats: GameStats = appState.gameStats;
     // Get percentage of bombs
-    for (const [key, value] of Object.entries(this.state.data.bombPercentage)) {
-      if (parseInt(key) === options.difficulty) {
-        percentage = parseFloat(value) * 0.01;
+    Object.entries(dataInit.bombPercentage).forEach((value) => {
+      if (Number(value[0]) === options.difficulty) {
+        percentage = parseFloat(value[1]) * 0.01;
       }
-    }
+    })
+    // for (const [key, value] of Object.entries(this.state.data.bombPercentage)) {
+    //   if (parseInt(key) === options.difficulty) {
+    //     percentage = parseFloat(value) * 0.01;
+    //   }
+    // }
     // Calculate number of bombs
-    const bombCount = Math.floor(size ** 2 * percentage);
+    const bombs = Math.floor(options.size ** 2 * percentage);
     // Save bombCount to stats
-    stats.bombs = bombCount;
+    // stats.bombs = bombCount;
     // Generate bomb positions
-    this.generatePositions(positionArray, squares, bombCount, size, 0);
+
     // Save bomb positions
-    this.setState({ squares, stats });
+    // this.setState({ squares, stats });
+    appDispatch({
+      type: "GAMESTATS_SET_BOMB_COUNT",
+      payload: {
+        bombs,
+      }
+    })
+    generatePositions(positionArray, 0);
   };
 
-  // Called by this.setBombs(), recursive function that determines whether a square has a bomb
-  protected generatePositions = (
-    positionArray: string[],
-    squares: SquaresType,
-    bombCount: number,
-    optionSize: number,
-    count: number
-  ): SquaresType => {
-    if (count > bombCount - 1) {
+  // Called by setBombs(), recursive function that determines whether a square has a bomb
+  const generatePositions = (positionArray: string[], count: number): void => {
+    const bombs: number = appState.gameStats.bombs;
+    if (count > bombs - 1) {
       // stop recursive call
-      return squares;
+      return;
     }
+
+    const size: number = appState.gameState.options.size;
     let tempPosition: string = `r${randomIntFromInterval(
       0,
-      optionSize - 1
-    )}-s${randomIntFromInterval(0, optionSize - 1)}`;
+      size - 1
+    )}-s${randomIntFromInterval(0, size - 1)}`;
+
+    // Position not a dupe, square is now set as a bomb, save in state
     if (!positionArray.includes(tempPosition)) {
+      const squares: SquaresType = appState.squares;
       squares[tempPosition].bomb = true;
       positionArray.push(tempPosition);
-      count++;
+      count += 1;
+      appDispatch({
+        type: "SQUARES_BOMB",
+        key: tempPosition,
+        payload: {
+          bomb: true,
+        }
+      });
     }
-    // If position was a dupe, count remains the same, otherwise a new bomb's position is generated
-    this.generatePositions(
+
+    // If position was a dupe, count remains the same, call again to generate a new position
+    generatePositions(
       positionArray,
-      squares,
-      bombCount,
-      optionSize,
       count
     );
   };
@@ -285,20 +277,18 @@ const App = (): JSX.Element => {
 
   // Prop for squares to update squareScroll state
   const toggleScroll = (bool: boolean, anim: string): void => {
-    const squareScroll: boolean = animationsState.squareScroll;
+    const squareScroll: boolean = appState.animations.squareScroll;
     appDispatch({
       type: "FORM_TOGGLE_SQUARESCROLL",
       payload: {
-        animations: {
-          [anim]: bool,
-        }
+        [anim]: bool,
       },
     });
   };
 
   // Prop function for stats to pass to global state
   const revealTarget = (totalToReveal: number): void => {
-    const totalToRevealState: number = gameStatsState.totalToReveal;
+    const totalToRevealState: number = appState.gameStats.totalToReveal;
     if (
       (totalToReveal > 0 && totalToRevealState <= 0) ||
       totalToReveal !== totalToRevealState
@@ -307,9 +297,7 @@ const App = (): JSX.Element => {
       appDispatch({
         type: "GAMESTATS_UPDATE_TOTALTOREVEAL",
         payload: {
-          animations: {
-            totalToReveal,
-          }
+          totalToReveal,
         },
       });
     }
