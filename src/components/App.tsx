@@ -48,7 +48,7 @@ const App = (): JSX.Element => {
       lives = 2;
     }
     appDispatch({
-      type: "GAMESTATE_INIT",
+      type: "GAME_INIT",
       payload: {
         progress,
         options: {
@@ -56,18 +56,7 @@ const App = (): JSX.Element => {
           difficulty,
           lives
         },
-      },
-    });
-    // Get initial number of lives
-    appDispatch({
-      type: "GAMESTATS_STARTING_LIVES",
-      payload: {
         currentLives: Number(dataInit.numberOfLives[lives]),
-      }
-    });
-    appDispatch({
-      type: "MODES_NEWGAME",
-      payload: {
         newGame: true,
       },
     });
@@ -79,7 +68,7 @@ const App = (): JSX.Element => {
     toggleScroll(true, "squareScroll");
     // Add new value to state
     appDispatch({
-      type: "GAMESTATE_INIT",
+      type: "GAME_INIT",
       payload: {
         progress: 0,
         options: {
@@ -87,30 +76,15 @@ const App = (): JSX.Element => {
           difficulty: obj.difficulty,
           lives: obj.lives,
         },
-      },
-    });
-    appDispatch({
-      type: "GAMESTATS_STARTING_LIVES",
-      payload: {
         currentLives: Number(dataInit.numberOfLives[obj.lives]),
-      }
-    });
-    appDispatch({
-      type: "MODES_NEWGAME",
-      payload: {
         newGame: true,
       },
     });
     appDispatch({
-      type: "FORM_RESET",
+      type: "FORM_INIT",
       payload: {
         seed: randomIntFromInterval(1, 9999),
         bombFade: false,
-      },
-    });
-    appDispatch({
-      type: "MODAL_CLOSE",
-      payload: {
         isVisible: false,
         timer: false,
         modalCleanup: false,
@@ -127,16 +101,11 @@ const App = (): JSX.Element => {
     // Cleanup a previous game
     const sizeState: number = appState.gameState.options.size;
     appDispatch({
-      type: "GAMESTATS_CLEANUP",
+      type: "GAMESTATS_NOTICES_CLEANUP",
       payload: {
         revealed = 0,
         flags = 0,
         questions = 0,
-      }
-    });
-    appDispatch({
-      type: "NOTICES_CLEANUP",
-      payload: {
         bombNotice = false,
         victoryNotice = false,
         defeatNotice = false,
@@ -204,10 +173,7 @@ const App = (): JSX.Element => {
   const setBombs = (): void => {
     let percentage: number;
     let positionArray: string[] = [];
-    // Copy game board dimension
     const options: SizeDifficultyLives = appState.gameState.options;
-    // const size: number = options.size;
-    // const squares: SquaresType = appState.squares;
     const gameStats: GameStats = appState.gameStats;
     // Get percentage of bombs
     Object.entries(dataInit.bombPercentage).forEach((value) => {
@@ -215,19 +181,7 @@ const App = (): JSX.Element => {
         percentage = parseFloat(value[1]) * 0.01;
       }
     })
-    // for (const [key, value] of Object.entries(this.state.data.bombPercentage)) {
-    //   if (parseInt(key) === options.difficulty) {
-    //     percentage = parseFloat(value) * 0.01;
-    //   }
-    // }
-    // Calculate number of bombs
     const bombs = Math.floor(options.size ** 2 * percentage);
-    // Save bombCount to stats
-    // stats.bombs = bombCount;
-    // Generate bomb positions
-
-    // Save bomb positions
-    // this.setState({ squares, stats });
     appDispatch({
       type: "GAMESTATS_SET_BOMB_COUNT",
       payload: {
@@ -266,7 +220,7 @@ const App = (): JSX.Element => {
       });
     }
 
-    // If position was a dupe, count remains the same, call again to generate a new position
+    // If position was a dupe, count remains the same.
     generatePositions(
       positionArray,
       count
@@ -304,11 +258,11 @@ const App = (): JSX.Element => {
   };
 
   // Prop to toggle state when mode buttons are clicked (flag, question mark)
-  protected onModeClick = (e: React.FormEvent<HTMLFormElement>): void => {
+  const onModeClick = (e: React.FormEvent<HTMLFormElement>): void => {
     e.preventDefault();
-    // 1. Get state of flag
-    const modes: ModesType = { ...this.state.modes };
-    // 2. Change flag setting
+    // 1. From State
+    const modes: ModesType = appState.modes;
+    // 2. Change setting
     modes[(e.target as HTMLFormElement).name] = !modes[
       (e.target as HTMLFormElement).name
     ];
@@ -325,50 +279,79 @@ const App = (): JSX.Element => {
       modes.flagMode = false;
     }
     // 4. Save change
-    this.setState({ modes });
+    appDispatch({
+      type: "SET_FLAG_QUESTION",
+      payload: {
+        flagMode: modes.flagMode,
+        questionMode: modes.questionMode,
+      },
+    });
   };
 
   // Prop for Square component when clicking on a bomb square
-  protected explode = (squareKey: string): void => {
-    let squares: SquaresType = { ...this.state.squares };
+  const explode = (squareKey: string): void => {
+    let squares: SquaresType = appState.squares;
     if (!squares[squareKey].explosion.explodeCleanup) {
       // Prevent further animations if it's time to cleanup
-      squares[squareKey].explosion.explodeTrigger = false;
-      this.setState({ squares });
+      appDispatch({
+        type: "SQUARES_TOGGLE_EXPLODE_TRIGGER",
+        key: squareKey,
+        payload: {
+          explodeTrigger: false,
+        },
+      });
       setTimeout(() => {
-        // Prompt bomb animation every second
-        squares = { ...this.state.squares };
-        squares[squareKey].explosion.explodeTrigger = true;
-        this.setState({ squares });
+        appDispatch({
+          type: "SQUARES_TOGGLE_EXPLODE_TRIGGER",
+          key: squareKey,
+          payload: {
+            explodeTrigger: true,
+          },
+        });
       }, 1000);
       if (!squares[squareKey].explosion.explodeTimer) {
         // Start a timer to stop bomb animation
-        squares = { ...this.state.squares };
         // Timer started, prevent it from starting again
-        squares[squareKey].explosion.explodeTimer = true;
+        // TODO was not saving this, what happens?
+        appDispatch({
+          type: "SQUARES_TOGGLE_EXPLODE_TIMER",
+          key: squareKey,
+          payload: {
+            explodeTimer: true,
+          },
+        });
+        // bomb explosion timer
         setTimeout(() => {
-          this.explodeCleanup(squareKey);
-        }, 3000); // bomb explosion timer
+          explodeCleanup(squareKey);
+        }, 3000);
       }
     } else {
       // Reset cleanup back to default
-      squares[squareKey].explosion.explodeCleanup = false;
-      squares[squareKey].explosion.explodeTrigger = false;
-      squares = { ...this.state.squares };
+      // TODO was not saving this, what happens?
+      appDispatch({
+        type: "SQUARES_EXPLODE_PARTIAL_RESET",
+        key: squareKey,
+        payload: {
+          explodeCleanup: false,
+          explodeTrigger: false,
+        },
+      });
     }
   };
 
   // Cleanup bombMode, resetting bomb square, reset bombNotice, and remove disabled from clickable squares
-  protected explodeCleanup = (squareKey: string): void => {
-    const squares: SquaresType = { ...this.state.squares };
-    const gameState: GameState = { ...this.state.gameState };
-    squares[squareKey].explosion.explodeTrigger = false;
-    squares[squareKey].explosion.explodeTimer = false;
-    squares[squareKey].explosion.explodeCleanup = true;
-    // Remove display notice
-    const notices = { ...this.state.notices };
-    notices.bombNotice = false;
-    this.setState({ squares, notices });
+  const explodeCleanup = (squareKey: string): void => {
+    appDispatch({
+      type: "SQUARES_NOTICES_CLEANUP",
+      key: squareKey,
+      payload: {
+        explodeTrigger = false,
+        explodeTimer = false,
+        explodeCleanup = true,
+        bombNotice = false,
+      },
+    });
+
     setTimeout(() => {
       const squares = { ...this.state.squares };
       const modes = { ...this.state.modes };

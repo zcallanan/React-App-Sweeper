@@ -226,7 +226,7 @@ export const statsReducer = (state: typeof statsInit, action: StatsAction) => {
 
 export const appReducer = (state: typeof appInit, action: AppAction) => {
   switch (action.type) {
-    case "GAMESTATE_INIT":
+    case "GAME_INIT":
     return {
       ...state,
       gameState: {
@@ -236,6 +236,14 @@ export const appReducer = (state: typeof appInit, action: AppAction) => {
           difficulty: action.payload.options.difficulty,
           lives: action.payload.options.lives,
         },
+      },
+      modes: {
+        ...state.modes,
+        newGame: action.payload.newGame,
+      },
+      gameStats: {
+        ...state.gameStats,
+        currentLives: action.payload.currentLives,
       }
     };
     case "GAMESTATE_SET_PROGRESS":
@@ -246,14 +254,6 @@ export const appReducer = (state: typeof appInit, action: AppAction) => {
         progress: action.payload.progress,
       }
     };
-    case "MODES_NEWGAME":
-    return {
-      ...state,
-      modes: {
-        ...state.modes,
-        newGame: action.payload.newGame,
-      }
-    };
     case "MODES_GAMEBOARD_DRAWING":
     return {
       ...state,
@@ -262,9 +262,24 @@ export const appReducer = (state: typeof appInit, action: AppAction) => {
         drawing: action.payload.drawing,
       }
     };
-    case "GAMESTATS_CLEANUP":
+    case "SET_FLAG_QUESTION":
     return {
       ...state,
+      modes: {
+        ...state.modes,
+        flagMode: action.payload.flagMode,
+        questionMode: action.payload.questionMode,
+      }
+    };
+    case "GAMESTATS_NOTICES_CLEANUP":
+    return {
+      ...state,
+      notices: {
+        ...state.notices,
+        bombNotice: action.payload.bombNotice,
+        victoryNotice: action.payload.victoryNotice,
+        defeatNotice: action.payload.defeatNotice,
+      },
       gameStats: {
         ...state.gameStats,
         revealed: action.payload.revealed,
@@ -272,14 +287,6 @@ export const appReducer = (state: typeof appInit, action: AppAction) => {
         questions: action.payload.questions,
       }
     }
-    case "GAMESTATS_STARTING_LIVES":
-    return {
-      ...state,
-      gameStats: {
-        ...state.gameStats,
-        currentLives: action.payload.currentLives,
-      }
-    };
     case "GAMESTATS_SET_BOMB_COUNT":
     return {
       ...state,
@@ -296,14 +303,20 @@ export const appReducer = (state: typeof appInit, action: AppAction) => {
         totalToReveal: action.payload.totalToReveal,
       }
     };
-    case "FORM_RESET":
+    case "FORM_INIT":
     return {
       ...state,
       animations: {
         ...state.animations,
         bombFade: action.payload.bombFade,
         seed: action.payload.seed,
-      }
+      },
+      modal: {
+        ...state.modal,
+        isVisible: action.payload.isVisible,
+        timer: action.payload.timer,
+        modalCleanup: action.payload.modalCleanup,
+      },
     };
     case "FORM_TOGGLE_SQUARESCROLL":
     return {
@@ -311,26 +324,6 @@ export const appReducer = (state: typeof appInit, action: AppAction) => {
       animations: {
         ...state.animations,
         squareScroll: action.payload.squareScroll,
-      }
-    };
-    case "MODAL_CLOSE":
-    return {
-      ...state,
-      modal: {
-        ...state.modal,
-        isVisible: action.payload.isVisible,
-        timer: action.payload.timer,
-        modalCleanup: action.payload.modalCleanup,
-      }
-    };
-    case "NOTICES_CLEANUP":
-    return {
-      ...state,
-      notices: {
-        ...state.notices,
-        bombNotice: action.payload.bombNotice,
-        victoryNotice: action.payload.victoryNotice,
-        defeatNotice: action.payload.defeatNotice,
       }
     };
     case "SQUARES_ADD":
@@ -355,6 +348,69 @@ export const appReducer = (state: typeof appInit, action: AppAction) => {
         [action.key]: {
           ...state.squares[action.key],
           bomb: action.payload.bomb,
+        }
+      }
+    };
+    case "SQUARES_TOGGLE_EXPLODE_TRIGGER":
+    return {
+      ...state,
+      squares: {
+        ...state.squares,
+        [action.key]: {
+          ...state.squares[action.key],
+          explosion: {
+            ...state.squares[action.key].explosion,
+            explodeTrigger: action.payload.explodeTrigger,
+          }
+        }
+      }
+    };
+    case "SQUARES_TOGGLE_EXPLODE_TIMER":
+    return {
+      ...state,
+      squares: {
+        ...state.squares,
+        [action.key]: {
+          ...state.squares[action.key],
+          explosion: {
+            ...state.squares[action.key].explosion,
+            explodeTimer: action.payload.explodeTimer,
+          }
+        }
+      }
+    };
+    case "SQUARES_EXPLODE_PARTIAL_RESET":
+    return {
+      ...state,
+      squares: {
+        ...state.squares,
+        [action.key]: {
+          ...state.squares[action.key],
+          explosion: {
+            ...state.squares[action.key].explosion,
+            explodeCleanup: action.payload.explodeCleanup,
+            explodeTrigger: action.payload.explodeTrigger,
+          }
+        }
+      }
+    };
+    case "SQUARES_NOTICES_CLEANUP":
+    return {
+      ...state,
+      squares: {
+        ...state.squares,
+        [action.key]: {
+          ...state.squares[action.key],
+          notices: {
+            ...state.notices,
+            bombNotice: action.payload.bombNotice,
+          },
+          explosion: {
+            ...state.squares[action.key].explosion,
+            explodeCleanup: action.payload.explodeCleanup,
+            explodeTrigger: action.payload.explodeTrigger,
+            explodeTimer: action.payload.explodeTimer,
+          }
         }
       }
     };

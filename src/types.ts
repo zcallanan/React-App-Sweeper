@@ -108,6 +108,21 @@ export type AnimationsType = {
   App Action Payload Types (Reducers)
 ************************************ */
 
+type GameInit = {
+  progress: number;
+  options: SizeDifficultyLives;
+  currentLives: number;
+  newGame: boolean;
+};
+
+type FormInit = {
+  seed: number,
+  bombFade: boolean,
+  isVisible: boolean,
+  timer: boolean,
+  modalCleanup: boolean,
+};
+
 type Progress = {
   progress: number;
 };
@@ -116,10 +131,13 @@ type CurrentLives = {
   currentLives: number;
 };
 
-type GStatsCleanup = {
+type GStatsNoticesCleanup = {
   revealed: number;
   flags: number;
   questions: number;
+  bombNotice: boolean;
+  victoryNotice: boolean;
+  defeatNotice: boolean;
 };
 
 type TotalToReveal = {
@@ -147,6 +165,31 @@ type Bomb = {
   bomb: boolean;
 };
 
+type ModeToggle = {
+  flagMode: boolean;
+  questionMode: boolean;
+}
+
+type ExplodeTrigger = {
+  explodeTrigger: boolean;
+};
+
+type ExplodeTimer = {
+  explodeTimer: boolean;
+};
+
+type ExplodePartial = {
+  explodeCleanup: boolean;
+  explodeTrigger: boolean;
+};
+
+type SquaresNoticesCleanup = {
+  explodeCleanup: boolean;
+  explodeTrigger: boolean;
+  explodeTimer: boolean;
+  bombNotice: boolean;
+};
+
 /* ***********************************
   Component Payload Types (Reducers)
 *********************************** */
@@ -169,32 +212,26 @@ export type StatsPd = {
   totalToReveal: number;
 };
 
-
-
-
-
-
-
-
 /* ************************
   Action Types (Reducers)
 ************************ */
 
-export type AppAction = { type: "GAMESTATE_INIT"; payload: GameState }
+export type AppAction = { type: "GAME_INIT"; payload: GameInit }
+  | { type: "FORM_INIT"; payload: FormInit }
   | { type: "GAMESTATE_SET_PROGRESS"; payload: Progress }
-  | { type: "MODES_NEWGAME"; payload: NewGame }
   | { type: "MODES_GAMEBOARD_DRAWING"; payload: Drawing }
-  | { type: "GAMESTATS_STARTING_LIVES"; payload: CurrentLives }
+  | { type: "SET_FLAG_QUESTION"; payload: ModeToggle }
   | { type: "GAMESTATS_SET_BOMB_COUNT"; payload: BombCount  }
-  | { type: "GAMESTATS_CLEANUP"; payload: GStatsCleanup }
+  | { type: "GAMESTATS_NOTICES_CLEANUP"; payload: GStatsNoticesCleanup }
   | { type: "GAMESTATS_UPDATE_TOTALTOREVEAL"; payload: TotalToReveal }
-  | { type: "FORM_RESET"; payload: FormReset }
   | { type: "FORM_TOGGLE_SQUARESCROLL"; payload: DictBool }
-  | { type: "MODAL_CLOSE"; payload: ModalType }
-  | { type: "NOTICES_CLEANUP"; payload: Notices }
   | { type: "SQUARES_ADD"; key: string; payload: SquareDataType }
   | { type: "SQUARES_DELETE"; key: string; }
   | { type: "SQUARES_BOMB"; key: string; payload: Bomb }
+  | { type: "SQUARES_TOGGLE_EXPLODE_TRIGGER"; key: string; payload: ExplodeTrigger }
+  | { type: "SQUARES_TOGGLE_EXPLODE_TIMER"; key: string; payload: ExplodeTimer }
+  | { type: "SQUARES_EXPLODE_PARTIAL_RESET"; key: string; payload: ExplodePartial }
+  | { type: "SQUARES_NOTICES_CLEANUP"; key: string; payload: SquaresNoticesCleanup }
 
 
 export type FormAction = { type: "FORM_INIT_VALUES"; payload: SizeDifficultyLives }
