@@ -24,10 +24,14 @@
     "styles:watch": "yarn styles -- -w",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "lint": "eslint . --ext .ts,.tsx"
   },
   "eslintConfig": {
-    "extends": "react-app"
+    "extends": [
+      "react-app",
+      "plugin:react-hooks/recommended"
+    ]
   },
   "browserslist": {
     "production": [
@@ -47,6 +51,7 @@
     "@testing-library/user-event": "^12.8.3",
     "@types/react": "^17.0.3",
     "@types/react-dom": "^17.0.2",
-    "@types/react-transition-group": "^4.4.1"
+    "@types/react-transition-group": "^4.4.1",
+    "eslint-plugin-react-hooks": "^4.2.0"
   }
 }

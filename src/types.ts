@@ -25,6 +25,8 @@ export type AppState = {
 
 // GameState data
 export type GameState = {
+  initialized: boolean,
+  clickHistory: string[],
   progress: number;
   options: SizeDifficultyLives;
 };
@@ -190,6 +192,97 @@ type SquaresNoticesCleanup = {
   bombNotice: boolean;
 };
 
+type RemoveClickBombMode = {
+  clicked: boolean;
+  bombMode: boolean;
+};
+
+type DefeatExplodeBomb = {
+  explodeTrigger: boolean;
+  explodeFire: boolean;
+  bombMode: boolean;
+};
+
+type ExplodeFire = {
+  explodeFire: boolean;
+};
+
+type ModalTimer = {
+  timer: boolean;
+};
+
+type ModalCleanup = {
+  modalCleanup: boolean;
+};
+
+type ModalVisibility = {
+  isVisible: boolean;
+};
+
+type Flagged = {
+  flagged: boolean;
+};
+
+type QuestionMarked = {
+  questionMarked: boolean;
+};
+
+type FlaggedFlagCount = {
+  flags: number;
+  flagged: boolean;
+};
+
+type QuestionMarkedQsCount = {
+  questions: number;
+  questionMarked: boolean;
+};
+
+type SquareHint = {
+  hint: boolean;
+};
+
+type SquareClicked = {
+  clicked: boolean;
+};
+
+type SquareNeighbors = {
+  neighbors: string[];
+  adjacentBombCount: number;
+};
+
+type SquaresRevealed = {
+  revealed: number;
+};
+
+type VictorySet = {
+  progress: number;
+  victoryNotice: boolean;
+  bombFade: boolean;
+};
+
+type BombNotice = {
+  bombNotice: boolean;
+};
+
+type BombClicked = {
+  currentLives: number;
+  bombMode: boolean;
+  explodeTrigger: boolean;
+};
+
+type DefeatNotice = {
+  defeatNotice: boolean;
+  progress: number;
+};
+
+type Initialized = {
+  initialized: boolean;
+};
+
+type PushClickHistory = {
+  key: string;
+};
+
 /* ***********************************
   Component Payload Types (Reducers)
 *********************************** */
@@ -218,6 +311,7 @@ export type StatsPd = {
 
 export type AppAction = { type: "GAME_INIT"; payload: GameInit }
   | { type: "FORM_INIT"; payload: FormInit }
+  | { type: "SQUARES_INITIALIZED"; payload: Initialized }
   | { type: "GAMESTATE_SET_PROGRESS"; payload: Progress }
   | { type: "MODES_GAMEBOARD_DRAWING"; payload: Drawing }
   | { type: "SET_FLAG_QUESTION"; payload: ModeToggle }
@@ -228,10 +322,30 @@ export type AppAction = { type: "GAME_INIT"; payload: GameInit }
   | { type: "SQUARES_ADD"; key: string; payload: SquareDataType }
   | { type: "SQUARES_DELETE"; key: string; }
   | { type: "SQUARES_BOMB"; key: string; payload: Bomb }
-  | { type: "SQUARES_TOGGLE_EXPLODE_TRIGGER"; key: string; payload: ExplodeTrigger }
-  | { type: "SQUARES_TOGGLE_EXPLODE_TIMER"; key: string; payload: ExplodeTimer }
-  | { type: "SQUARES_EXPLODE_PARTIAL_RESET"; key: string; payload: ExplodePartial }
+  | { type: "EXPLODE_TRIGGER"; key: string; payload: ExplodeTrigger }
+  | { type: "EXPLODE_TIMER"; key: string; payload: ExplodeTimer }
   | { type: "SQUARES_NOTICES_CLEANUP"; key: string; payload: SquaresNoticesCleanup }
+  | { type: "REMOVE_CLICK_BOMBMODE"; key: string; payload: RemoveClickBombMode }
+  | { type: "DEFEAT_EXPLODE_BOMB"; key: string; payload: DefeatExplodeBomb }
+  | { type: "EXPLODE_FIRE"; key: string; payload: ExplodeFire }
+  | { type: "SQUARE_HINT"; key: string; payload: SquareHint }
+  | { type: "SQUARE_CLICKED"; key: string; payload: SquareClicked }
+  | { type: "SQUARE_NEIGHBORS"; key: string, payload: SquareNeighbors }
+  | { type: "MODAL_TIMER"; payload: ModalTimer }
+  | { type: "MODAL_CLEANUP"; payload: ModalCleanup }
+  | { type: "MODAL_VISIBILITY"; payload: ModalVisibility }
+  | { type: "TOGGLE_NEWGAME"; payload: NewGame }
+  | { type: "FLAGGED_FLAG_COUNT"; key: string; payload: FlaggedFlagCount }
+  | { type: "QUESTIONMARKED_QS_COUNT"; key: string; payload: QuestionMarkedQsCount }
+  | { type: "FLAGGED"; key: string; payload: Flagged }
+  | { type: "QUESTIONMARKED"; key: string; payload: QuestionMarked }
+  | { type: "SQUARES_REVEALED"; payload: SquaresRevealed }
+  | { type: "VICTORY_SET"; payload: VictorySet }
+  | { type: "BOMB_NOTICE"; payload: BombNotice }
+  | { type: "BOMB_CLICKED"; key: string; payload: BombClicked }
+  | { type: "DEFEAT_NOTICE"; payload: DefeatNotice }
+  | { type: "PUSH_CLICK_HISTORY"; payload: PushClickHistory }
+
 
 
 export type FormAction = { type: "FORM_INIT_VALUES"; payload: SizeDifficultyLives }
@@ -273,7 +387,7 @@ export type StatsProps = {
 
 export type QuestionProps = {
   modes: ModesType;
-  gameState: GameState;
+  progress: number;
   onModeClick(e: React.FormEvent<HTMLFormElement>): void;
 };
 
@@ -282,17 +396,17 @@ export type NoticesProps = {
 };
 
 export type FormProps = {
-  gameState: GameState;
+  progress: number;
   data: CustomGameValues;
   options: SizeDifficultyLives;
-  modalClose: () => void;
   initSquares: (size: number) => void;
+  modalClose: () => void;
   saveOptions: (obj: SizeDifficultyLives) => void;
 };
 
 export type FlagProps = {
   modes: ModesType;
-  gameState: GameState;
+  progress: number;
   onModeClick(e: React.FormEvent<HTMLFormElement>): void;
 };
 

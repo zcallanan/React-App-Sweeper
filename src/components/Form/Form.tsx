@@ -1,9 +1,10 @@
 import React from "react";
-import { formReducer, formInit } from "../reducers";
-import { DictString, FormProps } from "../types";
+import formInit from "./form-init";
+import formReducer from "./form-reducer";
+import { DictString, FormProps } from "../../types";
 
 const Form = ({
-  gameState,
+  progress,
   data,
   options,
   modalClose,
@@ -146,7 +147,7 @@ const Form = ({
   const submitButtonText = (): string => {
     /* If the player won or lost, ask if they want to Play Another Game.
     If from customize settings, display Play Sweeper */
-    return gameState.progress !== 0 ? "Play Again?" : "Play Sweeper";
+    return progress !== 0 ? "Play Again?" : "Play Sweeper";
   };
 
   const percentages: DictString = data.bombPercentage;

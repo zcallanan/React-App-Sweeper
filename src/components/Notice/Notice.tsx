@@ -1,6 +1,6 @@
 import React from "react";
 import { TransitionGroup, CSSTransition } from "react-transition-group";
-import { NoticesProps, DictString } from "../types";
+import { NoticesProps, DictString } from "../../types";
 
 const Notice = ({notices}: NoticesProps): JSX.Element => {
   const handleNotice = (): JSX.Element => {

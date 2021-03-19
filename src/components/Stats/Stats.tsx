@@ -1,7 +1,8 @@
 import React from "react";
 import { TransitionGroup, CSSTransition } from "react-transition-group";
-import { statsReducer, statsInit } from "../reducers";
-import { StatsProps } from "../types";
+import statsInit from "./stats-init";
+import statsReducer from "./stats-reducer";
+import { StatsProps } from "../../types";
 
 const Stats = ({ stats, options, revealTarget }: StatsProps): JSX.Element => {
   // Manage state

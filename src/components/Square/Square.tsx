@@ -11,8 +11,9 @@ import {
   faFlag as farFlag,
   faQuestionCircle as farQuestionCircle,
 } from "@fortawesome/free-regular-svg-icons";
-import { squareReducer, squareInit } from "../reducers";
-import { SquareProps } from "../types";
+import squareInit from "./square-init";
+import squareReducer from "./square-reducer";
+import { SquareProps } from "../../types";
 
 const Square = ({
   animations,
@@ -33,20 +34,22 @@ const Square = ({
 
   React.useEffect(() => {
     // From State
-    const bombState: boolean = squareState.bombAnimIsPlaying;
-    const fireState: boolean = squareState.fireAnimIsPlaying;
+    const bombAnimIsPlaying: boolean = squareState.bombAnimIsPlaying;
+    const fireAnimIsPlaying: boolean = squareState.fireAnimIsPlaying;
     // From Props
     const explodeTrigger: boolean = explosion.explodeTrigger;
-    const fire: boolean = explosion.explodeFire;
+    const explodeFire: boolean = explosion.explodeFire;
     // Reset square if it's a new game
-    if (modes.newGame && fireState) {
+    if (modes.newGame && fireAnimIsPlaying) {
+      // Stop fire anim
       squareDispatch({
         type: "SQUARE_SET_FIRE_ANIM",
         payload: {
           fireAnimIsPlaying: false,
         },
       });
-    } else if (modes.newGame && bombState) {
+    } else if ((modes.newGame && bombAnimIsPlaying) || (!explodeTrigger && bombAnimIsPlaying)) {
+      // Stop bomb anim
       squareDispatch({
         type: "SQUARE_SET_BOMB_ANIM",
         payload: {
@@ -55,7 +58,8 @@ const Square = ({
       });
     }
     // Prevent animation renders if an animation is already playing
-    if (explodeTrigger && !fire && !bombState) {
+    if (explodeTrigger && !explodeFire && !bombAnimIsPlaying) {
+      // Start bomb anim
       squareDispatch({
         type: "SQUARE_ALL_VALUES",
         payload: {
@@ -63,7 +67,8 @@ const Square = ({
           fireAnimIsPlaying: false,
         },
       });
-    } else if (!explodeTrigger && fire && !fireState) {
+    } else if (!explodeTrigger && explodeFire && !fireAnimIsPlaying) {
+      // Start fire anim
       squareDispatch({
         type: "SQUARE_ALL_VALUES",
         payload: {
@@ -82,14 +87,14 @@ const Square = ({
 
   const cssTransition = (): JSX.Element => {
     // From State
-    const bombState: boolean = squareState.bombAnimIsPlaying;
-    const fireState: boolean = squareState.fireAnimIsPlaying;
+    const bombAnimIsPlaying: boolean = squareState.bombAnimIsPlaying;
+    const fireAnimIsPlaying: boolean = squareState.fireAnimIsPlaying;
     // From Props
     const bombFade: boolean = animations.bombFade;
     const explodeTrigger: boolean = explosion.explodeTrigger;
-    const fire: boolean = explosion.explodeFire;
+    const explodeFire: boolean = explosion.explodeFire;
 
-    if (explodeTrigger && !fire && !bombState) {
+    if (explodeTrigger && !explodeFire && !bombAnimIsPlaying) {
       return (
         <CSSTransition
           classNames="bomba"
@@ -102,15 +107,15 @@ const Square = ({
           <FontAwesomeIcon key={squareKey} icon={faBomb} />
         </CSSTransition>
       );
-    } else if (!explodeTrigger && fire && !fireState) {
+    } else if (!explodeTrigger && explodeFire && !fireAnimIsPlaying) {
       return (
         <CSSTransition
           className="fire-enter"
           classNames="fire"
           mountOnEnter
           key={squareKey}
-          in={fire}
-          appear={fire}
+          in={explodeFire}
+          appear={explodeFire}
           timeout={{ enter: 10000, exit: 20000 }}
         >
           <FontAwesomeIcon key={squareKey} icon={faFireAlt} />

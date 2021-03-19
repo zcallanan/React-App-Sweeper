@@ -1,6 +1,6 @@
 import React from "react";
-import Square from "./Square";
-import { ColumnProps } from "../types";
+import Square from "../Square/Square";
+import { ColumnProps } from "../../types";
 
 class Column extends React.Component<ColumnProps> {
   render() {
