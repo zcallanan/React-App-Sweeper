@@ -24,6 +24,7 @@ const appInit: AppState = {
   gameState : {
     initialized: false,
     clickHistory: [],
+    bombPositions: [],
     progress: 0, // -1 defeat, 0 mid-game, 1 victory
     options: {
       // User input settings, loaded from localStorage if available

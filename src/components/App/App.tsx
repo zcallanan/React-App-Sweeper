@@ -132,9 +132,9 @@ const App = (): JSX.Element => {
     }
   }, [needsNeighbors]);
 
-  /* ---------------------------------------------------
-    Calculate win condition number of squares revealed
-  --------------------------------------------------- */
+  /* ---------------------------------------------------------------
+    Calculate gameStats number of squares revealed (win condition)
+  --------------------------------------------------------------- */
 
   const getRevealed = React.useCallback((): number => {
     // Get a count of clicked non-bomb squares
@@ -153,6 +153,40 @@ const App = (): JSX.Element => {
       },
     });
   }, [getRevealed]);
+
+  /* ------------------------------------------------------
+    Calculate gameStats number of bombs on the game board
+  ------------------------------------------------------ */
+
+  const calculateBombs = React.useCallback((): number => {
+    // Determibes bomb count based on difficulty and board size
+    let percentage: number;
+    const difficulty: number = appState.gameState.options.difficulty;
+    const size: number = appState.gameState.options.size;
+    // Get percentage of bombs
+    Object.entries(dataInit.bombPercentage).forEach((value) => {
+      if (Number(value[0]) === difficulty) {
+        percentage = parseFloat(value[1]) * 0.01;
+      }
+    });
+    const bombs = Math.floor(size ** 2 * percentage);
+    return bombs;
+  }, [appState.gameState.options.difficulty, appState.gameState.options.size]);
+
+  useEffectDebugger((): void => {
+    // Saves bomb count to state if it's a value > 1
+    if (appState.gameStats.bombs < 1) {
+      const bombs = calculateBombs();
+      if (bombs && bombs > 1) {
+        appDispatch({
+          type: "GAMESTATS_SET_BOMB_COUNT",
+          payload: {
+            bombs,
+          },
+        });
+      }
+    }
+  }, [calculateBombs])
 
   /* --------------------------------------------------------------
     When a square is clicked, all nonbomb, nonhint squares clicked
@@ -309,31 +343,33 @@ const App = (): JSX.Element => {
     appState.squares,
   ]);
 
-  // Called by setBombs(), recursive function that determines whether a square has a bomb
-  const generatePositions = (
-    positionArray: string[],
-    bombs: number,
-    count: number
-  ): void => {
+  /* -----------------------------
+    Mark squares as hidden bombs
+  ----------------------------- */
+
+  const assignSquaresAsBombs = React.useCallback((positionArray: string[], count: number): number => {
+
+    const bombs: number = appState.gameStats.bombs;
     if (count > bombs - 1) {
-      // stop recursive call
-      return;
+      // Once positionArray has the number of bombs - 1 that we need, return
+      return 1;
     }
-
     const size: number = appState.gameState.options.size;
+    // Generate a random square key
+    let tempPosition: string = `r${
+      randomIntFromInterval(0, size - 1)
+    }-s${
+      randomIntFromInterval(0, size - 1)
+    }`;
 
-    let tempPosition: string = `r${randomIntFromInterval(
-      0,
-      size - 1
-    )}-s${randomIntFromInterval(0, size - 1)}`;
-
-    // Position not a dupe, square is now set as a bomb, save in state
+    /* Determine whether positionArray already contains tempPosition
+    If it does, then discard it and generate a different tempPosition
+    If it does not, then save it to positionArray */
     if (!positionArray.includes(tempPosition)) {
       // const squares: SquaresType = appState.squares;
       // squares[tempPosition].bomb = true;
       positionArray.push(tempPosition);
       count += 1;
-      console.log("generate:", tempPosition, ":", positionArray);
       appDispatch({
         type: "SQUARES_BOMB",
         key: tempPosition,
@@ -342,37 +378,19 @@ const App = (): JSX.Element => {
         },
       });
     }
-
     // If position was a dupe, count remains the same.
-    generatePositions(positionArray, bombs, count);
-  };
+    assignSquaresAsBombs(positionArray, count);
+  }, [appState.gameState.options.size, appState.gameStats.bombs]);
 
-  // Use user input to call bomb position fn and save positions to state
-  const setBombs = (): void => {
-    let percentage: number;
-    let positionArray: string[] = [];
-    const options: SizeDifficultyLives = appState.gameState.options;
-    // Get percentage of bombs
-    Object.entries(dataInit.bombPercentage).forEach((value) => {
-      console.log("forEach?");
-      if (Number(value[0]) === options.difficulty) {
-        percentage = parseFloat(value[1]) * 0.01;
-      }
-    });
-    console.log(percentage, "--", options.size);
-    const bombs = Math.floor(options.size ** 2 * percentage);
-    console.log("bombs:", bombs);
-    appDispatch({
-      type: "GAMESTATS_SET_BOMB_COUNT",
-      payload: {
-        bombs,
-      },
-    });
-    generatePositions(positionArray, bombs, 0);
-  };
-
-  const setBombsRef = React.useRef(setBombs);
-  setBombsRef.current = setBombs;
+  useEffectDebugger((): void => {
+    /* If a neighbor has an adjacent bomb, hasn't been clicked or
+    had its hint revealed, then reveal its hint */
+    const bombs = appState.gameStats.bombs;
+    if (bombs) {
+      const positionArray: string[] = [];
+      assignSquaresAsBombs(positionArray, 0);
+    }
+  }, [assignSquaresAsBombs]);
 
   // Generate initial squares state
   const initSquares = (size: number): void => {
@@ -435,7 +453,6 @@ const App = (): JSX.Element => {
       }
     }
     // Determine what squares have bombs
-    setTimeout(() => setBombsRef.current(), 200);
     setTimeout(() => {
       // When the board initially draws input is disabled. This timer enables the board
       appDispatch({
@@ -446,6 +463,10 @@ const App = (): JSX.Element => {
       });
     }, 1500); // Timer ~synced with square draw anim transition of 1.5s
   };
+
+  /* ****************
+    Component Props
+  **************** */
 
   // User submits form: Save Player's game board options
   const saveOptions = (obj: SizeDifficultyLives): void => {
@@ -478,8 +499,6 @@ const App = (): JSX.Element => {
     // Save user selection to local storage
     localStorage.setItem("sweeper-options", JSON.stringify(obj));
   };
-
-  /* Props */
 
   // Prop for squares to update squareScroll state
   const toggleScroll = (bool: boolean, anim: string): void => {

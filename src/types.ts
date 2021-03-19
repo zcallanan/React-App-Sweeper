@@ -27,6 +27,7 @@ export type AppState = {
 export type GameState = {
   initialized: boolean,
   clickHistory: string[],
+  bombPositions: string[],
   progress: number;
   options: SizeDifficultyLives;
 };

@@ -183,22 +183,14 @@ const appReducer = (state: typeof appInit, action: AppAction) => {
       }
     };
     case "SQUARES_DELETE":
-    let stateCopy = {
-      ...state,
-    };
-    delete stateCopy.squares[action.key];
-    return stateCopy;
+    const stateA = { ...state };
+    delete stateA.squares[action.key];
+    return stateA;
     case "SQUARES_BOMB":
-    return {
-      ...state,
-      squares: {
-        ...state.squares,
-        [action.key]: {
-          ...state.squares[action.key],
-          bomb: action.payload.bomb,
-        }
-      }
-    };
+    const stateB = { ...state };
+    stateB.gameState.bombPositions.push(action.key);
+    stateB.squares[action.key].bomb = action.payload.bomb;
+    return stateB;
     case "EXPLODE_TRIGGER":
     return {
       ...state,
