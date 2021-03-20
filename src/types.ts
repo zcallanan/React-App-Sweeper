@@ -4,7 +4,7 @@ export type DictNumber = {
 };
 
 export type DictBool = {
-  [key:string]: boolean;
+  [key: string]: boolean;
 };
 
 export type DictString = {
@@ -13,7 +13,7 @@ export type DictString = {
 
 // App State
 export type AppState = {
-  gameState : GameState;
+  gameState: GameState;
   data: CustomGameValues;
   squares: SquaresType;
   modes: ModesType;
@@ -25,9 +25,11 @@ export type AppState = {
 
 // GameState data
 export type GameState = {
-  initialized: boolean,
-  clickHistory: string[],
-  bombPositions: string[],
+  initialized: boolean;
+  clickHistory: string[];
+  bombPositions: string[];
+  gameReset: boolean;
+  squaresComplete: boolean;
   progress: number;
   options: SizeDifficultyLives;
 };
@@ -118,12 +120,22 @@ type GameInit = {
   newGame: boolean;
 };
 
-type FormInit = {
-  seed: number,
-  bombFade: boolean,
-  isVisible: boolean,
-  timer: boolean,
-  modalCleanup: boolean,
+type GameResetCleanup = {
+  seed: number;
+  bombs: number;
+  clickHistory: string[];
+  bombPositions: string[];
+  squaresComplete: boolean;
+  bombFade: boolean;
+  isVisible: boolean;
+  timer: boolean;
+  modalCleanup: boolean;
+  revealed: number;
+  flags: number;
+  questions: number;
+  bombNotice: boolean;
+  victoryNotice: boolean;
+  defeatNotice: boolean;
 };
 
 type Progress = {
@@ -132,15 +144,6 @@ type Progress = {
 
 type CurrentLives = {
   currentLives: number;
-};
-
-type GStatsNoticesCleanup = {
-  revealed: number;
-  flags: number;
-  questions: number;
-  bombNotice: boolean;
-  victoryNotice: boolean;
-  defeatNotice: boolean;
 };
 
 type TotalToReveal = {
@@ -153,15 +156,10 @@ type BombCount = {
 
 type NewGame = {
   newGame: boolean;
-}
+};
 
 type Drawing = {
   drawing: boolean;
-}
-
-type FormReset = {
-  seed: number;
-  bombFade: boolean;
 };
 
 type Bomb = {
@@ -171,7 +169,7 @@ type Bomb = {
 type ModeToggle = {
   flagMode: boolean;
   questionMode: boolean;
-}
+};
 
 type ExplodeTrigger = {
   explodeTrigger: boolean;
@@ -284,15 +282,23 @@ type PushClickHistory = {
   key: string;
 };
 
+type GameReset = {
+  gameReset: boolean;
+};
+
+type SquaresComplete = {
+  squaresComplete: boolean;
+};
+
 /* ***********************************
   Component Payload Types (Reducers)
 *********************************** */
 
 export type FormPd = {
-  size: number,
-  difficulty: number,
-  lives: number,
-  errorString: string,
+  size: number;
+  difficulty: number;
+  lives: number;
+  errorString: string;
 };
 
 export type SquarePd = {
@@ -310,34 +316,44 @@ export type StatsPd = {
   Action Types (Reducers)
 ************************ */
 
-export type AppAction = { type: "GAME_INIT"; payload: GameInit }
-  | { type: "FORM_INIT"; payload: FormInit }
+export type AppAction =
+  | { type: "GAME_INIT"; payload: GameInit }
+  | { type: "GAME_RESET"; payload: GameReset }
+  | { type: "GAME_RESET_CLEANUP"; payload: GameResetCleanup }
   | { type: "SQUARES_INITIALIZED"; payload: Initialized }
   | { type: "GAMESTATE_SET_PROGRESS"; payload: Progress }
   | { type: "MODES_GAMEBOARD_DRAWING"; payload: Drawing }
   | { type: "SET_FLAG_QUESTION"; payload: ModeToggle }
-  | { type: "GAMESTATS_SET_BOMB_COUNT"; payload: BombCount  }
-  | { type: "GAMESTATS_NOTICES_CLEANUP"; payload: GStatsNoticesCleanup }
+  | { type: "GAMESTATS_SET_BOMB_COUNT"; payload: BombCount }
   | { type: "GAMESTATS_UPDATE_TOTALTOREVEAL"; payload: TotalToReveal }
   | { type: "FORM_TOGGLE_SQUARESCROLL"; payload: DictBool }
   | { type: "SQUARES_ADD"; key: string; payload: SquareDataType }
-  | { type: "SQUARES_DELETE"; key: string; }
+  | { type: "SQUARES_DELETE"; key: string }
   | { type: "SQUARES_BOMB"; key: string; payload: Bomb }
   | { type: "EXPLODE_TRIGGER"; key: string; payload: ExplodeTrigger }
   | { type: "EXPLODE_TIMER"; key: string; payload: ExplodeTimer }
-  | { type: "SQUARES_NOTICES_CLEANUP"; key: string; payload: SquaresNoticesCleanup }
+  | {
+      type: "SQUARES_NOTICES_CLEANUP";
+      key: string;
+      payload: SquaresNoticesCleanup;
+    }
   | { type: "REMOVE_CLICK_BOMBMODE"; key: string; payload: RemoveClickBombMode }
   | { type: "DEFEAT_EXPLODE_BOMB"; key: string; payload: DefeatExplodeBomb }
   | { type: "EXPLODE_FIRE"; key: string; payload: ExplodeFire }
   | { type: "SQUARE_HINT"; key: string; payload: SquareHint }
   | { type: "SQUARE_CLICKED"; key: string; payload: SquareClicked }
-  | { type: "SQUARE_NEIGHBORS"; key: string, payload: SquareNeighbors }
+  | { type: "SQUARE_NEIGHBORS"; key: string; payload: SquareNeighbors }
   | { type: "MODAL_TIMER"; payload: ModalTimer }
   | { type: "MODAL_CLEANUP"; payload: ModalCleanup }
   | { type: "MODAL_VISIBILITY"; payload: ModalVisibility }
   | { type: "TOGGLE_NEWGAME"; payload: NewGame }
   | { type: "FLAGGED_FLAG_COUNT"; key: string; payload: FlaggedFlagCount }
-  | { type: "QUESTIONMARKED_QS_COUNT"; key: string; payload: QuestionMarkedQsCount }
+  | { type: "SQUARES_INIT_COMPLETE"; payload: SquaresComplete }
+  | {
+      type: "QUESTIONMARKED_QS_COUNT";
+      key: string;
+      payload: QuestionMarkedQsCount;
+    }
   | { type: "FLAGGED"; key: string; payload: Flagged }
   | { type: "QUESTIONMARKED"; key: string; payload: QuestionMarked }
   | { type: "SQUARES_REVEALED"; payload: SquaresRevealed }
@@ -345,21 +361,22 @@ export type AppAction = { type: "GAME_INIT"; payload: GameInit }
   | { type: "BOMB_NOTICE"; payload: BombNotice }
   | { type: "BOMB_CLICKED"; key: string; payload: BombClicked }
   | { type: "DEFEAT_NOTICE"; payload: DefeatNotice }
-  | { type: "PUSH_CLICK_HISTORY"; payload: PushClickHistory }
+  | { type: "PUSH_CLICK_HISTORY"; payload: PushClickHistory };
 
-
-
-export type FormAction = { type: "FORM_INIT_VALUES"; payload: SizeDifficultyLives }
+export type FormAction =
+  | { type: "FORM_INIT_VALUES"; payload: SizeDifficultyLives }
   | { type: "FORM_SET_SIZE"; payload: DictNumber }
   | { type: "FORM_SET_DIFFICULTY"; payload: DictNumber }
   | { type: "FORM_SET_LIVES"; payload: DictNumber }
   | { type: "FORM_SET_ERROR"; payload: DictString };
 
-export type SquareAction = { type: "SQUARE_ALL_VALUES"; payload: SquarePd }
+export type SquareAction =
+  | { type: "SQUARE_ALL_VALUES"; payload: SquarePd }
   | { type: "SQUARE_SET_BOMB_ANIM"; payload: DictBool }
   | { type: "SQUARE_SET_FIRE_ANIM"; payload: DictBool };
 
-export type StatsAction = { type: "STATS_INIT_VALUES"; payload: StatsPd }
+export type StatsAction =
+  | { type: "STATS_INIT_VALUES"; payload: StatsPd }
   | { type: "STATS_SET_SIZE"; payload: DictNumber }
   | { type: "STATS_SET_BOMBS"; payload: DictNumber }
   | { type: "STATS_SET_TOTALTOREVEAL"; payload: DictNumber };

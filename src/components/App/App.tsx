@@ -159,7 +159,7 @@ const App = (): JSX.Element => {
   ------------------------------------------------------ */
 
   const calculateBombs = React.useCallback((): number => {
-    // Determibes bomb count based on difficulty and board size
+    // Determines bomb count based on difficulty and board size
     let percentage: number;
     const difficulty: number = appState.gameState.options.difficulty;
     const size: number = appState.gameState.options.size;
@@ -175,7 +175,8 @@ const App = (): JSX.Element => {
 
   useEffectDebugger((): void => {
     // Saves bomb count to state if it's a value > 1
-    if (appState.gameStats.bombs < 1) {
+    const bombsState = appState.gameStats.bombs;
+    if (bombsState < 1) {
       const bombs = calculateBombs();
       if (bombs && bombs > 1) {
         appDispatch({
@@ -186,7 +187,7 @@ const App = (): JSX.Element => {
         });
       }
     }
-  }, [calculateBombs])
+  }, [calculateBombs, appState.gameStats.bombs])
 
   /* --------------------------------------------------------------
     When a square is clicked, all nonbomb, nonhint squares clicked
@@ -205,7 +206,6 @@ const App = (): JSX.Element => {
           && !value[1].hint
         );
       });
-      console.log("hint values", toBeClicked)
       if (toBeClicked.length) {
         toBeClicked.forEach((subArray) => {
           result.push(subArray[0]);
@@ -219,7 +219,8 @@ const App = (): JSX.Element => {
     /* If a neighbor has no adjacent bombs, hasn't been clicked or
     had its hint revealed, then mark it clicked */
     const squareKeys: string[] = needsToBeClicked();
-    if (squareKeys.length) {
+    const gameReset: boolean = appState.gameState.gameReset;
+    if (squareKeys.length && !gameReset) {
       squareKeys.forEach((squareKey) => {
         // Set square as clicked in state
         appDispatch({
@@ -239,7 +240,7 @@ const App = (): JSX.Element => {
         });
       })
     }
-  }, [needsToBeClicked]);
+  }, [needsToBeClicked, appState.gameState.gameReset]);
 
   /* -----------------------------------------------------------------------
     When a square is clicked, all nonbomb, nonclicked neighbors gain hints
@@ -293,6 +294,7 @@ const App = (): JSX.Element => {
     let size: number;
     // Get options from local storage or default starting values
     const options = appState.gameState.options;
+    const gameReset = appState.gameState.gameReset;
     if (options.size === -1 || options.difficulty === -1) {
       const progress = 0;
 
@@ -305,6 +307,8 @@ const App = (): JSX.Element => {
         size = options.size;
         difficulty = options.difficulty;
         lives = options.lives;
+      } else if (gameReset) {
+        size = options.size;
       } else {
         // No local storage, set initial default values
         size = 10;
@@ -328,12 +332,6 @@ const App = (): JSX.Element => {
 
     const initialized = appState.gameState.initialized;
     if (!initialized) {
-      appDispatch({
-        type: "SQUARES_INITIALIZED",
-        payload: {
-          initialized: true,
-        },
-      });
       initSquares(size);
     }
   }, [
@@ -343,12 +341,14 @@ const App = (): JSX.Element => {
     appState.squares,
   ]);
 
-  /* -----------------------------
-    Mark squares as hidden bombs
-  ----------------------------- */
+  /* ---------------------------------------
+    Mark squares that contain hidden bombs
+  --------------------------------------- */
 
-  const assignSquaresAsBombs = React.useCallback((positionArray: string[], count: number): number => {
-
+  const assignSquaresAsBombs = React.useCallback((
+    positionArray: string[],
+    count: number
+  ): number => {
     const bombs: number = appState.gameStats.bombs;
     if (count > bombs - 1) {
       // Once positionArray has the number of bombs - 1 that we need, return
@@ -366,8 +366,6 @@ const App = (): JSX.Element => {
     If it does, then discard it and generate a different tempPosition
     If it does not, then save it to positionArray */
     if (!positionArray.includes(tempPosition)) {
-      // const squares: SquaresType = appState.squares;
-      // squares[tempPosition].bomb = true;
       positionArray.push(tempPosition);
       count += 1;
       appDispatch({
@@ -386,21 +384,43 @@ const App = (): JSX.Element => {
     /* If a neighbor has an adjacent bomb, hasn't been clicked or
     had its hint revealed, then reveal its hint */
     const bombs = appState.gameStats.bombs;
+    console.log("assign bombs")
     if (bombs) {
       const positionArray: string[] = [];
-      assignSquaresAsBombs(positionArray, 0);
+      const success = assignSquaresAsBombs(positionArray, 0);
+      const gameReset = appState.gameState.gameReset;
+      if (success && gameReset) {
+        // Once bombs assigned, if the game was reset by the form, mark as false
+        appDispatch({
+        type: "GAME_RESET",
+        payload: {
+          gameReset: false,
+        }
+      });
+      }
     }
-  }, [assignSquaresAsBombs]);
+  }, [assignSquaresAsBombs, appState.gameStats.bombs, appState.gameState.squaresComplete]);
 
-  // Generate initial squares state
-  const initSquares = (size: number): void => {
-    // Squares state
-    let squares: SquaresType = appState.squares;
-    // Cleanup a previous game
-    const sizeState: number = appState.gameState.options.size;
+  /* ---------------------------------------
+    Form submitted, reset the game board
+  --------------------------------------- */
+
+  useEffectDebugger((): void => {
+    /* If a neighbor has an adjacent bomb, hasn't been clicked or
+    had its hint revealed, then reveal its hint */
+    // Form submit triggers cleanup
     appDispatch({
-      type: "GAMESTATS_NOTICES_CLEANUP",
+      type: "GAME_RESET_CLEANUP",
       payload: {
+        seed: randomIntFromInterval(1, 9999),
+        bombs: -1,
+        clickHistory: [],
+        bombPositions: [],
+        squaresComplete: false,
+        bombFade: false,
+        isVisible: false,
+        timer: false,
+        modalCleanup: false,
         revealed: 0,
         flags: 0,
         questions: 0,
@@ -409,12 +429,33 @@ const App = (): JSX.Element => {
         defeatNotice: false,
       },
     });
+    appDispatch({
+      type: "SQUARES_INITIALIZED",
+      payload: {
+        initialized: false,
+      },
+    });
+  }, [appState.gameState.gameReset]);
+
+  // Generate initial squares state
+  const initSquares = (size: number): void => {
+    const gameReset = appState.gameState.gameReset;
+    appDispatch({
+      type: "SQUARES_INITIALIZED",
+      payload: {
+        initialized: true,
+      },
+    });
+    // Squares state
+    let squares: SquaresType = appState.squares;
+    // Cleanup a previous game
+    const sizeState: number = appState.gameState.options.size;
+
     // If size decreases, then square keys should be deleted before the board is regenerated
-    if (Object.keys(squares).length > 1) {
+    if (Object.keys(squares).length > 1 && gameReset) {
       let row: number = 0;
       let column: number = 0;
       Object.keys(squares).forEach((square: string) => {
-        console.log("test");
         row = Number(square!.split("-")[0].match(/\d{1,3}/)[0]);
         column = Number(square!.split("-")[1].match(/(\d{1,3})/)[0]);
         if (row > sizeState - 1 || column > sizeState - 1) {
@@ -429,8 +470,8 @@ const App = (): JSX.Element => {
     }
 
     // 2. Build squares object with default values
-    for (let i = 0; i < size; i++) {
-      for (let k = 0; k < size; k++) {
+    for (let i = 0; i < size; i += 1) {
+      for (let k = 0; k < size; k += 1) {
         appDispatch({
           type: "SQUARES_ADD",
           key: `r${i}-s${k}`,
@@ -452,16 +493,24 @@ const App = (): JSX.Element => {
         });
       }
     }
-    // Determine what squares have bombs
-    setTimeout(() => {
-      // When the board initially draws input is disabled. This timer enables the board
-      appDispatch({
-        type: "MODES_GAMEBOARD_DRAWING",
-        payload: {
-          drawing: false,
-        },
-      });
-    }, 1500); // Timer ~synced with square draw anim transition of 1.5s
+    appDispatch({
+      type: "SQUARES_INIT_COMPLETE",
+      payload: {
+        squaresComplete: true,
+      },
+    });
+
+    if (!gameReset) {
+      setTimeout(() => {
+        // When the board initially draws input is disabled.
+        appDispatch({
+          type: "MODES_GAMEBOARD_DRAWING",
+          payload: {
+            drawing: false,
+          },
+        });
+      }, 1500); // Timer ~synced with square draw anim transition of 1.5s
+    }
   };
 
   /* ****************
@@ -485,16 +534,11 @@ const App = (): JSX.Element => {
         newGame: true,
       },
     });
-    // Form submit triggers cleanup
     appDispatch({
-      type: "FORM_INIT",
+      type: "GAME_RESET",
       payload: {
-        seed: randomIntFromInterval(1, 9999),
-        bombFade: false,
-        isVisible: false,
-        timer: false,
-        modalCleanup: false,
-      },
+        gameReset: true,
+      }
     });
     // Save user selection to local storage
     localStorage.setItem("sweeper-options", JSON.stringify(obj));
@@ -810,6 +854,7 @@ const App = (): JSX.Element => {
           }
 
           Object.keys(squares).forEach((key) => {
+            console.log("Reveal the board")
             if (!squares[key].clicked) {
               // Reveal the board
               appDispatch({
@@ -853,6 +898,7 @@ const App = (): JSX.Element => {
               progress: -1,
             },
           });
+          console.log("Defeated")
           Object.keys(squares).forEach((key) => {
             if (!squares[key].clicked) {
               // Reveal the board when you lose

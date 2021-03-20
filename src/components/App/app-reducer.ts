@@ -65,22 +65,6 @@ const appReducer = (state: typeof appInit, action: AppAction) => {
         questionMode: action.payload.questionMode,
       }
     };
-    case "GAMESTATS_NOTICES_CLEANUP":
-    return {
-      ...state,
-      notices: {
-        ...state.notices,
-        bombNotice: action.payload.bombNotice,
-        victoryNotice: action.payload.victoryNotice,
-        defeatNotice: action.payload.defeatNotice,
-      },
-      gameStats: {
-        ...state.gameStats,
-        revealed: action.payload.revealed,
-        flags: action.payload.flags,
-        questions: action.payload.questions,
-      }
-    }
     case "GAMESTATS_SET_BOMB_COUNT":
     return {
       ...state,
@@ -135,13 +119,26 @@ const appReducer = (state: typeof appInit, action: AppAction) => {
         bombMode: action.payload.bombMode,
       }
     };
-    case "FORM_INIT":
+    case "GAME_RESET_CLEANUP":
     return {
       ...state,
+      gameStats: {
+        ...state.gameStats,
+        bombs: action.payload.bombs,
+        revealed: action.payload.revealed,
+        flags: action.payload.flags,
+        questions: action.payload.questions,
+      },
       animations: {
         ...state.animations,
         bombFade: action.payload.bombFade,
         seed: action.payload.seed,
+      },
+      gameState: {
+        ...state.gameState,
+        clickHistory: action.payload.clickHistory,
+        bombPositions: action.payload.bombPositions,
+        squaresComplete: action.payload.squaresComplete,
       },
       modal: {
         ...state.modal,
@@ -149,6 +146,11 @@ const appReducer = (state: typeof appInit, action: AppAction) => {
         timer: action.payload.timer,
         modalCleanup: action.payload.modalCleanup,
       },
+      notices: {
+        bombNotice: action.payload.bombNotice,
+        victoryNotice: action.payload.victoryNotice,
+        defeatNotice: action.payload.defeatNotice,
+      }
     };
     case "FORM_TOGGLE_SQUARESCROLL":
     return {
@@ -175,13 +177,9 @@ const appReducer = (state: typeof appInit, action: AppAction) => {
       },
     };
     case "SQUARES_ADD":
-    return {
-      ...state,
-      squares: {
-        ...state.squares,
-        [action.key]: action.payload,
-      }
-    };
+    const stateD = { ...state };
+    stateD.squares[action.key] = action.payload;
+    return stateD;
     case "SQUARES_DELETE":
     const stateA = { ...state };
     delete stateA.squares[action.key];
@@ -409,10 +407,26 @@ const appReducer = (state: typeof appInit, action: AppAction) => {
         progress: action.payload.progress,
       },
     };
+    case "GAME_RESET":
+    return {
+      ...state,
+      gameState: {
+        ...state.gameState,
+        gameReset: action.payload.gameReset,
+      },
+    };
     case "PUSH_CLICK_HISTORY":
-    let stateC = { ...state } ;
+    const stateC = { ...state } ;
     stateC.gameState.clickHistory.push(action.payload.key);
     return stateC;
+    case "SQUARES_INIT_COMPLETE":
+    return {
+      ...state,
+      gameState: {
+        ...state.gameState,
+        squaresComplete: action.payload.squaresComplete,
+      }
+    }
     default:
       throw new Error();
   }
