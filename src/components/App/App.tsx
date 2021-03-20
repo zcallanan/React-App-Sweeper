@@ -9,7 +9,7 @@ import Stats from "../Stats/Stats";
 import Notice from "../Notice/Notice";
 import { randomIntFromInterval, useEffectDebugger } from "../../helpers";
 import appReducer from "./app-reducer";
-import { appInit, dataInit } from "./app-init";
+import { appInit, dataInit, squareInit } from "./app-init";
 import {
   GameState,
   SquaresType,
@@ -21,10 +21,6 @@ import {
 const App = (): JSX.Element => {
   // Manage state
   const [appState, appDispatch] = React.useReducer(appReducer, appInit);
-
-  /* ************************
-    useEffect / useCallback
-  ************************ */
 
   /* -----------------------
     Find Square neighbors
@@ -533,36 +529,15 @@ const App = (): JSX.Element => {
     Assign default values to square properties
   ------------------------------------------- */
 
-  useEffectDebugger((): void => {
-    const initialized = appState.gameState.initialized;
-    const squaresPruned = appState.gameState.squaresPruned;
-    if (initialized && squaresPruned) {
-      // const squares: SquaresType = appState.squares;
-      const size: number = appState.gameState.options.size;
+  const addSquare = (i: number, k: number): number => {
+    const size: number = appState.gameState.options.size;
+    if (k === size) {
+      // Roll over to the next row/column set if k equals size
+      [i, k] = [i + 1, 0];
+    }
 
-      for (let i = 0; i < size; i += 1) {
-        for (let k = 0; k < size; k += 1) {
-          appDispatch({
-            type: "SQUARES_ADD",
-            key: `r${i}-s${k}`,
-            payload: {
-              bomb: false,
-              flagged: false,
-              questionMarked: false,
-              clicked: false,
-              hint: false,
-              neighbors: [],
-              adjacentBombCount: -1,
-              explosion: {
-                explodeTrigger: false,
-                explodeTimer: false,
-                explodeCleanup: false,
-                explodeFire: false,
-              },
-            },
-          });
-        }
-      }
+    if (i === size) {
+      // End recursion if row # is equal to size
       appDispatch({
         type: "SQUARES_PRUNED",
         payload: {
@@ -575,6 +550,26 @@ const App = (): JSX.Element => {
           squaresComplete: true,
         },
       });
+      return 1;
+    } else {
+      // Copy squareInit or bombs property is mutated
+      const squareData = { ...squareInit };
+      appDispatch({
+        type: "SQUARES_ADD",
+        key: `r${i}-s${k}`,
+        payload: squareData,
+      });
+    }
+    // Increment column # by one each time through
+    addSquare(i, k + 1);
+  };
+
+  useEffectDebugger((): void => {
+    const initialized = appState.gameState.initialized;
+    const squaresPruned = appState.gameState.squaresPruned;
+    if (initialized && squaresPruned) {
+      // Add square properties to squares gameState
+      addSquare(0, 0);
     }
   }, [appState.gameState.initialized, appState.gameState.squaresPruned]);
 

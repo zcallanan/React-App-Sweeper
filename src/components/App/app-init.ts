@@ -1,4 +1,4 @@
-import { AppState, CustomGameValues } from "../../types";
+import { AppState, CustomGameValues, SquareDataType } from "../../types";
 import { randomIntFromInterval } from "../../helpers";
 
 const dataInit: CustomGameValues = {
@@ -20,6 +20,22 @@ const dataInit: CustomGameValues = {
   },
 };
 
+const squareInit: SquareDataType = {
+  bomb: false,
+  flagged: false,
+  questionMarked: false,
+  clicked: false,
+  hint: false,
+  neighbors: [],
+  adjacentBombCount: -1,
+  explosion: {
+    explodeTrigger: false,
+    explodeTimer: false,
+    explodeCleanup: false,
+    explodeFire: false,
+  }
+}
+
 const appInit: AppState = {
   gameState : {
     initialized: false, // Prevents calling initSquares during a game
@@ -39,21 +55,7 @@ const appInit: AppState = {
   },
   data: dataInit,
   squares: {
-    "r0-s0": {
-      bomb: false,
-      flagged: false,
-      questionMarked: false,
-      clicked: false,
-      hint: false,
-      neighbors: [],
-      adjacentBombCount: -1,
-      explosion: {
-        explodeTrigger: false,
-        explodeTimer: false,
-        explodeCleanup: false,
-        explodeFire: false,
-      },
-    },
+    "r0-s0": squareInit,
   },
   modes: {
     newGame: false, // Denotes the start of a new game before a square is selected
@@ -87,4 +89,4 @@ const appInit: AppState = {
    },
 };
 
-export { appInit, dataInit };
+export { appInit, dataInit, squareInit };
