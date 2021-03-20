@@ -25,8 +25,10 @@ const appInit: AppState = {
     initialized: false, // Prevents calling initSquares during a game
     clickHistory: [], // Every square revealed during a game
     bombPositions: [], // Where bombs are hidden
+    bombPositionsAssigned: false,
     gameReset: false, // Toggled when a form submits (saveOptions) a game reset
     squaresComplete: false, // Toggled when squares are saved with default data
+    squaresPruned: false,
     progress: 0, // -1 defeat, 0 mid-game, 1 victory
     options: {
       // User input settings, loaded from localStorage if available

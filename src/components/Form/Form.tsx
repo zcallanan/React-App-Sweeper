@@ -8,7 +8,6 @@ const Form = ({
   data,
   options,
   modalClose,
-  initSquares,
   saveOptions,
 }: FormProps): JSX.Element => {
   // Manage state
@@ -103,8 +102,6 @@ const Form = ({
         difficulty: difficultyState,
         lives: livesState,
       });
-      // Determine positioning of bombs
-      initSquares(sizeState);
     } else {
       setTimeout(() => {
         const errorState: string = formState.errorString;

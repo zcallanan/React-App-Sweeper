@@ -29,7 +29,9 @@ export type GameState = {
   clickHistory: string[];
   bombPositions: string[];
   gameReset: boolean;
+  squaresPruned: boolean;
   squaresComplete: boolean;
+  bombPositionsAssigned: boolean;
   progress: number;
   options: SizeDifficultyLives;
 };
@@ -125,7 +127,9 @@ type GameResetCleanup = {
   bombs: number;
   clickHistory: string[];
   bombPositions: string[];
+  bombPositionsAssigned: boolean,
   squaresComplete: boolean;
+  squaresPruned: boolean;
   bombFade: boolean;
   isVisible: boolean;
   timer: boolean;
@@ -290,6 +294,14 @@ type SquaresComplete = {
   squaresComplete: boolean;
 };
 
+type BombPositionsAssigned = {
+  bombPositionsAssigned: boolean;
+}
+
+type SquaresPruned = {
+  squaresPruned: boolean;
+}
+
 /* ***********************************
   Component Payload Types (Reducers)
 *********************************** */
@@ -349,6 +361,7 @@ export type AppAction =
   | { type: "TOGGLE_NEWGAME"; payload: NewGame }
   | { type: "FLAGGED_FLAG_COUNT"; key: string; payload: FlaggedFlagCount }
   | { type: "SQUARES_INIT_COMPLETE"; payload: SquaresComplete }
+  | { type: "SQUARES_PRUNED"; payload: SquaresPruned }
   | {
       type: "QUESTIONMARKED_QS_COUNT";
       key: string;
@@ -361,6 +374,7 @@ export type AppAction =
   | { type: "BOMB_NOTICE"; payload: BombNotice }
   | { type: "BOMB_CLICKED"; key: string; payload: BombClicked }
   | { type: "DEFEAT_NOTICE"; payload: DefeatNotice }
+  | { type: "BOMB_POSITIONS_ASSIGNED"; payload: BombPositionsAssigned }
   | { type: "PUSH_CLICK_HISTORY"; payload: PushClickHistory };
 
 export type FormAction =
@@ -417,7 +431,6 @@ export type FormProps = {
   progress: number;
   data: CustomGameValues;
   options: SizeDifficultyLives;
-  initSquares: (size: number) => void;
   modalClose: () => void;
   saveOptions: (obj: SizeDifficultyLives) => void;
 };

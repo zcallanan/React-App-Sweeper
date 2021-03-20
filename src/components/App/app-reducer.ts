@@ -139,6 +139,8 @@ const appReducer = (state: typeof appInit, action: AppAction) => {
         clickHistory: action.payload.clickHistory,
         bombPositions: action.payload.bombPositions,
         squaresComplete: action.payload.squaresComplete,
+        squaresPruned: action.payload.squaresPruned,
+        bombPositionsAssigned: action.payload.bombPositionsAssigned,
       },
       modal: {
         ...state.modal,
@@ -427,9 +429,26 @@ const appReducer = (state: typeof appInit, action: AppAction) => {
         squaresComplete: action.payload.squaresComplete,
       }
     }
+    case "BOMB_POSITIONS_ASSIGNED":
+    return {
+      ...state,
+      gameState: {
+        ...state.gameState,
+        bombPositionsAssigned: action.payload.bombPositionsAssigned,
+      }
+    }
+    case "SQUARES_PRUNED":
+    return {
+      ...state,
+      gameState: {
+        ...state.gameState,
+        squaresPruned: action.payload.squaresPruned,
+      }
+    }
+    // Default
     default:
       throw new Error();
-  }
+  };
 };
 
 export default appReducer;
