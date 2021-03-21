@@ -539,12 +539,6 @@ const App = (): JSX.Element => {
     if (i === size) {
       // End recursion if row # is equal to size
       appDispatch({
-        type: "SQUARES_PRUNED",
-        payload: {
-          squaresPruned: false,
-        }
-      });
-      appDispatch({
         type: "SQUARES_INIT_COMPLETE",
         payload: {
           squaresComplete: true,
@@ -552,12 +546,10 @@ const App = (): JSX.Element => {
       });
       return 1;
     } else {
-      // Copy squareInit or bombs property is mutated
-      const squareData = { ...squareInit };
       appDispatch({
         type: "SQUARES_ADD",
         key: `r${i}-s${k}`,
-        payload: squareData,
+        payload: { ...squareInit },
       });
     }
     // Increment column # by one each time through
@@ -568,6 +560,12 @@ const App = (): JSX.Element => {
     const initialized = appState.gameState.initialized;
     const squaresPruned = appState.gameState.squaresPruned;
     if (initialized && squaresPruned) {
+      appDispatch({
+        type: "SQUARES_PRUNED",
+        payload: {
+          squaresPruned: false,
+        }
+      });
       // Add square properties to squares gameState
       addSquare(0, 0);
     }
@@ -577,8 +575,8 @@ const App = (): JSX.Element => {
     Component Props
   **************** */
 
-  // User submits form: Save Player's game board options
   const saveOptions = (obj: SizeDifficultyLives): void => {
+    // User submits form: Save Player's game board options
     toggleScroll(true, "squareScroll");
     // Apply submitted data to state
     appDispatch({
@@ -604,8 +602,9 @@ const App = (): JSX.Element => {
     localStorage.setItem("sweeper-options", JSON.stringify(obj));
   };
 
-  // Prop for squares to update squareScroll state
+
   const toggleScroll = (bool: boolean, anim: string): void => {
+    // Prop for squares to update squareScroll state
     appDispatch({
       type: "FORM_TOGGLE_SQUARESCROLL",
       payload: {
@@ -614,14 +613,14 @@ const App = (): JSX.Element => {
     });
   };
 
-  // Prop function for stats to pass to global state
-  const revealTarget = (totalToReveal: number): void => {
+
+  const updateTotalToReveal = (totalToReveal: number): void => {
+    // Prop for stats to pass to global state
     const totalToRevealState: number = appState.gameStats.totalToReveal;
     if (
       (totalToReveal > 0 && totalToRevealState <= 0) ||
       totalToReveal !== totalToRevealState
     ) {
-      // stats.totalToReveal = totalToReveal;
       appDispatch({
         type: "GAMESTATS_UPDATE_TOTALTOREVEAL",
         payload: {
@@ -1097,9 +1096,9 @@ const App = (): JSX.Element => {
             </button>
             <Notice notices={appState.notices} />
             <Stats
-              stats={appState.gameStats}
+              gameStats={appState.gameStats}
               options={appState.gameState.options}
-              revealTarget={revealTarget}
+              totalToReveal={updateTotalToReveal}
             />
             <div className="modes">
               <Flag

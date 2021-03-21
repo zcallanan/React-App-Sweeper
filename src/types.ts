@@ -104,6 +104,10 @@ export type ExplosionType = {
   explodeFire: boolean;
 };
 
+export type Disabled = {
+  disabled: string;
+};
+
 // Square animations data
 export type AnimationsType = {
   squareScroll: boolean;
@@ -127,7 +131,7 @@ type GameResetCleanup = {
   bombs: number;
   clickHistory: string[];
   bombPositions: string[];
-  bombPositionsAssigned: boolean,
+  bombPositionsAssigned: boolean;
   squaresComplete: boolean;
   squaresPruned: boolean;
   bombFade: boolean;
@@ -296,11 +300,11 @@ type SquaresComplete = {
 
 type BombPositionsAssigned = {
   bombPositionsAssigned: boolean;
-}
+};
 
 type SquaresPruned = {
   squaresPruned: boolean;
-}
+};
 
 /* ***********************************
   Component Payload Types (Reducers)
@@ -345,10 +349,10 @@ export type AppAction =
   | { type: "EXPLODE_TRIGGER"; key: string; payload: ExplodeTrigger }
   | { type: "EXPLODE_TIMER"; key: string; payload: ExplodeTimer }
   | {
-      type: "SQUARES_NOTICES_CLEANUP";
-      key: string;
-      payload: SquaresNoticesCleanup;
-    }
+    type: "SQUARES_NOTICES_CLEANUP";
+    key: string;
+    payload: SquaresNoticesCleanup;
+  }
   | { type: "REMOVE_CLICK_BOMBMODE"; key: string; payload: RemoveClickBombMode }
   | { type: "DEFEAT_EXPLODE_BOMB"; key: string; payload: DefeatExplodeBomb }
   | { type: "EXPLODE_FIRE"; key: string; payload: ExplodeFire }
@@ -363,10 +367,10 @@ export type AppAction =
   | { type: "SQUARES_INIT_COMPLETE"; payload: SquaresComplete }
   | { type: "SQUARES_PRUNED"; payload: SquaresPruned }
   | {
-      type: "QUESTIONMARKED_QS_COUNT";
-      key: string;
-      payload: QuestionMarkedQsCount;
-    }
+    type: "QUESTIONMARKED_QS_COUNT";
+    key: string;
+    payload: QuestionMarkedQsCount;
+  }
   | { type: "FLAGGED"; key: string; payload: Flagged }
   | { type: "QUESTIONMARKED"; key: string; payload: QuestionMarked }
   | { type: "SQUARES_REVEALED"; payload: SquaresRevealed }
@@ -412,9 +416,9 @@ export type SquareProps = {
 };
 
 export type StatsProps = {
-  stats: GameStats;
+  gameStats: GameStats;
   options: SizeDifficultyLives;
-  revealTarget: (totalToReveal: number) => void;
+  totalToReveal: (totalToReveal: number) => void;
 };
 
 export type QuestionProps = {
@@ -446,7 +450,7 @@ export type ColumnProps = {
   animations: AnimationsType;
   gameState: GameState;
   modes: ModesType;
-  squares: object;
+  squares: SquaresType;
   size: number;
   explode: (squareKey: string) => void;
   onSquareClick: (squareKey: string) => void;

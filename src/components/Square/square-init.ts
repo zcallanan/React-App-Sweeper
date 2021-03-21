@@ -5,5 +5,4 @@ const squareInit: SquarePd = {
   fireAnimIsPlaying: false,
 };
 
-
 export default squareInit;

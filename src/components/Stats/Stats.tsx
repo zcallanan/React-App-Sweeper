@@ -4,12 +4,9 @@ import statsInit from "./stats-init";
 import statsReducer from "./stats-reducer";
 import { StatsProps } from "../../types";
 
-const Stats = ({ stats, options, revealTarget }: StatsProps): JSX.Element => {
+const Stats = ({ gameStats, options, totalToReveal }: StatsProps): JSX.Element => {
   // Manage state
-  const [statsState, statsDispatch] = React.useReducer(
-    statsReducer,
-    statsInit,
-  );
+  const [statsState, statsDispatch] = React.useReducer(statsReducer, statsInit);
 
   React.useEffect(() => {
     // From State
@@ -17,11 +14,8 @@ const Stats = ({ stats, options, revealTarget }: StatsProps): JSX.Element => {
     const bombsState: number = statsState.bombs;
     const totalToRevealState: number = statsState.totalToReveal;
     // From Props
-    let sizeProps: number;
-    if (typeof options.size === "number") {
-      sizeProps = options.size;
-    }
-    const bombsProps: number = stats.bombs;
+    const sizeProps: number = options.size;
+    const bombsProps: number = gameStats.bombs;
 
     const currentTotalToReveal: number = sizeProps ** 2 - bombsProps;
 
@@ -51,10 +45,7 @@ const Stats = ({ stats, options, revealTarget }: StatsProps): JSX.Element => {
         },
       });
     }
-    if (
-      (sizeState < 0 || sizeState !== sizeProps)
-      && sizeProps > 0
-    ) {
+    if ((sizeState < 0 || sizeState !== sizeProps) && sizeProps > 0) {
       // Size changed, save it
       statsDispatch({
         type: "STATS_SET_SIZE",
@@ -72,147 +63,142 @@ const Stats = ({ stats, options, revealTarget }: StatsProps): JSX.Element => {
         },
       });
     }
-    revealTarget(totalToRevealState);
-  }, [stats,
+    totalToReveal(totalToRevealState);
+  }, [
+    gameStats,
     options,
-    revealTarget,
+    totalToReveal,
     statsState.bombs,
     statsState.size,
     statsState.totalToReveal,
   ]);
 
   const renderLives = (): React.ReactNode => {
-    const statsProps = stats;
-    const currentLives = statsProps.currentLives;
-    let life = "Lives:";
-    if (currentLives === 1) {
-      life = "Life:";
-    }
+    const { currentLives }: { currentLives: number } = gameStats;
+    const life: string = currentLives === 1 ? "Life:" : "Lives";
+    const output: number | string = currentLives >= 0 ? currentLives : "";
+    const livesJSX: React.ReactNode = (
+      <tr key="lifeCount">
+        <td>{life}</td>
+        <td>
+          <TransitionGroup component="span" className="lives">
+            <CSSTransition
+              classNames="lives"
+              key={output}
+              timeout={{ enter: 3000, exit: 3000 }}
+            >
+              <span>{output}</span>
+            </CSSTransition>
+          </TransitionGroup>
+        </td>
+      </tr>
+    );
     // Avoid display of stats before currentLives is set
-    if (currentLives >= 0) {
-      return (
-        <tr key="lifeCount">
-          <td>{life}</td>
-          <td>
-            <TransitionGroup component="span" className="lives">
-              <CSSTransition
-                classNames="lives"
-                key={currentLives}
-                timeout={{ enter: 3000, exit: 3000 }}
-              >
-                <span>{currentLives}</span>
-              </CSSTransition>
-            </TransitionGroup>
-          </td>
-        </tr>
-      );
-    }
+    return livesJSX;
   };
 
   const renderBombCount = (): React.ReactNode => {
-    const bombs = stats.bombs;
-    if (bombs >= 0) {
-      return (
-        <tr key="bombs">
-          <td>Hidden Bombs:</td>
-          <td>
-            <TransitionGroup component="span" className="bombs">
-              <CSSTransition
-                classNames="bombs"
-                key={bombs}
-                timeout={{ enter: 1500, exit: 1500 }}
-              >
-                <span>{bombs}</span>
-              </CSSTransition>
-            </TransitionGroup>
-          </td>
-        </tr>
-      );
-    }
+    const { bombs }: { bombs: number } = gameStats;
+    const output: number | string = bombs >= 0 ? bombs : "";
+    const bombCountJSX: React.ReactNode = (
+      <tr key="bombs">
+        <td>Hidden Bombs:</td>
+        <td>
+          <TransitionGroup component="span" className="bombs">
+            <CSSTransition
+              classNames="bombs"
+              key={output}
+              timeout={{ enter: 1500, exit: 1500 }}
+            >
+              <span>{output}</span>
+            </CSSTransition>
+          </TransitionGroup>
+        </td>
+      </tr>
+    );
+    return bombCountJSX;
   };
 
   const renderRevealed = (): React.ReactNode => {
-    const revealed = stats.revealed;
-    const totalToReveal = statsState.totalToReveal;
-
-    if (revealed >= 0 && totalToReveal >= 0) {
-      return (
-        <tr key="revealed">
-          <td>Squares Revealed: </td>
-          <td>
-            <TransitionGroup component="span" className="revealed">
-              <CSSTransition
-                classNames="revealed"
-                key={revealed}
-                timeout={{ enter: 1500, exit: 1500 }}
-              >
-                <span>{revealed}</span>
-              </CSSTransition>
-            </TransitionGroup>
-          </td>
-          <td>/</td>
-          <td>
-            <TransitionGroup component="span" className="total-to-reveal">
-              <CSSTransition
-                classNames="total-to-reveal"
-                key={totalToReveal}
-                timeout={{ enter: 1500, exit: 1500 }}
-              >
-                <span>{totalToReveal}</span>
-              </CSSTransition>
-            </TransitionGroup>
-          </td>
-        </tr>
-      );
-    }
+    const { revealed }: { revealed: number } = gameStats;
+    const { totalToReveal } = statsState;
+    const output: number | string = revealed >= 0 && totalToReveal >= 0
+      ? revealed
+      : "";
+    const revealedJSX: React.ReactNode = (
+      <tr key="revealed">
+        <td>Squares Revealed: </td>
+        <td>
+          <TransitionGroup component="span" className="revealed">
+            <CSSTransition
+              classNames="revealed"
+              key={output}
+              timeout={{ enter: 1500, exit: 1500 }}
+            >
+              <span>{output}</span>
+            </CSSTransition>
+          </TransitionGroup>
+        </td>
+        <td>/</td>
+        <td>
+          <TransitionGroup component="span" className="total-to-reveal">
+            <CSSTransition
+              classNames="total-to-reveal"
+              key={totalToReveal}
+              timeout={{ enter: 1500, exit: 1500 }}
+            >
+              <span>{totalToReveal}</span>
+            </CSSTransition>
+          </TransitionGroup>
+        </td>
+      </tr>
+    );
+    return revealedJSX;
   };
 
   const renderFlagCount = (): React.ReactNode => {
-    const flags = stats.flags;
-    let flagText = "Bombs Flagged:";
-    if (flags === 1) {
-      flagText = "Bomb Flagged:";
-    }
-    if (flags >= 0) {
-      return (
-        <tr key="flags">
-          <td>{flagText}</td>
-          <td>
-            <TransitionGroup component="span" className="flags">
-              <CSSTransition
-                classNames="flags"
-                key={flags}
-                timeout={{ enter: 1500, exit: 1500 }}
-              >
-                <span>{flags}</span>
-              </CSSTransition>
-            </TransitionGroup>
-          </td>
-        </tr>
-      );
-    }
+    const { flags }: { flags: number } = gameStats;
+    const flagText: string = flags === 1 ? "Bomb Flagged" : "Bombs Flagged:";
+    const output: number | string = flags >= 0 ? flags : "";
+    const flagCountJSX = (
+      <tr key="flags">
+        <td>{flagText}</td>
+        <td>
+          <TransitionGroup component="span" className="flags">
+            <CSSTransition
+              classNames="flags"
+              key={output}
+              timeout={{ enter: 1500, exit: 1500 }}
+            >
+              <span>{output}</span>
+            </CSSTransition>
+          </TransitionGroup>
+        </td>
+      </tr>
+    );
+    return flagCountJSX;
   };
 
   const renderQuestionsCount = (): React.ReactNode => {
-    const questions = stats.questions;
-    if (questions >= 0) {
-      return (
-        <tr key="questions">
-          <td>Marked Unknown:</td>
-          <td>
-            <TransitionGroup component="span" className="questions">
-              <CSSTransition
-                classNames="questions"
-                key={questions}
-                timeout={{ enter: 1500, exit: 1500 }}
-              >
-                <span>{questions}</span>
-              </CSSTransition>
-            </TransitionGroup>
-          </td>
-        </tr>
-      );
-    }
+    const { questions }: { questions: number } = gameStats;
+    const output = questions >= 0 ? questions : "";
+    const questionsJSX = (
+      <tr key="questions">
+        <td>Marked Unknown:</td>
+        <td>
+          <TransitionGroup component="span" className="questions">
+            <CSSTransition
+              classNames="questions"
+              key={output}
+              timeout={{ enter: 1500, exit: 1500 }}
+            >
+              <span>{output}</span>
+            </CSSTransition>
+          </TransitionGroup>
+        </td>
+      </tr>
+    );
+    return questionsJSX;
   };
 
   return (
@@ -229,6 +215,6 @@ const Stats = ({ stats, options, revealTarget }: StatsProps): JSX.Element => {
       </table>
     </div>
   );
-}
+};
 
 export default Stats;

@@ -1,3 +1,4 @@
+/* eslint-disable react/jsx-props-no-spreading */
 import React from "react";
 import { TransitionGroup, CSSTransition } from "react-transition-group";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -13,7 +14,7 @@ import {
 } from "@fortawesome/free-regular-svg-icons";
 import squareInit from "./square-init";
 import squareReducer from "./square-reducer";
-import { SquareProps } from "../../types";
+import { SquareProps, Disabled } from "../../types";
 
 const Square = ({
   animations,
@@ -24,7 +25,7 @@ const Square = ({
   explode,
   onSquareClick,
   toggleScroll,
-  explosion
+  explosion,
 }: SquareProps): JSX.Element => {
   // Manage state
   const [squareState, squareDispatch] = React.useReducer(
@@ -32,13 +33,13 @@ const Square = ({
     squareInit,
   );
 
-  React.useEffect(() => {
+  React.useEffect((): void => {
     // From State
-    const bombAnimIsPlaying: boolean = squareState.bombAnimIsPlaying;
-    const fireAnimIsPlaying: boolean = squareState.fireAnimIsPlaying;
+    const { bombAnimIsPlaying }: { bombAnimIsPlaying: boolean } = squareState;
+    const { fireAnimIsPlaying }: { fireAnimIsPlaying: boolean } = squareState;
     // From Props
-    const explodeTrigger: boolean = explosion.explodeTrigger;
-    const explodeFire: boolean = explosion.explodeFire;
+    const { explodeTrigger }: { explodeTrigger: boolean } = explosion;
+    const { explodeFire }: { explodeFire: boolean } = explosion;
     // Reset square if it's a new game
     if (modes.newGame && fireAnimIsPlaying) {
       // Stop fire anim
@@ -48,7 +49,10 @@ const Square = ({
           fireAnimIsPlaying: false,
         },
       });
-    } else if ((modes.newGame && bombAnimIsPlaying) || (!explodeTrigger && bombAnimIsPlaying)) {
+    } else if (
+      (modes.newGame && bombAnimIsPlaying)
+      || (!explodeTrigger && bombAnimIsPlaying)
+    ) {
       // Stop bomb anim
       squareDispatch({
         type: "SQUARE_SET_BOMB_ANIM",
@@ -78,24 +82,39 @@ const Square = ({
       });
     }
   }, [
-    explosion.explodeFire,
-    explosion.explodeTrigger,
+    explosion,
     modes.newGame,
-    squareState.bombAnimIsPlaying,
-    squareState.fireAnimIsPlaying,
+    squareState,
   ]);
 
   const cssTransition = (): JSX.Element => {
     // From State
-    const bombAnimIsPlaying: boolean = squareState.bombAnimIsPlaying;
-    const fireAnimIsPlaying: boolean = squareState.fireAnimIsPlaying;
+    const { bombAnimIsPlaying }: { bombAnimIsPlaying: boolean } = squareState;
+    const { fireAnimIsPlaying }: { fireAnimIsPlaying: boolean } = squareState;
     // From Props
-    const bombFade: boolean = animations.bombFade;
-    const explodeTrigger: boolean = explosion.explodeTrigger;
-    const explodeFire: boolean = explosion.explodeFire;
+    const { bombFade }: { bombFade: boolean } = animations;
+    const { explodeTrigger }: { explodeTrigger: boolean } = explosion;
+    const { explodeFire }: { explodeFire: boolean } = explosion;
 
-    if (explodeTrigger && !explodeFire && !bombAnimIsPlaying) {
-      return (
+    let output: JSX.Element;
+
+    if (gameState.progress === 1) {
+      // On win, change bomb opacity
+      output = (
+        <CSSTransition
+          classNames="win"
+          mountOnEnter
+          key={squareKey}
+          in={bombFade}
+          appear={bombFade}
+          timeout={{ enter: 3000, exit: 3000 }}
+        >
+          <FontAwesomeIcon key={squareKey} icon={faBomb} />
+        </CSSTransition>
+      );
+    } else if (explodeTrigger && !explodeFire && !bombAnimIsPlaying) {
+      // Handles bomb explosion animation
+      output = (
         <CSSTransition
           classNames="bomba"
           key={squareKey}
@@ -108,7 +127,8 @@ const Square = ({
         </CSSTransition>
       );
     } else if (!explodeTrigger && explodeFire && !fireAnimIsPlaying) {
-      return (
+      // Handles fire explosion animation
+      output = (
         <CSSTransition
           className="fire-enter"
           classNames="fire"
@@ -121,52 +141,43 @@ const Square = ({
           <FontAwesomeIcon key={squareKey} icon={faFireAlt} />
         </CSSTransition>
       );
-    } else if (gameState.progress === 1) {
-      // On win, change bomb opacity
-      return (
-        <CSSTransition
-          classNames="win"
-          mountOnEnter
-          key={squareKey}
-          in={bombFade}
-          appear={bombFade}
-          timeout={{ enter: 3000, exit: 3000 }}
-        >
-          <FontAwesomeIcon key={squareKey} icon={faBomb} />
-        </CSSTransition>
-      );
     }
+    return output;
   };
 
   const renderIcons = (): JSX.Element => {
     // From Props
-    const bomb: boolean = squareData.bomb;
-    const clicked: boolean = squareData.clicked;
+    const { bomb }: { bomb: boolean } = squareData;
+    const { clicked }: { clicked: boolean } = squareData;
     const flaggedBool: boolean = squareData.flagged;
     const questionmarkBool: boolean = squareData.questionMarked;
 
+    let output: JSX.Element;
+
     if (bomb && clicked) {
-      // If it's a bomb and clicked, show the bomb
-      return (
+      // Bomb icon
+      output = (
         <TransitionGroup component="span" className="bomba">
           {cssTransition()}
         </TransitionGroup>
       );
     } else if (flaggedBool && !clicked) {
-      return (
+      // Solid flag icon
+      output = (
         <span>
           <FontAwesomeIcon icon={faFlag} />
         </span>
       );
     } else if (questionmarkBool && !clicked) {
-      return (
+      // Solid questionmark icon
+      output = (
         <span>
           <FontAwesomeIcon icon={faQuestionCircle} />
         </span>
       );
-    }
-    if (gameState.progress === 0) {
-      return (
+    } else if (gameState.progress === 0) {
+      // Lined flag and questionmark icons for cursor hover
+      output = (
         <span>
           <FontAwesomeIcon className="flag-icon" icon={farFlag} />
           <FontAwesomeIcon
@@ -176,33 +187,33 @@ const Square = ({
         </span>
       );
     }
+    return output;
   };
 
-  const disableButtons = (attribute: object): object => {
-    if (modes.bombMode || modes.drawing) {
-      attribute["disabled"] = "disabled";
-    }
-    return attribute;
-  };
+  const disableButtons = (): Disabled | Record<string, never> => (modes.bombMode
+    || modes.drawing
+    ? { disabled: "disabled" }
+    : {});
 
   const insertElement = (element: boolean): JSX.Element => {
+    let output: JSX.Element;
     if (element) {
-      const adjacentBombCount: number = squareData.adjacentBombCount;
-      return (
+      const { adjacentBombCount}: { adjacentBombCount: number } = squareData;
+      output = (
         <p className={`bomb-count neighbors-${adjacentBombCount}`}>
           {adjacentBombCount}
         </p>
       );
     }
+    return output;
   };
 
   const buttonMarkup = (
     className: string,
-    attribute: object,
-    element: boolean
+    attribute: Record<string, unknown>,
+    element: boolean,
   ): JSX.Element => {
-
-    return (
+    const output = (
       <button
         className={className}
         {...attribute}
@@ -216,26 +227,28 @@ const Square = ({
         </span>
       </button>
     );
+    return output;
   };
 
   // Handles button modes
   const generateButton = (): JSX.Element => {
     // From Props
-    const clicked: boolean = squareData.clicked;
-    const hint: boolean = squareData.hint;
+    const { clicked }: { clicked: boolean } = squareData;
+    const { hint }: { hint: boolean } = squareData;
     const flaggedBool: boolean = squareData.flagged;
     const questionmarkBool: boolean = squareData.questionMarked;
     const drawingBool: boolean = modes.drawing;
 
-    let className: string = "";
-    let attribute: object = {};
-    let element: boolean = false;
+    let className = "";
+    let attribute: Disabled | Record<string, never> = {};
+    let element = false;
+    let output: JSX.Element;
 
     if (clicked) {
       // Disable the button if it's been clicked
       className = "square";
-      attribute["disabled"] = "disabled";
-      return buttonMarkup(className, attribute, element);
+      attribute = { disabled: "disabled" };
+      output = buttonMarkup(className, attribute, element);
     } else if (modes.flagMode) {
       // Toggle placement of flags
       if (questionmarkBool) {
@@ -245,14 +258,16 @@ const Square = ({
         className = "square flag-mode flagged";
       } else if (hint) {
         if (questionmarkBool) {
-          // In flagMode, if the square has a solid question mark over a hint, display it (hint should be hidden)
+          /* In flagMode, if the square has a solid question mark over a hint,
+          display it (hint should be hidden) */
           className = "square flag-mode questionmarked hint";
         } else {
-          // Toggle display of hints if hint is true and it doesn't have a flag or question mark
+          /* Toggle display of hints if hint is true and it doesn't have a
+          flag or question mark */
           element = true;
           className = "square flag-mode hint";
         }
-        return buttonMarkup(className, attribute, element);
+        output = buttonMarkup(className, attribute, element);
       } else {
         className = "square flag-mode";
       }
@@ -272,7 +287,7 @@ const Square = ({
           element = true;
           className = "square questionmark-mode hint";
         }
-        return buttonMarkup(className, attribute, element);
+        output = buttonMarkup(className, attribute, element);
       } else {
         className = "square questionmark-mode";
       }
@@ -292,10 +307,10 @@ const Square = ({
         element = true;
         className = !modes.bombMode ? "square hint" : "square hint bomb-mode";
       }
-      attribute = disableButtons(attribute);
-      return buttonMarkup(className, attribute, element);
+      attribute = disableButtons();
+      output = buttonMarkup(className, attribute, element);
     } else {
-      attribute = disableButtons(attribute);
+      attribute = disableButtons();
       if (flaggedBool) {
         // if a square is clickable or a bomb is active, display the flag on the square
         className = !modes.bombMode
@@ -306,25 +321,24 @@ const Square = ({
         className = !modes.bombMode
           ? "square questionmarked"
           : "square questionmarked bomb-mode";
+      } else if (drawingBool) {
+        // If the board is drawing, disable the buttons
+        className = "drawing default";
+        attribute = disableButtons();
       } else {
-        if (drawingBool) {
-          // If the board is drawing, disable the buttons
-          className = "drawing default";
-          attribute = disableButtons(attribute);
-        } else {
-          // Default functional button
-          className = !modes.bombMode
-            ? "square default"
-            : "square default bomb-mode";
-        }
+        // Default functional button
+        className = !modes.bombMode
+          ? "square default"
+          : "square default bomb-mode";
       }
     }
-    return buttonMarkup(className, attribute, element);
+    if (!output) {
+      return buttonMarkup(className, attribute, element);
+    }
+    return output;
   };
 
-  let squareScroll = modes.newGame && !animations.squareScroll
-    ? true
-    : false;
+  const squareScroll = (modes.newGame && !animations.squareScroll);
 
   return (
     <TransitionGroup
@@ -344,6 +358,6 @@ const Square = ({
       </CSSTransition>
     </TransitionGroup>
   );
-}
+};
 
 export default Square;

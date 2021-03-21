@@ -1,7 +1,7 @@
 import statsInit from "./stats-init";
-import { StatsAction } from "../../types";
+import { StatsAction, StatsPd } from "../../types";
 
-const statsReducer = (state: typeof statsInit, action: StatsAction) => {
+const statsReducer = (state: typeof statsInit, action: StatsAction): StatsPd => {
   switch (action.type) {
     case "STATS_INIT_VALUES":
       return {
@@ -10,20 +10,20 @@ const statsReducer = (state: typeof statsInit, action: StatsAction) => {
         totalToReveal: action.payload.totalToReveal,
       };
     case "STATS_SET_SIZE":
-    return {
-      ...state,
-      size: action.payload.size,
-    };
+      return {
+        ...state,
+        size: action.payload.size,
+      };
     case "STATS_SET_BOMBS":
-    return {
-      ...state,
-      bombs: action.payload.bombs,
-    };
+      return {
+        ...state,
+        bombs: action.payload.bombs,
+      };
     case "STATS_SET_TOTALTOREVEAL":
-    return {
-      ...state,
-      totalToReveal: action.payload.totalToReveal,
-    };
+      return {
+        ...state,
+        totalToReveal: action.payload.totalToReveal,
+      };
     default:
       throw new Error();
   }
