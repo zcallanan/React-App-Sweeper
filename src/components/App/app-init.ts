@@ -33,11 +33,11 @@ const squareInit: SquareDataType = {
     explodeTimer: false,
     explodeCleanup: false,
     explodeFire: false,
-  }
-}
+  },
+};
 
 const appInit: AppState = {
-  gameState : {
+  gameState: {
     initialized: false, // Prevents calling initSquares during a game
     clickHistory: [], // Every square revealed during a game
     bombPositions: [], // Where bombs are hidden
@@ -84,9 +84,9 @@ const appInit: AppState = {
   },
   modal: {
     isVisible: false, // Is the modal visible?
-    timer: false, // Prevents multiple timers from starting in order to show a delayed modal on win/loss
+    timer: false, // Prevents multiple timers from starting in order to show a modal on win/loss
     modalCleanup: false,
-   },
+  },
 };
 
 export { appInit, dataInit, squareInit };

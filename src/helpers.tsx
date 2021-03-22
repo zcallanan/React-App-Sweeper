@@ -8,7 +8,7 @@ export function randomIntFromInterval(min: number, max: number): number {
   DEBUG
 */
 
-const usePrevious = (value, initialValue) => {
+const usePrevious = (value: unknown[], initialValue: unknown[]) => {
   const ref = useRef(initialValue);
   useEffect(() => {
     ref.current = value;
@@ -19,7 +19,7 @@ const usePrevious = (value, initialValue) => {
 export const useEffectDebugger = (
   effectHook,
   dependencies,
-  dependencyNames = []
+  dependencyNames = [],
 ) => {
   const previousDeps = usePrevious(dependencies, []);
 

@@ -5,6 +5,6 @@ const formInit: FormPd = {
   difficulty: -1,
   lives: -1,
   errorString: "",
-}
+};
 
 export default formInit;

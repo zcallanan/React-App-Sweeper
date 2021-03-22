@@ -121,8 +121,8 @@ const Stats = ({ gameStats, options, totalToReveal }: StatsProps): JSX.Element =
 
   const renderRevealed = (): React.ReactNode => {
     const { revealed }: { revealed: number } = gameStats;
-    const { totalToReveal } = statsState;
-    const output: number | string = revealed >= 0 && totalToReveal >= 0
+    const totalToRevealState = statsState.totalToReveal;
+    const output: number | string = revealed >= 0 && totalToRevealState >= 0
       ? revealed
       : "";
     const revealedJSX: React.ReactNode = (
@@ -144,10 +144,10 @@ const Stats = ({ gameStats, options, totalToReveal }: StatsProps): JSX.Element =
           <TransitionGroup component="span" className="total-to-reveal">
             <CSSTransition
               classNames="total-to-reveal"
-              key={totalToReveal}
+              key={totalToRevealState}
               timeout={{ enter: 1500, exit: 1500 }}
             >
-              <span>{totalToReveal}</span>
+              <span>{totalToRevealState}</span>
             </CSSTransition>
           </TransitionGroup>
         </td>

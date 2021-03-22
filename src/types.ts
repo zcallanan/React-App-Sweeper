@@ -115,6 +115,11 @@ export type AnimationsType = {
   bombFade: boolean;
 };
 
+export type KeyMessage = {
+  key: string;
+  message: string;
+};
+
 /* ************************************
   App Action Payload Types (Reducers)
 ************************************ */
@@ -150,10 +155,6 @@ type Progress = {
   progress: number;
 };
 
-type CurrentLives = {
-  currentLives: number;
-};
-
 type TotalToReveal = {
   totalToReveal: number;
 };
@@ -185,11 +186,6 @@ type ExplodeTrigger = {
 
 type ExplodeTimer = {
   explodeTimer: boolean;
-};
-
-type ExplodePartial = {
-  explodeCleanup: boolean;
-  explodeTrigger: boolean;
 };
 
 type SquaresNoticesCleanup = {
@@ -412,7 +408,6 @@ export type SquareProps = {
   explode: (squareKey: string) => void;
   onSquareClick: (squareKey: string) => void;
   toggleScroll: (bool: boolean, anim: string) => void;
-  explosion: ExplosionType;
 };
 
 export type StatsProps = {

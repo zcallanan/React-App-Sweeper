@@ -11,16 +11,13 @@ const Form = ({
   saveOptions,
 }: FormProps): JSX.Element => {
   // Manage state
-  const [formState, formDispatch] = React.useReducer(
-    formReducer,
-    formInit,
-  );
+  const [formState, formDispatch] = React.useReducer(formReducer, formInit);
 
   React.useEffect(() => {
     const sizeState = formState.size;
     const difficultyState = formState.difficulty;
     const livesState = formState.lives;
-    if (sizeState < 0 && difficultyState < 0 && livesState < 0 ) {
+    if (sizeState < 0 && difficultyState < 0 && livesState < 0) {
       formDispatch({
         type: "FORM_INIT_VALUES",
         payload: {
@@ -36,7 +33,7 @@ const Form = ({
     options.lives,
     formState.size,
     formState.difficulty,
-    formState.lives
+    formState.lives,
   ]);
 
   // Field Validation
@@ -54,7 +51,7 @@ const Form = ({
       formIsValid = false;
       errorString = "Square number field cannot be empty";
     } else if (typeof sizeState !== undefined) {
-      if (isNaN(sizeState)) {
+      if (Number.isNaN(sizeState)) {
         // If input NaN() returns true
         formIsValid = false;
         errorString = "Enter an integer number";
@@ -66,14 +63,14 @@ const Form = ({
     } else if (!difficultyState) {
       formIsValid = false;
       errorString = "The percentage field cannot be empty";
-    } else if (typeof difficultyState !== undefined && isNaN(difficultyState)) {
+    } else if (typeof difficultyState !== undefined && Number.isNaN(difficultyState)) {
       // If the value of the select is not a number for some reason
       formIsValid = false;
       errorString = "Select a different percentage";
     } else if (!livesState) {
       formIsValid = false;
       errorString = "The lives field cannot be empty";
-    } else if (typeof livesState !== undefined && isNaN(livesState)) {
+    } else if (typeof livesState !== undefined && Number.isNaN(livesState)) {
       // If the value of the select is not a number for some reason
       formIsValid = false;
       errorString = "Select a different number of lives";
@@ -111,7 +108,7 @@ const Form = ({
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
-    if ((e.target as HTMLInputElement).name === 'size') {
+    if ((e.target as HTMLInputElement).name === "size") {
       formDispatch({
         type: "FORM_SET_SIZE",
         payload: {
@@ -122,16 +119,16 @@ const Form = ({
   };
 
   const handleChangeSelect = (
-    e: React.ChangeEvent<HTMLSelectElement>
+    e: React.ChangeEvent<HTMLSelectElement>,
   ): void => {
-    if ((e.target as HTMLSelectElement).name === 'difficulty') {
+    if ((e.target as HTMLSelectElement).name === "difficulty") {
       formDispatch({
         type: "FORM_SET_DIFFICULTY",
         payload: {
           difficulty: Number((e.target as HTMLSelectElement).value),
         },
       });
-    } else if ((e.target as HTMLSelectElement).name === 'lives') {
+    } else if ((e.target as HTMLSelectElement).name === "lives") {
       formDispatch({
         type: "FORM_SET_LIVES",
         payload: {
@@ -141,11 +138,11 @@ const Form = ({
     }
   };
 
-  const submitButtonText = (): string => {
+  const submitButtonText = (): string => (progress !== 0
     /* If the player won or lost, ask if they want to Play Another Game.
     If from customize settings, display Play Sweeper */
-    return progress !== 0 ? "Play Again?" : "Play Sweeper";
-  };
+    ? "Play Again?"
+    : "Play Sweeper");
 
   const percentages: DictString = data.bombPercentage;
   const lives: DictString = data.numberOfLives;
@@ -213,6 +210,6 @@ const Form = ({
       </form>
     </div>
   );
-}
+};
 
 export default Form;

@@ -1,19 +1,20 @@
+/* eslint-disable react/jsx-props-no-spreading */
 import React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFlag } from "@fortawesome/free-solid-svg-icons";
 import { faFlag as farFlag } from "@fortawesome/free-regular-svg-icons";
 import { FlagProps } from "../../types";
 
-const Flag = ({modes, progress, onModeClick}: FlagProps): JSX.Element => {
+const Flag = ({ modes, progress, onModeClick }: FlagProps): JSX.Element => {
   const renderFlagIcons = (): JSX.Element => {
-    const attribute: object = {};
     // If a bomb is exploding or you have won/lost, disable the button
-    if (modes.bombMode || progress !== 0) {
-      attribute["disabled"] = "disabled";
-    }
+    const attribute: Record<string, unknown> = (modes.bombMode || progress !== 0)
+      ? { disabled: "disabled" }
+      : {};
     // Flagmode button was clicked
     if (modes.flagMode) {
       return (
+        // eslint-disable-next-line react/button-has-type
         <button
           className="btn btn-outline-secondary flag-button buttons"
           {...attribute}
@@ -25,6 +26,7 @@ const Flag = ({modes, progress, onModeClick}: FlagProps): JSX.Element => {
     }
     // Flagmode button not clicked
     return (
+      // eslint-disable-next-line react/button-has-type
       <button
         className="btn btn-outline-secondary flag-button buttons"
         {...attribute}
@@ -40,6 +42,6 @@ const Flag = ({modes, progress, onModeClick}: FlagProps): JSX.Element => {
       {renderFlagIcons()}
     </form>
   );
-}
+};
 
 export default Flag;

@@ -2,32 +2,44 @@ import React from "react";
 import Square from "../Square/Square";
 import { ColumnProps } from "../../types";
 
-class Column extends React.Component<ColumnProps> {
-  render() {
-    const column: JSX.Element[] = [];
-    let squareKey: string = "";
-
-    for (let i = 0; i < this.props.size; i++) {
-      squareKey = `r${i}-${this.props.columnKey}`;
-      if (this.props.squares[squareKey]) {
-        column.push(
-          <Square
-            key={squareKey}
-            squareKey={squareKey}
-            modes={this.props.modes}
-            animations={this.props.animations}
-            squareData={this.props.squares[squareKey]}
-            onSquareClick={this.props.onSquareClick}
-            toggleScroll={this.props.toggleScroll}
-            explode={this.props.explode}
-            gameState={this.props.gameState}
-            explosion={this.props.squares[squareKey].explosion}
-          />
-        );
-      }
+const Column = ({
+  columnKey,
+  size,
+  squares,
+  modes,
+  animations,
+  onSquareClick,
+  toggleScroll,
+  explode,
+  gameState,
+}: ColumnProps): JSX.Element => {
+  const createArray = (
+    columnArray: JSX.Element[],
+    count: number,
+  ): JSX.Element[] => {
+    // Recursive fn to create a columnArray of Square components
+    const squareKey = `r${count}-${columnKey}`;
+    if (count < size && squares[squareKey]) {
+      columnArray.push(
+        <Square
+          key={squareKey}
+          squareKey={squareKey}
+          modes={modes}
+          animations={animations}
+          squareData={squares[squareKey]}
+          onSquareClick={onSquareClick}
+          toggleScroll={toggleScroll}
+          explode={explode}
+          gameState={gameState}
+        />,
+      );
+      createArray(columnArray, count + 1);
     }
-    return <div className="board-column">{column}</div>;
-  }
-}
+    return columnArray;
+  };
+  const columnArray: JSX.Element[] = [];
+  createArray(columnArray, 0);
+  return <div className="board-column">{columnArray}</div>;
+};
 
 export default Column;

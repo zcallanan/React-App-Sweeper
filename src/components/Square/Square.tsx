@@ -25,7 +25,6 @@ const Square = ({
   explode,
   onSquareClick,
   toggleScroll,
-  explosion,
 }: SquareProps): JSX.Element => {
   // Manage state
   const [squareState, squareDispatch] = React.useReducer(
@@ -38,8 +37,8 @@ const Square = ({
     const { bombAnimIsPlaying }: { bombAnimIsPlaying: boolean } = squareState;
     const { fireAnimIsPlaying }: { fireAnimIsPlaying: boolean } = squareState;
     // From Props
-    const { explodeTrigger }: { explodeTrigger: boolean } = explosion;
-    const { explodeFire }: { explodeFire: boolean } = explosion;
+    const { explodeTrigger }: { explodeTrigger: boolean } = squareData.explosion;
+    const { explodeFire }: { explodeFire: boolean } = squareData.explosion;
     // Reset square if it's a new game
     if (modes.newGame && fireAnimIsPlaying) {
       // Stop fire anim
@@ -82,7 +81,7 @@ const Square = ({
       });
     }
   }, [
-    explosion,
+    squareData.explosion,
     modes.newGame,
     squareState,
   ]);
@@ -93,8 +92,8 @@ const Square = ({
     const { fireAnimIsPlaying }: { fireAnimIsPlaying: boolean } = squareState;
     // From Props
     const { bombFade }: { bombFade: boolean } = animations;
-    const { explodeTrigger }: { explodeTrigger: boolean } = explosion;
-    const { explodeFire }: { explodeFire: boolean } = explosion;
+    const { explodeTrigger }: { explodeTrigger: boolean } = squareData.explosion;
+    const { explodeFire }: { explodeFire: boolean } = squareData.explosion;
 
     let output: JSX.Element;
 
@@ -198,7 +197,7 @@ const Square = ({
   const insertElement = (element: boolean): JSX.Element => {
     let output: JSX.Element;
     if (element) {
-      const { adjacentBombCount}: { adjacentBombCount: number } = squareData;
+      const { adjacentBombCount }: { adjacentBombCount: number } = squareData;
       output = (
         <p className={`bomb-count neighbors-${adjacentBombCount}`}>
           {adjacentBombCount}
@@ -214,6 +213,7 @@ const Square = ({
     element: boolean,
   ): JSX.Element => {
     const output = (
+      // eslint-disable-next-line react/button-has-type
       <button
         className={className}
         {...attribute}

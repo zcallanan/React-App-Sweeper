@@ -1,14 +1,15 @@
 import React from "react";
 import { TransitionGroup, CSSTransition } from "react-transition-group";
-import { NoticesProps, DictString } from "../../types";
+import { NoticesProps, KeyMessage } from "../../types";
 
-const Notice = ({notices}: NoticesProps): JSX.Element => {
+const Notice = ({ notices }: NoticesProps): JSX.Element => {
   const handleNotice = (): JSX.Element => {
     const { bombNotice, victoryNotice, defeatNotice } = notices;
-    let notice: DictString = {
+    let notice: KeyMessage = {
       key: null,
       message: null,
     };
+    let output: JSX.Element;
     if (bombNotice) {
       // Notice content
       notice = {
@@ -28,7 +29,7 @@ const Notice = ({notices}: NoticesProps): JSX.Element => {
     }
     if (notice.key !== null) {
       // If there's content to display, render it
-      return (
+      output = (
         <CSSTransition
           classNames="notices"
           key={notice.key}
@@ -40,7 +41,7 @@ const Notice = ({notices}: NoticesProps): JSX.Element => {
         </CSSTransition>
       );
     }
-    return;
+    return output;
   };
 
   return (
@@ -50,6 +51,6 @@ const Notice = ({notices}: NoticesProps): JSX.Element => {
       </TransitionGroup>
     </div>
   );
-}
+};
 
 export default Notice;
