@@ -160,7 +160,7 @@ type TotalToReveal = {
 };
 
 type BombCount = {
-  bombs: number;
+  bombCount: number;
 };
 
 type NewGame = {

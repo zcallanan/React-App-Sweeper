@@ -161,24 +161,26 @@ const App = (): JSX.Element => {
       }
     });
     const bombs = Math.floor(size ** 2 * percentage);
+    console.log("bombCount:", percentage, difficulty, size, bombs)
     return bombs;
   }, [appState.gameState.options]);
 
   React.useEffect((): void => {
     // Saves bomb count to state if it's a value > 1
-    const bombsState = appState.gameStats.bombs;
-    if (bombsState < 1) {
-      const bombs = calculateBombs();
-      if (bombs && bombs > 1) {
+    const { bombs }: { bombs: number } = appState.gameStats;
+    const { squaresComplete }: { squaresComplete: boolean } = appState.gameState;
+    if (bombs < 1 && squaresComplete) {
+      const bombCount = calculateBombs();
+      if (bombCount && bombCount > 1) {
         appDispatch({
           type: "GAMESTATS_SET_BOMB_COUNT",
           payload: {
-            bombs,
+            bombCount,
           },
         });
       }
     }
-  }, [calculateBombs, appState.gameStats.bombs]);
+  }, [calculateBombs, appState.gameStats, appState.gameState]);
 
   /* --------------------------------------------------------------
     When a square is clicked, all nonbomb, nonhint squares clicked
@@ -400,6 +402,7 @@ const App = (): JSX.Element => {
     const { bombs }: { bombs: number } = appState.gameStats;
     const { squaresComplete }: { squaresComplete: boolean } = appState.gameState;
     const { bombPositions }: { bombPositions: string[] } = appState.gameState;
+    console.log("logging", bombs, squaresComplete, bombPositions.length)
     if (bombs && squaresComplete && !bombPositions.length) {
       const positionArray: string[] = [];
       assignSquaresAsBombs(positionArray, 0);
@@ -431,8 +434,7 @@ const App = (): JSX.Element => {
         },
       });
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [appState.gameState.squaresComplete]);
+  }, [appState.gameState]);
 
   /* ---------------------------------------
     Form submitted, reset the game board

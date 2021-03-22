@@ -70,7 +70,7 @@ const appReducer = (state: typeof appInit, action: AppAction): AppState => {
         ...state,
         gameStats: {
           ...state.gameStats,
-          bombs: action.payload.bombs,
+          bombs: action.payload.bombCount,
         },
       };
     case "GAMESTATS_UPDATE_TOTALTOREVEAL":
