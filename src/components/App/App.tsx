@@ -161,7 +161,6 @@ const App = (): JSX.Element => {
       }
     });
     const bombs = Math.floor(size ** 2 * percentage);
-    console.log("bombCount:", percentage, difficulty, size, bombs)
     return bombs;
   }, [appState.gameState.options]);
 
