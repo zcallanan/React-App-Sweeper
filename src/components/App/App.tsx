@@ -7,7 +7,7 @@ import Header from "../Header/Header";
 import QuestionMark from "../QuestionMark/QuestionMark";
 import Stats from "../Stats/Stats";
 import Notice from "../Notice/Notice";
-import { randomIntFromInterval, useEffectDebugger } from "../../helpers";
+import { randomIntFromInterval } from "../../helpers";
 import appReducer from "./app-reducer";
 import { appInit, dataInit, squareInit } from "./app-init";
 import {
@@ -51,7 +51,7 @@ const App = (): JSX.Element => {
     [appState],
   );
 
-  const populateNeighbors = (squareKey: string): void => {
+  const populateNeighbors = React.useCallback((squareKey: string): void => {
     // Populate neighbors property for a square
     const { squares }: { squares: SquaresType } = appState;
     const { size }: { size: number } = appState.gameState.options;
@@ -106,9 +106,9 @@ const App = (): JSX.Element => {
         adjacentBombCount,
       },
     });
-  };
+  }, [appState]);
 
-  useEffectDebugger((): void => {
+  React.useEffect((): void => {
     // Generates neighbors and adjacentBombCount for all squares
     const { squares }: { squares: SquaresType } = appState;
     const squaresArray: string[] = Object.keys(squares);
@@ -125,7 +125,7 @@ const App = (): JSX.Element => {
         });
       });
     }
-  }, [needsNeighbors]);
+  }, [needsNeighbors, appState, populateNeighbors]);
 
   /* ---------------------------------------------------------------
     Calculate gameStats number of squares revealed (win condition)
@@ -134,7 +134,7 @@ const App = (): JSX.Element => {
   const getRevealed = React.useCallback((): number => Object.values(appState.squares)
     .filter((value) => value.clicked && !value.bomb).length, [appState.squares]);
 
-  useEffectDebugger((): void => {
+  React.useEffect((): void => {
     // Calculate revealed squares
     const revealed = getRevealed();
     appDispatch({
@@ -164,7 +164,7 @@ const App = (): JSX.Element => {
     return bombs;
   }, [appState.gameState.options]);
 
-  useEffectDebugger((): void => {
+  React.useEffect((): void => {
     // Saves bomb count to state if it's a value > 1
     const bombsState = appState.gameStats.bombs;
     if (bombsState < 1) {
@@ -202,7 +202,7 @@ const App = (): JSX.Element => {
     return result;
   }, [appState]);
 
-  useEffectDebugger((): void => {
+  React.useEffect((): void => {
     /* If a neighbor has no adjacent bombs, hasn't been clicked or
     had its hint revealed, then mark it clicked */
     const squareKeys: string[] = needsToBeClicked();
@@ -251,7 +251,7 @@ const App = (): JSX.Element => {
     return result;
   }, [appState]);
 
-  useEffectDebugger((): void => {
+  React.useEffect((): void => {
     /* If a neighbor has an adjacent bomb, hasn't been clicked or
     had its hint revealed, then reveal its hint */
     const squareKeys: string[] = needsHint();
@@ -272,7 +272,7 @@ const App = (): JSX.Element => {
     Set gameState values for a new game and init squares
   ----------------------------------------------------- */
 
-  const initSquares = (): void => {
+  const initSquares = React.useCallback((): void => {
     const { gameReset }: { gameReset: boolean } = appState.gameState;
     appDispatch({
       type: "SQUARES_INITIALIZED",
@@ -293,9 +293,9 @@ const App = (): JSX.Element => {
         });
       }, 1500); // Timer ~synced with square draw anim transition of 1.5s
     }
-  };
+  }, [appState.gameState]);
 
-  useEffectDebugger((): void => {
+  React.useEffect((): void => {
     let size: number;
     // Get options from local storage or default starting values
     const { options }: { options: SizeDifficultyLives } = appState.gameState;
@@ -343,6 +343,7 @@ const App = (): JSX.Element => {
     appState.gameState,
     appState.gameStats.bombs,
     appState.squares,
+    initSquares,
   ]);
 
   /* ---------------------------------------
@@ -393,7 +394,7 @@ const App = (): JSX.Element => {
     return 1;
   }, [appState.gameState.options, appState.gameStats]);
 
-  useEffectDebugger((): void => {
+  React.useEffect((): void => {
     /* If a neighbor has an adjacent bomb, hasn't been clicked or
       had its hint revealed, then reveal its hint */
     const { bombs }: { bombs: number } = appState.gameStats;
@@ -405,15 +406,15 @@ const App = (): JSX.Element => {
     }
   }, [
     assignSquaresAsBombs,
-    appState.gameStats.bombs,
-    appState.gameState.squaresComplete,
+    appState.gameStats,
+    appState.gameState,
   ]);
 
   /* ------------------------
     Recover from game reset
   ------------------------ */
 
-  useEffectDebugger((): void => {
+  React.useEffect((): void => {
     // Once bombs assigned, if the game was reset by the form, mark as false
     const { gameReset }: { gameReset: boolean } = appState.gameState;
     if (gameReset) {
@@ -430,13 +431,14 @@ const App = (): JSX.Element => {
         },
       });
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [appState.gameState.squaresComplete]);
 
   /* ---------------------------------------
     Form submitted, reset the game board
   --------------------------------------- */
 
-  useEffectDebugger((): void => {
+  React.useEffect((): void => {
     /* If a neighbor has an adjacent bomb, hasn't been clicked or
     had its hint revealed, then reveal its hint */
     // Form submit triggers cleanup
@@ -474,7 +476,7 @@ const App = (): JSX.Element => {
     Prune excess square properties when game board shrinks after reset
   ------------------------------------------------------------------- */
 
-  useEffectDebugger((): void => {
+  React.useEffect((): void => {
     const { initialized }: { initialized: boolean } = appState.gameState;
     const { gameReset }: { gameReset: boolean } = appState.gameState;
     if (initialized && gameReset) {
@@ -511,13 +513,14 @@ const App = (): JSX.Element => {
         },
       });
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [appState.gameState.initialized, appState.gameState.gameReset]);
 
   /* -------------------------------------------
     Assign default values to square properties
   ------------------------------------------- */
 
-  const addSquare = (rowNum: number, colNum: number): number => {
+  const addSquare = React.useCallback((rowNum: number, colNum: number): number => {
     const { size }: { size: number } = appState.gameState.options;
     let i: number = rowNum;
     let k: number = colNum;
@@ -546,9 +549,9 @@ const App = (): JSX.Element => {
       },
     });
     return 1;
-  };
+  }, [appState.gameState.options]);
 
-  useEffectDebugger((): void => {
+  React.useEffect((): void => {
     const { initialized }: { initialized: boolean } = appState.gameState;
     const { squaresPruned }: { squaresPruned: boolean } = appState.gameState;
     if (initialized && squaresPruned) {
@@ -561,7 +564,8 @@ const App = (): JSX.Element => {
       // Add square properties to squares gameState
       addSquare(0, 0);
     }
-  }, [appState.gameState.initialized, appState.gameState.squaresPruned]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [appState.gameState.initialized, appState.gameState.squaresPruned, addSquare]);
 
   /* ****************
     Component Props
