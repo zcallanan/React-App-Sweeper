@@ -269,9 +269,53 @@ const App = (): JSX.Element => {
     }
   }, [needsHint]);
 
-  /* -----------------------------------------------------
-    Set gameState values for a new game and init squares
-  ----------------------------------------------------- */
+  /* ----------------------
+    Set gameState options
+  ---------------------- */
+
+  React.useEffect((): void => {
+    // Get options from local storage or default starting values
+    const { options }: { options: SizeDifficultyLives } = appState.gameState;
+    const { optionsSet }: { optionsSet: boolean } = appState.gameState;
+    let progress;
+    let size: number;
+    let difficulty: number;
+    let lives: number;
+    if ((options.size === -1 || options.difficulty === -1) && !optionsSet) {
+      progress = 0;
+      // Read options from local storage
+      const localStorageRef = localStorage.getItem("sweeper-options");
+      if (localStorageRef) {
+        const storageOptions = JSON.parse(localStorageRef);
+        size = storageOptions.size;
+        difficulty = storageOptions.difficulty;
+        lives = storageOptions.lives;
+      } else {
+        // No local storage, set initial default values
+        size = 10;
+        difficulty = 2;
+        lives = 2;
+      }
+      appDispatch({
+        type: "GAME_INIT",
+        payload: {
+          optionsSet: true,
+          progress,
+          options: {
+            size,
+            difficulty,
+            lives,
+          },
+          currentLives: Number(dataInit.numberOfLives[lives]),
+          newGame: true,
+        },
+      });
+    }
+  }, [appState.gameState]);
+
+  /* -------------------------
+    Create gameboard squares
+  ------------------------- */
 
   const initSquares = React.useCallback((): void => {
     const { gameReset }: { gameReset: boolean } = appState.gameState;
@@ -297,55 +341,13 @@ const App = (): JSX.Element => {
   }, [appState.gameState]);
 
   React.useEffect((): void => {
-    let size: number;
-    // Get options from local storage or default starting values
-    const { options }: { options: SizeDifficultyLives } = appState.gameState;
-    const { gameReset }: { gameReset: boolean } = appState.gameState;
-    if (options.size === -1 || options.difficulty === -1) {
-      const progress = 0;
-
-      let difficulty: number;
-      let lives: number;
-      // Read options from local storage
-      const localStorageRef = localStorage.getItem("sweeper-options");
-      if (localStorageRef) {
-        const storageOptions = JSON.parse(localStorageRef);
-        size = storageOptions.size;
-        difficulty = storageOptions.difficulty;
-        lives = storageOptions.lives;
-      } else if (gameReset) {
-        size = options.size;
-      } else {
-        // No local storage, set initial default values
-        size = 10;
-        difficulty = 2;
-        lives = 2;
-      }
-      appDispatch({
-        type: "GAME_INIT",
-        payload: {
-          progress,
-          options: {
-            size,
-            difficulty,
-            lives,
-          },
-          currentLives: Number(dataInit.numberOfLives[lives]),
-          newGame: true,
-        },
-      });
-    }
-
     const { initialized }: { initialized: boolean } = appState.gameState;
-    if (!initialized && appState.gameState.options.size > 0) {
+    const { size }: { size: number } = appState.gameState.options;
+    const { optionsSet }: { optionsSet: boolean } = appState.gameState;
+    if (!initialized && size > 0 && optionsSet) {
       initSquares();
     }
-  }, [
-    appState.gameState,
-    appState.gameStats.bombs,
-    appState.squares,
-    initSquares,
-  ]);
+  }, [appState.gameState, initSquares]);
 
   /* ---------------------------------------
     Mark squares that contain hidden bombs
@@ -401,7 +403,6 @@ const App = (): JSX.Element => {
     const { bombs }: { bombs: number } = appState.gameStats;
     const { squaresComplete }: { squaresComplete: boolean } = appState.gameState;
     const { bombPositions }: { bombPositions: string[] } = appState.gameState;
-    console.log("logging", bombs, squaresComplete, bombPositions.length)
     if (bombs && squaresComplete && !bombPositions.length) {
       const positionArray: string[] = [];
       assignSquaresAsBombs(positionArray, 0);
@@ -498,22 +499,13 @@ const App = (): JSX.Element => {
           });
         }
       });
-
-      appDispatch({
-        type: "SQUARES_PRUNED",
-        payload: {
-          squaresPruned: true,
-        },
-      });
-    } else if (initialized && !gameReset) {
-      // First game skips pruning step
-      appDispatch({
-        type: "SQUARES_PRUNED",
-        payload: {
-          squaresPruned: true,
-        },
-      });
     }
+    appDispatch({
+      type: "SQUARES_PRUNED",
+      payload: {
+        squaresPruned: true,
+      },
+    });
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [appState.gameState.initialized, appState.gameState.gameReset]);
 
@@ -589,6 +581,7 @@ const App = (): JSX.Element => {
     appDispatch({
       type: "GAME_INIT",
       payload: {
+        optionsSet: true,
         progress: 0,
         options: {
           size: obj.size,

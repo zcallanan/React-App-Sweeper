@@ -25,6 +25,7 @@ export type AppState = {
 
 // GameState data
 export type GameState = {
+  optionsSet: boolean;
   initialized: boolean;
   clickHistory: string[];
   bombPositions: string[];
@@ -125,6 +126,7 @@ export type KeyMessage = {
 ************************************ */
 
 type GameInit = {
+  optionsSet: boolean;
   progress: number;
   options: SizeDifficultyLives;
   currentLives: number;
