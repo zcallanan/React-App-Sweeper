@@ -38,6 +38,7 @@ const squareInit: SquareDataType = {
 
 const appInit: AppState = {
   gameState: {
+    optionsSet: false,
     initialized: false, // Prevents calling initSquares during a game
     clickHistory: [], // Every square revealed during a game
     bombPositions: [], // Where bombs are hidden

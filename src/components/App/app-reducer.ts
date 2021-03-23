@@ -8,6 +8,7 @@ const appReducer = (state: typeof appInit, action: AppAction): AppState => {
         ...state,
         gameState: {
           ...state.gameState,
+          optionsSet: action.payload.optionsSet,
           progress: action.payload.progress,
           options: {
             size: action.payload.options.size,
