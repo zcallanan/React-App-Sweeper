@@ -41,6 +41,14 @@ const appReducer = (state: typeof appInit, action: AppAction): AppState => {
           newGame: action.payload.newGame,
         },
       };
+    case "LAST_CLICKED":
+      return {
+        ...state,
+        gameState: {
+          ...state.gameState,
+          lastClicked: action.payload.lastClicked,
+        },
+      };
     case "GAMESTATE_SET_PROGRESS":
       return {
         ...state,
@@ -139,6 +147,7 @@ const appReducer = (state: typeof appInit, action: AppAction): AppState => {
           ...state.gameState,
           clickHistory: action.payload.clickHistory,
           bombPositions: action.payload.bombPositions,
+          lastClicked: action.payload.lastClicked,
           squaresComplete: action.payload.squaresComplete,
           squaresPruned: action.payload.squaresPruned,
           bombPositionsAssigned: action.payload.bombPositionsAssigned,

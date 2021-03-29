@@ -27,6 +27,7 @@ export type AppState = {
 export type GameState = {
   optionsSet: boolean;
   initialized: boolean;
+  lastClicked: string;
   clickHistory: string[];
   bombPositions: string[];
   gameReset: boolean;
@@ -138,6 +139,7 @@ type GameResetCleanup = {
   bombs: number;
   clickHistory: string[];
   bombPositions: string[];
+  lastClicked: string;
   bombPositionsAssigned: boolean;
   squaresComplete: boolean;
   squaresPruned: boolean;
@@ -304,6 +306,10 @@ type SquaresPruned = {
   squaresPruned: boolean;
 };
 
+type LastClicked = {
+  lastClicked: string;
+};
+
 /* ***********************************
   Component Payload Types (Reducers)
 *********************************** */
@@ -335,6 +341,7 @@ export type AppAction =
   | { type: "GAME_RESET"; payload: GameReset }
   | { type: "GAME_RESET_CLEANUP"; payload: GameResetCleanup }
   | { type: "SQUARES_INITIALIZED"; payload: Initialized }
+  | { type: "LAST_CLICKED"; payload: LastClicked }
   | { type: "GAMESTATE_SET_PROGRESS"; payload: Progress }
   | { type: "MODES_GAMEBOARD_DRAWING"; payload: Drawing }
   | { type: "SET_FLAG_QUESTION"; payload: ModeToggle }

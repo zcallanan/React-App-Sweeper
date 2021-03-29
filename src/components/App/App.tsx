@@ -30,7 +30,8 @@ const App = (): JSX.Element => {
   const needsNeighbors = React.useCallback(
     // Generate an array of squares that need neighbors populated
     (clickedSquare: string): string[] => {
-      const { squares }: { squares: SquaresType } = appState;
+      // eslint-disable-next-line prefer-destructuring
+      const squares: SquaresType = appState.squares;
       const squaresArray = Object.keys(squares);
       const result: string[] = [];
       if (squaresArray.length > 1) {
@@ -53,7 +54,8 @@ const App = (): JSX.Element => {
 
   const populateNeighbors = React.useCallback((squareKey: string): void => {
     // Populate neighbors property for a square
-    const { squares }: { squares: SquaresType } = appState;
+    // eslint-disable-next-line prefer-destructuring
+    const squares: SquaresType = appState.squares;
     const { size }: { size: number } = appState.gameState.options;
     const row = Number(squareKey.split("-")[0].match(/\d{1,3}/)[0]);
     const column = Number(
@@ -110,7 +112,8 @@ const App = (): JSX.Element => {
 
   React.useEffect((): void => {
     // Generates neighbors and adjacentBombCount for all squares
-    const { squares }: { squares: SquaresType } = appState;
+    // eslint-disable-next-line prefer-destructuring
+    const squares: SquaresType = appState.squares;
     const squaresArray: string[] = Object.keys(squares);
     const { clickHistory }: { clickHistory: string[] } = appState.gameState;
     if (squaresArray.length > 1) {
@@ -125,7 +128,7 @@ const App = (): JSX.Element => {
         });
       });
     }
-  }, [needsNeighbors, appState, populateNeighbors]);
+  }, [needsNeighbors, appState.squares, populateNeighbors, appState.gameState]);
 
   /* ---------------------------------------------------------------
     Calculate gameStats number of squares revealed (win condition)
@@ -187,7 +190,8 @@ const App = (): JSX.Element => {
 
   const needsToBeClicked = React.useCallback((): string[] => {
     // Returns array of square key strings to be clicked
-    const { squares }: { squares: SquaresType } = appState;
+    // eslint-disable-next-line prefer-destructuring
+    const squares: SquaresType = appState.squares;
     const squaresArray = Object.keys(squares);
     const result: string[] = [];
     if (squaresArray.length > 1) {
@@ -201,7 +205,7 @@ const App = (): JSX.Element => {
       }
     }
     return result;
-  }, [appState]);
+  }, [appState.squares]);
 
   React.useEffect((): void => {
     /* If a neighbor has no adjacent bombs, hasn't been clicked or
@@ -236,7 +240,8 @@ const App = (): JSX.Element => {
 
   const needsHint = React.useCallback((): string[] => {
     // Returns array of square key strings to be marked as hints
-    const { squares }: { squares: SquaresType } = appState;
+    // eslint-disable-next-line prefer-destructuring
+    const squares: SquaresType = appState.squares;
     const squaresArray = Object.keys(squares);
     const result: string[] = [];
     if (squaresArray.length > 1) {
@@ -250,7 +255,7 @@ const App = (): JSX.Element => {
       }
     }
     return result;
-  }, [appState]);
+  }, [appState.squares]);
 
   React.useEffect((): void => {
     /* If a neighbor has an adjacent bomb, hasn't been clicked or
@@ -398,8 +403,7 @@ const App = (): JSX.Element => {
   }, [appState.gameState.options, appState.gameStats]);
 
   React.useEffect((): void => {
-    /* If a neighbor has an adjacent bomb, hasn't been clicked or
-      had its hint revealed, then reveal its hint */
+    /* Assign bomb value to squares */
     const { bombs }: { bombs: number } = appState.gameStats;
     const { squaresComplete }: { squaresComplete: boolean } = appState.gameState;
     const { bombPositions }: { bombPositions: string[] } = appState.gameState;
@@ -418,7 +422,7 @@ const App = (): JSX.Element => {
   ------------------------ */
 
   React.useEffect((): void => {
-    // Once bombs assigned, if the game was reset by the form, mark as false
+    /* Once bombs assigned, if the game was reset by the form, mark as false */
     const { gameReset }: { gameReset: boolean } = appState.gameState;
     if (gameReset) {
       appDispatch({
@@ -441,9 +445,7 @@ const App = (): JSX.Element => {
   --------------------------------------- */
 
   React.useEffect((): void => {
-    /* If a neighbor has an adjacent bomb, hasn't been clicked or
-    had its hint revealed, then reveal its hint */
-    // Form submit triggers cleanup
+    /* Reset values following Form submit -> game reset */
     appDispatch({
       type: "GAME_RESET_CLEANUP",
       payload: {
@@ -451,6 +453,7 @@ const App = (): JSX.Element => {
         bombs: -1,
         clickHistory: [],
         bombPositions: [],
+        lastClicked: "",
         bombPositionsAssigned: false,
         squaresComplete: false,
         squaresPruned: false,
@@ -473,6 +476,97 @@ const App = (): JSX.Element => {
       },
     });
   }, [appState.gameState.gameReset]);
+
+  /* -----------------------------------------
+    Mark square as flagged or questionMarked
+  ----------------------------------------- */
+
+  React.useEffect(() => {
+    const { flagMode }: { flagMode: boolean } = appState.modes;
+    const { questionMode }: { questionMode: boolean } = appState.modes;
+    // eslint-disable-next-line prefer-destructuring
+    let flags: number = appState.gameStats.flags;
+    // eslint-disable-next-line prefer-destructuring
+    let questions: number = appState.gameStats.questions;
+    // eslint-disable-next-line prefer-destructuring
+    const lastClicked: string = appState.gameState.lastClicked;
+    // eslint-disable-next-line prefer-destructuring
+    const squares: SquaresType = appState.squares;
+    let flagged: boolean;
+    let questionMarked;
+
+    if (flagMode && lastClicked !== "") {
+      // If marking a flag is active, then mark only that square and then save to state
+      flagged = !squares[lastClicked].flagged;
+      if (flagged) {
+        // If a flag is placed, increment the flag count
+        flags += 1;
+      } else {
+        // If a flag is removed, decrement the flag count
+        flags -= 1;
+      }
+      appDispatch({
+        type: "FLAGGED_FLAG_COUNT",
+        key: lastClicked,
+        payload: {
+          flags,
+          flagged,
+        },
+      });
+      if (squares[lastClicked].questionMarked) {
+        // If the square is question marked when placing a flag, remove questionMarked
+        questionMarked = !squares[lastClicked].questionMarked;
+        appDispatch({
+          type: "QUESTIONMARKED",
+          key: lastClicked,
+          payload: {
+            questionMarked,
+          },
+        });
+      }
+    } else if (questionMode && lastClicked !== "") {
+      /* If placing a question mark is active, then mark only that square
+      and then save to state */
+      questionMarked = !squares[lastClicked].questionMarked;
+      if (questionMarked) {
+        // If a question mark is placed, increment the question mark count
+        questions += 1;
+      } else {
+        // If a question mark is removed, decrement the question mark count
+        questions -= 1;
+      }
+      appDispatch({
+        type: "QUESTIONMARKED_QS_COUNT",
+        key: lastClicked,
+        payload: {
+          questions,
+          questionMarked,
+        },
+      });
+      if (squares[lastClicked].flagged) {
+        // If the square is flagged when placing a question mark, unflag it
+        flagged = !squares[lastClicked].flagged;
+        appDispatch({
+          type: "FLAGGED",
+          key: lastClicked,
+          payload: {
+            flagged,
+          },
+        });
+      }
+    }
+    appDispatch({
+      type: "LAST_CLICKED",
+      payload: {
+        lastClicked: "",
+      },
+    });
+  }, [
+    appState.modes,
+    appState.gameState.lastClicked,
+    appState.gameStats.flags,
+    appState.gameStats.questions,
+    appState.squares]);
 
   /* -------------------------------------------------------------------
     Prune excess square properties when game board shrinks after reset
@@ -565,7 +659,7 @@ const App = (): JSX.Element => {
   **************** */
 
   const toggleScroll = (bool: boolean, anim: string): void => {
-    // Prop for squares to update squareScroll state
+    /* Prop for squares to update squareScroll state */
     appDispatch({
       type: "FORM_TOGGLE_SQUARESCROLL",
       payload: {
@@ -575,7 +669,7 @@ const App = (): JSX.Element => {
   };
 
   const saveOptions = (obj: SizeDifficultyLives): void => {
-    // User submits form: Save Player's game board options
+    /* User submits form: Save Player's game board options */
     toggleScroll(true, "squareScroll");
     // Apply submitted data to state
     appDispatch({
@@ -603,7 +697,7 @@ const App = (): JSX.Element => {
   };
 
   const updateTotalToReveal = (totalToReveal: number): void => {
-    // Prop for stats to pass to global state
+    /* Prop for stats to pass to global state */
     const totalToRevealState: number = appState.gameStats.totalToReveal;
     if (
       (totalToReveal > 0 && totalToRevealState <= 0)
@@ -618,8 +712,8 @@ const App = (): JSX.Element => {
     }
   };
 
-  // Prop to toggle state when mode buttons are clicked (flag, question mark)
   const onModeClick = (e: React.FormEvent<HTMLFormElement>): void => {
+    /* Prop to toggle state when mode buttons are clicked (flag, question mark) */
     e.preventDefault();
     // 1. From State
     const { modes }: { modes: ModesType } = appState;
@@ -650,6 +744,7 @@ const App = (): JSX.Element => {
   };
 
   const modalShow = () => {
+    /* Modal component toggle to reveal modal */
     let { isVisible }: { isVisible: boolean } = appState.modal;
     if (!isVisible) {
       isVisible = true;
@@ -663,9 +758,9 @@ const App = (): JSX.Element => {
     return isVisible;
   };
 
-  /* Cleanup bombMode, resetting bomb square, reset bombNotice,
-  and remove disabled from clickable squares */
   const explodeCleanup = (squareKey: string): void => {
+    /* Cleanup bombMode, resetting bomb square, reset bombNotice,
+      and remove disabled from clickable squares */
     appDispatch({
       type: "SQUARES_NOTICES_CLEANUP",
       key: squareKey,
@@ -736,8 +831,8 @@ const App = (): JSX.Element => {
     }, 1000); // triggers bomb explosion enter anim
   };
 
-  // Prop for Square component when clicking on a bomb square
   const explode = (squareKey: string): void => {
+    /* Prop for Square component when clicking on a bomb square */
     console.log("explode");
     const { squares }: { squares: SquaresType } = appState;
     if (!squares[squareKey].explosion.explodeCleanup) {
@@ -783,8 +878,8 @@ const App = (): JSX.Element => {
     // 1. From state
     const { squares }: { squares: SquaresType } = appState;
     const { gameStats }: { gameStats: GameStats } = appState;
-    let { flags }: { flags: number } = gameStats;
-    let { questions }: { questions: number } = gameStats;
+    // let { flags }: { flags: number } = gameStats;
+    // let { questions }: { questions: number } = gameStats;
     const { revealed }: { revealed: number } = gameStats;
     const { totalToReveal }: { totalToReveal: number } = gameStats;
 
@@ -792,8 +887,8 @@ const App = (): JSX.Element => {
     const { bomb }: { bomb: boolean } = squares[squareKey];
     const { flagMode }: { flagMode: boolean } = modes;
     const { questionMode }: { questionMode: boolean } = modes;
-    let flagged: boolean;
-    let questionMarked;
+    // let flagged: boolean;
+    // let questionMarked;
 
     if (modes.newGame) {
       appDispatch({
@@ -803,69 +898,14 @@ const App = (): JSX.Element => {
         },
       });
     }
-
-    // 2. Update square
-    if (flagMode) {
-      // If marking a flag is active, then mark only that square and then save to state
-      flagged = !squares[squareKey].flagged;
-      if (flagged) {
-        // If a flag is placed, increment the flag count
-        flags += 1;
-      } else {
-        // If a flag is removed, decrement the flag count
-        flags -= 1;
-      }
+    if (flagMode || questionMode) {
       appDispatch({
-        type: "FLAGGED_FLAG_COUNT",
-        key: squareKey,
+        type: "LAST_CLICKED",
         payload: {
-          flags,
-          flagged,
+          lastClicked: squareKey,
         },
       });
-      if (squares[squareKey].questionMarked) {
-        // If the square is question marked when placing a flag, remove questionMarked
-        questionMarked = !squares[squareKey].questionMarked;
-        appDispatch({
-          type: "QUESTIONMARKED",
-          key: squareKey,
-          payload: {
-            questionMarked,
-          },
-        });
-      }
-    } else if (questionMode) {
-      /* If placing a question mark is active, then mark only that square
-      and then save to state */
-      questionMarked = !squares[squareKey].questionMarked;
-      if (questionMarked) {
-        // If a question mark is placed, increment the question mark count
-        questions += 1;
-      } else {
-        // If a question mark is removed, decrement the question mark count
-        questions -= 1;
-      }
-      appDispatch({
-        type: "QUESTIONMARKED_QS_COUNT",
-        key: squareKey,
-        payload: {
-          questions,
-          questionMarked,
-        },
-      });
-      if (squares[squareKey].flagged) {
-        // If the square is flagged when placing a question mark, unflag it
-        flagged = !squares[squareKey].flagged;
-        appDispatch({
-          type: "FLAGGED",
-          key: squareKey,
-          payload: {
-            flagged,
-          },
-        });
-      }
     } else {
-      // Mark as clicked and evaluate whether it's a bomb
       appDispatch({
         type: "SQUARE_CLICKED",
         key: squareKey,
